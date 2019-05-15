@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class WorldController : MonoBehaviour {
 
@@ -25,6 +26,8 @@ public class WorldController : MonoBehaviour {
                 // Add a sprite renderer, but don't bother setting a sprite
                 // because all the tiles are empty right now.
                 tile_go.AddComponent<SpriteRenderer>();
+
+                tile_data.RegisterTileTypeChangedCallback( (tile) => { OnTileTypeChanged(tile, tile_go); } );
             }
         }
 
@@ -32,17 +35,9 @@ public class WorldController : MonoBehaviour {
 
 	}
 
-    float randomizeTileTimer = 2f;
-
 	// Update is called once per frame
 	void Update () {
-        randomizeTileTimer -= Time.deltaTime;
 
-        if (randomizeTileTimer < 0)
-        {
-            world.RandomizeTiles();
-            randomizeTileTimer = 2f;
-        }
 	}
 
     void OnTileTypeChanged(Tile tile_data, GameObject tile_go)

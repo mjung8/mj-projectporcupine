@@ -8,6 +8,8 @@ public class Tile {
 
 	TileType type = TileType.Empty;
 
+    Action<Tile> cbTileTypeChanged;
+
 	LooseObject looseObject;
 	InstalledObject installedObject;
 
@@ -41,8 +43,11 @@ public class Tile {
 
         set
         {
+            TileType oldType = type;
             type = value;
             // Call the callback and let things know we've changed
+            if (cbTileTypeChanged != null && oldType != type)
+                cbTileTypeChanged(this);
         }
     }
 
@@ -52,4 +57,13 @@ public class Tile {
 		this.y = y;
 	}
 
+    public void RegisterTileTypeChangedCallback(Action<Tile> callback)
+    {
+        cbTileTypeChanged += callback;
+    }
+
+    public void UnRegisterTileTypeChangedCallback(Action<Tile> callback)
+    {
+        cbTileTypeChanged -= callback;
+    }
 }
