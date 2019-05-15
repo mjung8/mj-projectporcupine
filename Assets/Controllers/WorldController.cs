@@ -4,8 +4,10 @@ using System;
 
 public class WorldController : MonoBehaviour {
 
+    // Simple way to handle current sprite
     public Sprite floorSprite;
 
+    // World and tile data
 	World world;
 
 	// Use this for initialization
@@ -18,7 +20,9 @@ public class WorldController : MonoBehaviour {
         {
             for (int y = 0; y < world.Height; y++)
             {
+                // Get the tile data
                 Tile tile_data = world.GetTileAt(x, y);
+                // Create a new GameObject and add to the scene
                 GameObject tile_go = new GameObject();
                 tile_go.name = "Tile_ " + x + "_" + y;
                 tile_go.transform.position = new Vector3(tile_data.X, tile_data.Y, 0);
@@ -27,10 +31,12 @@ public class WorldController : MonoBehaviour {
                 // because all the tiles are empty right now.
                 tile_go.AddComponent<SpriteRenderer>();
 
+                // Use a lambda to create anonymous function to 'wrap' the callback function
                 tile_data.RegisterTileTypeChangedCallback( (tile) => { OnTileTypeChanged(tile, tile_go); } );
             }
         }
 
+        // For testing
         world.RandomizeTiles(); 
 
 	}
@@ -40,6 +46,7 @@ public class WorldController : MonoBehaviour {
 
 	}
 
+    // Called automatically whenever a tile's type gets changed
     void OnTileTypeChanged(Tile tile_data, GameObject tile_go)
     {
         if (tile_data.Type == Tile.TileType.Floor)
