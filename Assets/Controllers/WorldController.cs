@@ -71,4 +71,17 @@ public class WorldController : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Gets the tile at the unity-space coordinates.
+    /// </summary>
+    /// <param name="coord">Unity world-space coordinates.</param>
+    /// <returns>The tile at the world coordinate.</returns>
+    public Tile GetTileAtWorldCoord(Vector3 coord)
+    {
+        int x = Mathf.FloorToInt(coord.x);
+        int y = Mathf.FloorToInt(coord.y);
+
+        return World.GetTileAt(x, y);
+    }
+
 }
