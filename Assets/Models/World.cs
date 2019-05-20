@@ -42,10 +42,10 @@ public class World {
             {
                 if(Random.Range(0, 2) == 0)
                 {
-                    tiles[x, y].Type = Tile.TileType.Empty;
+                    tiles[x, y].Type = TileType.Empty;
                 } else
                 {
-                    tiles[x, y].Type = Tile.TileType.Floor;
+                    tiles[x, y].Type = TileType.Floor;
                 }
             }
         }

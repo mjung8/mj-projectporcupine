@@ -2,12 +2,16 @@
 using System.Collections;
 using System;
 
-public class Tile {
+// TileType is  the base type of the tile. In some tile-based games, that might be
+// the terrain type. For us, we only need to differentiate between empty space
+// and floor (aka the station structure/scaffold). Walls/Doors/etc... will be
+// InstalledObjects sitting on top of the floor
+public enum TileType { Empty, Floor };
 
-    // TileType is base type of tile
-	public enum TileType { Empty, Floor };
+public class Tile
+{
 
-	private TileType _type = TileType.Empty;
+    private TileType _type = TileType.Empty;
     public TileType Type
     {
         get
@@ -26,13 +30,13 @@ public class Tile {
     }
 
     // LooseObject is like a stack of something
-	LooseObject looseObject;
+    LooseObject looseObject;
     // InstalledObject is a wall, door, furniture
-	InstalledObject installedObject;
+    InstalledObject installedObject;
 
     // Know the context in which this exists...
-	World world;
-	public int X { get; protected set; }
+    World world;
+    public int X { get; protected set; }
     public int Y { get; protected set; }
 
     // The function to callback any time the type changes
@@ -44,11 +48,12 @@ public class Tile {
     /// <param name="world">A World instance.</param>
     /// <param name="x">The x coordinate.</param>
     /// <param name="y">The y coordinate.</param>
-    public Tile( World world, int x, int y ) {
-		this.world = world;
-		this.X = x;
-		this.Y = y;
-	}
+    public Tile(World world, int x, int y)
+    {
+        this.world = world;
+        this.X = x;
+        this.Y = y;
+    }
 
     /// <summary>
     /// Register a function to be called back when the tile type changes.
@@ -58,12 +63,12 @@ public class Tile {
     {
         cbTileTypeChanged += callback;
     }
-    
+
     /// <summary>
     /// Unregister a callback.
     /// </summary>
     /// <param name="callback"></param>
-    public void UnRegisterTileTypeChangedCallback(Action<Tile> callback)
+    public void UnregisterTileTypeChangedCallback(Action<Tile> callback)
     {
         cbTileTypeChanged -= callback;
     }
