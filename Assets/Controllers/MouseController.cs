@@ -6,6 +6,7 @@ public class MouseController : MonoBehaviour
 {
     public GameObject circleCursorPrefab;
 
+    bool buildModeIsObjects = false;
     TileType buildModeTile = TileType.Floor;
 
     // The world-position of the mouse last frame.
@@ -31,7 +32,7 @@ public class MouseController : MonoBehaviour
         //UpdateCursor();
         UpdateDragging();
         UpdateCameraMovement();
-        
+
         // Save the mouse position from this frame
         lastFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         lastFramePosition.z = 0;
@@ -88,7 +89,7 @@ public class MouseController : MonoBehaviour
         }
 
         // Clean up old drag previews
-        while(dragPreviewGameObjects.Count > 0)
+        while (dragPreviewGameObjects.Count > 0)
         {
             GameObject go = dragPreviewGameObjects[0];
             dragPreviewGameObjects.RemoveAt(0);
@@ -109,7 +110,7 @@ public class MouseController : MonoBehaviour
                         // Display the building hint on top of this tile position
                         GameObject go = SimplePool.Spawn(circleCursorPrefab, new Vector3(x, y, 0), Quaternion.identity);
                         go.transform.SetParent(this.transform, true);
-                        dragPreviewGameObjects.Add(go);                        
+                        dragPreviewGameObjects.Add(go);
                     }
                 }
             }
@@ -124,9 +125,20 @@ public class MouseController : MonoBehaviour
                 for (int y = start_y; y <= end_y; y++)
                 {
                     Tile t = WorldController.Instance.World.GetTileAt(x, y);
+
                     if (t != null)
                     {
-                        t.Type = buildModeTile;
+                        if (buildModeIsObjects == true)
+                        {
+                            // Create the InstalledObject and assign it to the tile
+
+
+                            // FIXME: Right now, we're just going to assume walls
+                        } else
+                        {
+                            // We are in tile-changing mode
+                            t.Type = buildModeTile;
+                        }
                     }
                 }
             }
@@ -149,11 +161,20 @@ public class MouseController : MonoBehaviour
 
     public void SetMode_BuildFloor()
     {
+        buildModeIsObjects = false;
         buildModeTile = TileType.Floor;
     }
+
     public void SetMode_Bulldoze()
     {
+        buildModeIsObjects = false;
         buildModeTile = TileType.Empty;
+    }
+
+    public void SetMode_BuildWall()
+    {
+        // Wall is not a Tile. Wall is an InstalledObject that exists on top of a tile.
+        buildModeIsObjects = true;
     }
 
 }
