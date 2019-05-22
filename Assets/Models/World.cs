@@ -1,34 +1,57 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
-public class World {
+public class World
+{
 
     // A 2D arary to hold tile data
-	Tile[,] tiles;
+    Tile[,] tiles;
+
+    Dictionary<string, InstalledObject> installedObjectPrototypes;
+
     // The tile width of world.
-	public int Width { get; protected set; }
+    public int Width { get; protected set; }
     // The tile height of world.
-	public int Height { get; protected set; }
+    public int Height { get; protected set; }
 
     /// <summary>
     /// Initializes a new instance of the World class.
     /// </summary>
     /// <param name="width">Width in tiles.</param>
     /// <param name="height">Height in tiles.</param>
-	public World(int width = 100, int height = 100) {
-		Width = width;
-		Height = height;
+	public World(int width = 100, int height = 100)
+    {
+        Width = width;
+        Height = height;
 
-		tiles = new Tile[Width,Height];
+        tiles = new Tile[Width, Height];
 
-		for (int x = 0; x < Width; x++) {
-			for (int y = 0; y < Height; y++) {
-				tiles[x,y] = new Tile(this, x, y);
-			}
-		}
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                tiles[x, y] = new Tile(this, x, y);
+            }
+        }
 
-		Debug.Log ("World created with " + (Width*Height) + " tiles.");
-	}
+        Debug.Log("World created with " + (Width * Height) + " tiles.");
+
+        CreateInstalledObjectPrototypes();
+    }
+
+    void CreateInstalledObjectPrototypes()
+    {
+        installedObjectPrototypes = new Dictionary<string, InstalledObject>();
+
+        installedObjectPrototypes.Add("Wall",
+            InstalledObject.CreatePrototype(
+                                "Wall",
+                                0,  // Impassable
+                                1,  // Width
+                                1   // Height
+                            )
+        );
+    }
 
     /// <summary>
     /// A function for testing.
@@ -40,10 +63,11 @@ public class World {
         {
             for (int y = 0; y < Height; y++)
             {
-                if(Random.Range(0, 2) == 0)
+                if (Random.Range(0, 2) == 0)
                 {
                     tiles[x, y].Type = TileType.Empty;
-                } else
+                }
+                else
                 {
                     tiles[x, y].Type = TileType.Floor;
                 }
@@ -57,12 +81,14 @@ public class World {
     /// <param name="x">The x coordinate.</param>
     /// <param name="y">The y coordinate.</param>
     /// <returns>The Tile.</returns>
-	public Tile GetTileAt(int x, int y) {
-		if( x > Width || x < 0 || y > Height || y < 0) {
-			Debug.LogError("Tile ("+x+","+y+") is out of range.");
-			return null;
-		}
-		return tiles[x, y];
-	}
+	public Tile GetTileAt(int x, int y)
+    {
+        if (x > Width || x < 0 || y > Height || y < 0)
+        {
+            Debug.LogError("Tile (" + x + "," + y + ") is out of range.");
+            return null;
+        }
+        return tiles[x, y];
+    }
 
 }
