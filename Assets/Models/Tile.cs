@@ -32,7 +32,10 @@ public class Tile
     // LooseObject is like a stack of something
     LooseObject looseObject;
     // InstalledObject is a wall, door, furniture
-    InstalledObject installedObject;
+    public InstalledObject installedObject
+    {
+        get; protected set;
+    }
 
     // Know the context in which this exists...
     World world;

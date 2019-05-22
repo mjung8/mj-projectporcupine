@@ -51,7 +51,8 @@ public class World
                                 "Wall",
                                 0,  // Impassable
                                 1,  // Width
-                                1   // Height
+                                1,  // Height
+                                true    // Links to neighbours and "sort of" becomes part of a larger object
                             )
         );
     }
