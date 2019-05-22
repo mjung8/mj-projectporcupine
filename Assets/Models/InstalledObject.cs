@@ -1,14 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class InstalledObject
 {
     // Represents base tile of object -- but large objects will occupy
     // multiple tiles.
-    Tile tile;
+    public Tile tile {
+        get; protected set;
+    }
 
     // This will be queried by the visual system to know what sprite to render
-    string objectType;
+    public string objectType
+    {
+        get; protected set;
+    }
 
     // This is a multiplier. Value of 2 means move twice as slow (at half speed)
     // Tile type and other environmental effects (fire) may be combined.
@@ -18,6 +24,8 @@ public class InstalledObject
     // For example, a sofa might be 3x2 but graphics are only 3x1 (extra row for leg room)
     int width;
     int height;
+
+    Action<InstalledObject> cbOnChanged;
 
     // TODO: implement larger objects
     // TODO: implement object rotation
@@ -60,6 +68,16 @@ public class InstalledObject
         }
 
         return obj;
+    }
+
+    public void RegisterOnChangedCallback(Action<InstalledObject> callbackfunc)
+    {
+        cbOnChanged += callbackfunc;
+    }
+
+    public void UnregisterOnChangedCallback(Action<InstalledObject> callbackfunc)
+    {
+        cbOnChanged -= callbackfunc;
     }
 
 }
