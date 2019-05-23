@@ -5,7 +5,7 @@ using System;
 // TileType is  the base type of the tile. In some tile-based games, that might be
 // the terrain type. For us, we only need to differentiate between empty space
 // and floor (aka the station structure/scaffold). Walls/Doors/etc... will be
-// InstalledObjects sitting on top of the floor
+// furnitures sitting on top of the floor
 public enum TileType { Empty, Floor };
 
 public class Tile
@@ -30,15 +30,15 @@ public class Tile
     }
 
     // LooseObject is like a stack of something
-    LooseObject looseObject;
-    // InstalledObject is a wall, door, furniture
-    public InstalledObject installedObject
+    Inventory inventory;
+    // furniture is a wall, door, furniture
+    public Furniture furniture
     {
         get; protected set;
     }
 
     // Know the context in which this exists...
-    World world;
+    public World world { get; protected set; }
     public int X { get; protected set; }
     public int Y { get; protected set; }
 
@@ -76,25 +76,25 @@ public class Tile
         cbTileTypeChanged -= callback;
     }
 
-    public bool PlaceObject(InstalledObject objInstance)
+    public bool PlaceFurniture(Furniture objInstance)
     {
         if (objInstance == null)
         {
             // We are uninstalling whatever was here
-            installedObject = null;
+            furniture = null;
             return true;
         }
 
         // objInstance isn't null
 
-        if(installedObject != null)
+        if(furniture != null)
         {
-            Debug.LogError("Trying to assign an installed object to a tile that already has one!");
+            Debug.LogError("Trying to assign a furniture to a tile that already has one!");
             return false;
         }
 
         // At this point, everything's fine!
-        installedObject = objInstance;
+        furniture = objInstance;
         return true;
     }
 }
