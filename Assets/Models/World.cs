@@ -60,24 +60,24 @@ public class World
     /// <summary>
     /// A function for testing.
     /// </summary>
-    public void RandomizeTiles()
-    {
-        Debug.Log("RandomizeTiles");
-        for (int x = 0; x < Width; x++)
-        {
-            for (int y = 0; y < Height; y++)
-            {
-                if (UnityEngine.Random.Range(0, 2) == 0)
-                {
-                    tiles[x, y].Type = TileType.Empty;
-                }
-                else
-                {
-                    tiles[x, y].Type = TileType.Floor;
-                }
-            }
-        }
-    }
+    //public void RandomizeTiles()
+    //{
+    //    Debug.Log("RandomizeTiles");
+    //    for (int x = 0; x < Width; x++)
+    //    {
+    //        for (int y = 0; y < Height; y++)
+    //        {
+    //            if (UnityEngine.Random.Range(0, 2) == 0)
+    //            {
+    //                tiles[x, y].Type = TileType.Empty;
+    //            }
+    //            else
+    //            {
+    //                tiles[x, y].Type = TileType.Floor;
+    //            }
+    //        }
+    //    }
+    //}
 
     /// <summary>
     /// Get the tile data at x and y.
