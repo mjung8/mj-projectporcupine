@@ -24,8 +24,8 @@ public class Tile
             TileType oldType = _type;
             _type = value;
             // Call the callback and let things know we've changed
-            if (cbTileTypeChanged != null && oldType != _type)
-                cbTileTypeChanged(this);
+            if (cbTileChanged != null && oldType != _type)
+                cbTileChanged(this);
         }
     }
 
@@ -42,8 +42,8 @@ public class Tile
     public int X { get; protected set; }
     public int Y { get; protected set; }
 
-    // The function to callback any time the type changes
-    Action<Tile> cbTileTypeChanged;
+    // The function to callback any time the data changes
+    Action<Tile> cbTileChanged;
 
     /// <summary>
     /// Initialize a new instance of the Tile class.
@@ -64,7 +64,7 @@ public class Tile
     /// <param name="callback"></param>
     public void RegisterTileTypeChangedCallback(Action<Tile> callback)
     {
-        cbTileTypeChanged += callback;
+        cbTileChanged += callback;
     }
 
     /// <summary>
@@ -73,7 +73,7 @@ public class Tile
     /// <param name="callback"></param>
     public void UnregisterTileTypeChangedCallback(Action<Tile> callback)
     {
-        cbTileTypeChanged -= callback;
+        cbTileChanged -= callback;
     }
 
     public bool PlaceFurniture(Furniture objInstance)
