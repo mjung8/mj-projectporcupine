@@ -20,7 +20,8 @@ public class WorldController : MonoBehaviour {
 	public World World { get; protected set; }
 
 	// Use this for initialization
-	void Start () {
+    // OnEnable runs first
+	void OnEnable () {
 
         LoadSprites();
 
@@ -61,9 +62,11 @@ public class WorldController : MonoBehaviour {
 
                 // Register our callback so that or GameObjet gets updated whenever
                 // the tile's type changes
-                tile_data.RegisterTileTypeChangedCallback(OnTileTypeChanged);
+                //tile_data.RegisterTileTypeChangedCallback(OnTileTypeChanged);
             }
         }
+
+        World.RegisterTileChanged(OnTileChanged);
 
         // Center the camera
         Camera.main.transform.position = new Vector3(World.Width / 2, World.Height / 2, Camera.main.transform.position.z);
@@ -106,7 +109,7 @@ public class WorldController : MonoBehaviour {
             tileGameObjectMap.Remove(tile_data);
 
             // Unregister the callback!
-            tile_data.UnregisterTileTypeChangedCallback(OnTileTypeChanged);
+            tile_data.UnregisterTileTypeChangedCallback(OnTileChanged);
 
             // Destroy the visual GameObject
             Destroy(tile_go);
@@ -116,8 +119,8 @@ public class WorldController : MonoBehaviour {
         // function to build all the GameObject's for the tile on the new floor/level
     }
 
-    // Called automatically whenever a tile's type gets changed
-    void OnTileTypeChanged(Tile tile_data)
+    // Called automatically whenever a tile's data gets changed
+    void OnTileChanged(Tile tile_data)
     {
         if (tileGameObjectMap.ContainsKey(tile_data) == false)
         {
