@@ -9,6 +9,7 @@ public class WorldController : MonoBehaviour {
 
     // Simple way to handle current sprite
     public Sprite floorSprite;
+    public Sprite emptySprite;
 
     Dictionary<Tile, GameObject> tileGameObjectMap;
     Dictionary<Furniture, GameObject> furnitureGameObjectMap;
@@ -55,9 +56,8 @@ public class WorldController : MonoBehaviour {
                 tile_go.transform.position = new Vector3(tile_data.X, tile_data.Y, 0);
                 tile_go.transform.SetParent(this.transform, true);
 
-                // Add a sprite renderer, but don't bother setting a sprite
-                // because all the tiles are empty right now.
-                tile_go.AddComponent<SpriteRenderer>();
+                // Add a sprite renderer, add empty tile sprite
+                tile_go.AddComponent<SpriteRenderer>().sprite = emptySprite;
 
                 // Register our callback so that or GameObjet gets updated whenever
                 // the tile's type changes
@@ -65,8 +65,11 @@ public class WorldController : MonoBehaviour {
             }
         }
 
+        // Center the camera
+        Camera.main.transform.position = new Vector3(World.Width / 2, World.Height / 2, Camera.main.transform.position.z);
+
         // For testing
-        World.RandomizeTiles(); 
+        //World.RandomizeTiles(); 
 
 	}
 
