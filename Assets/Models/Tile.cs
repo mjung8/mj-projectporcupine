@@ -37,6 +37,8 @@ public class Tile
         get; protected set;
     }
 
+    public Job pendingFunitureJob;
+
     // Know the context in which this exists...
     public World world { get; protected set; }
     public int X { get; protected set; }

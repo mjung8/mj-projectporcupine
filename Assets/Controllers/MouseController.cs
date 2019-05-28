@@ -133,10 +133,36 @@ public class MouseController : MonoBehaviour
                         {
                             // Create the furniture and assign it to the tile
 
-                            // FIXME: Right now, we're just going to assume walls
-                            WorldController.Instance.World.PlaceFurniture(buildModeObjectType, t);
+                            // FIXME: This instantly builds furniture
+                            //WorldController.Instance.World.PlaceFurniture(buildModeObjectType, t);
 
-                        } else
+                            // Can we build the furniture in the selected tile?
+                            // Run the ValidPlacement function
+                            string furnitureType = buildModeObjectType;
+
+                            if (WorldController.Instance.World.IsFurniturePlacementValid(furnitureType, t)
+                                && t.pendingFunitureJob == null)
+                            {
+                                // This tile position is valid for this furniture
+                                // Create a job for it to be built
+                                Job j = new Job(t, (theJob) =>
+                                {
+                                    WorldController.Instance.World.PlaceFurniture(furnitureType, theJob.tile);
+                                    t.pendingFunitureJob = null;
+                                }
+                                );
+
+                                // not good to explicitly set stuff like this
+                                t.pendingFunitureJob = j;
+                                j.RegisterJobCompleteCallback((theJob) => theJob.tile.pendingFunitureJob = null);
+
+                                // Add the job to the queue
+                                WorldController.Instance.World.jobQueue.Enqueue(j);
+                                Debug.Log("Job Queue Size: " + WorldController.Instance.World.jobQueue.Count);
+                            }
+
+                        }
+                        else
                         {
                             // We are in tile-changing mode
                             t.Type = buildModeTile;
