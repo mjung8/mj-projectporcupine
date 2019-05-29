@@ -57,9 +57,9 @@ public class FurnitureSpriteController : MonoBehaviour {
 
         // FIXME: we assume the object must be a wall so use the hardcoded
         // reference to the wall sprite
-        furn_go.AddComponent<SpriteRenderer>().sprite = GetSpriteForFurniture(furn);
-        // Make sorting order in layer above tiles (builds have a bug where wall sprite is below tile sprite)
-        furn_go.GetComponent<SpriteRenderer>().sortingOrder = 1;
+        SpriteRenderer sr = furn_go.AddComponent<SpriteRenderer>();
+        sr.sprite = GetSpriteForFurniture(furn);
+        sr.sortingLayerName = "Furniture";
 
         // Register our callback so that or GameObject gets updated whenever
         // the object's info changes

@@ -7,6 +7,7 @@ public class World
 
     // A 2D arary to hold tile data
     Tile[,] tiles;
+    List<Character> characters;
 
     Dictionary<string, Furniture> furniturePrototypes;
 
@@ -16,6 +17,7 @@ public class World
     public int Height { get; protected set; }
 
     Action<Furniture> cbFurnitureCreated;
+    Action<Character> cbCharacterCreated;
     Action<Tile> cbTileChanged;
 
     // TODO: most likely replaced with dedicated class
@@ -47,6 +49,16 @@ public class World
         Debug.Log("World created with " + (Width * Height) + " tiles.");
 
         CreateFurniturePrototypes();
+
+        characters = new List<Character>();
+
+    }
+
+    public void CreateCharacter(Tile t)
+    {
+        Character c = new Character(t);
+        if (cbCharacterCreated != null)
+            cbCharacterCreated(c);
     }
 
     void CreateFurniturePrototypes()
@@ -134,6 +146,16 @@ public class World
     public void UnregisterFurnitureCreated(Action<Furniture> callbackfunc)
     {
         cbFurnitureCreated -= callbackfunc;
+    }
+
+    public void RegisterCharacterCreated(Action<Character> callbackfunc)
+    {
+        cbCharacterCreated += callbackfunc;
+    }
+
+    public void UnregisterCharacterCreated(Action<Character> callbackfunc)
+    {
+        cbCharacterCreated -= callbackfunc;
     }
 
     public void RegisterTileChanged(Action<Tile> callbackfunc)

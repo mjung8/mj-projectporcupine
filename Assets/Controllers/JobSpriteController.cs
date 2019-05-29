@@ -38,6 +38,7 @@ public class JobSpriteController : MonoBehaviour
         SpriteRenderer sr = job_go.AddComponent<SpriteRenderer>();
         sr.sprite = fsc.GetSpriteForFurniture(job.jobObjectType);
         sr.color = new Color(0.5f, 1f, 0.5f, 0.25f);
+        sr.sortingLayerName = "Jobs";
 
         // Make sorting order in layer above tiles (builds have a bug where wall sprite is below tile sprite)
         sr.sortingOrder = 1;

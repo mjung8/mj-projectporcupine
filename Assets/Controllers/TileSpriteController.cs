@@ -39,11 +39,10 @@ public class TileSpriteController : MonoBehaviour {
                 tile_go.transform.SetParent(this.transform, true);
 
                 // Add a sprite renderer, add empty tile sprite
-                tile_go.AddComponent<SpriteRenderer>().sprite = emptySprite;
+                SpriteRenderer sr = tile_go.AddComponent<SpriteRenderer>();
+                sr.sprite = emptySprite;
+                sr.sortingLayerName = "Tiles";
 
-                // Register our callback so that or GameObjet gets updated whenever
-                // the tile's type changes
-                //tile_data.RegisterTileTypeChangedCallback(OnTileTypeChanged);
             }
         }
 
