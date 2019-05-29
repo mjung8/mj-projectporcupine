@@ -19,7 +19,7 @@ public class World
     Action<Tile> cbTileChanged;
 
     // TODO: most likely replaced with dedicated class
-    public Queue<Job> jobQueue;
+    public JobQueue jobQueue;
 
     /// <summary>
     /// Initializes a new instance of the World class.
@@ -28,7 +28,7 @@ public class World
     /// <param name="height">Height in tiles.</param>
 	public World(int width = 100, int height = 100)
     {
-        jobQueue = new Queue<Job>();
+        jobQueue = new JobQueue();
 
         Width = width;
         Height = height;
@@ -158,4 +158,16 @@ public class World
     {
         return furniturePrototypes[furnitureType].IsValidPosition(t);
     }
+
+    public Furniture GetFurniturePrototype(string objectType)
+    {
+        if (furniturePrototypes.ContainsKey(objectType) == false)
+        {
+            Debug.LogError("No furniture with type: " + objectType);
+            return null;
+        }
+
+        return furniturePrototypes[objectType];
+    }
+
 }

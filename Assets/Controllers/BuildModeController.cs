@@ -50,7 +50,7 @@ public class BuildModeController : MonoBehaviour
             {
                 // This tile position is valid for this furniture
                 // Create a job for it to be built
-                Job j = new Job(t, (theJob) =>
+                Job j = new Job(t, furnitureType, (theJob) =>
                 {
                     WorldController.Instance.world.PlaceFurniture(furnitureType, theJob.tile);
                     t.pendingFunitureJob = null;
@@ -63,7 +63,6 @@ public class BuildModeController : MonoBehaviour
 
                 // Add the job to the queue
                 WorldController.Instance.world.jobQueue.Enqueue(j);
-                Debug.Log("Job Queue Size: " + WorldController.Instance.world.jobQueue.Count);
             }
 
         }

@@ -9,7 +9,7 @@ public class SoundController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         WorldController.Instance.world.RegisterFurnitureCreated(OnFurnitureCreated);
-        WorldController.Instance.world.RegisterTileChanged(OnTileTypeChanged);
+        WorldController.Instance.world.RegisterTileChanged(OnTileChanged);
     }
 	
 	// Update is called once per frame
@@ -17,7 +17,7 @@ public class SoundController : MonoBehaviour {
         soundCooldown -= Time.deltaTime;
 	}
 
-    void OnTileTypeChanged (Tile tile_data)
+    void OnTileChanged (Tile tile_data)
     {
         if (soundCooldown > 0)
             return;
