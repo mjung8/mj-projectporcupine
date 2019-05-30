@@ -103,21 +103,26 @@ public class Tile
     // Tells us if two tiles are adjaccent
     public bool IsNeighbour(Tile tile, bool diagOkay = false)
     {
-        if (this.X == tile.X && (this.Y == tile.Y + 1 || this.Y == tile.Y - 1))
-            return true;
+        return
+            Mathf.Abs(this.X - tile.X) + Mathf.Abs(this.Y - tile.Y) == 1 ||
+            (diagOkay && (Mathf.Abs(this.X - tile.X) == 1 && Mathf.Abs(this.Y - tile.Y) == 1));
 
-        if (this.Y == tile.Y && (this.X == tile.X + 1 || this.X == tile.X - 1))
-            return true;
+        //// Same column X, check Y difference
+        //if (this.X == tile.X && (this.Y == tile.Y + 1 || this.Y == tile.Y - 1))
+        //    return true;
+        //// Same row Y, check X difference
+        //if (this.Y == tile.Y && (this.X == tile.X + 1 || this.X == tile.X - 1))
+        //    return true;
 
-        if (diagOkay)
-        {
-            if (this.X == tile.X + 1 && (this.Y == tile.Y + 1 || this.X == tile.X - 1))
-                return true;
-            if (this.X == tile.X - 1 && (this.Y == tile.Y + 1 || this.X == tile.X - 1))
-                return true;
-        }
+        //if (diagOkay)
+        //{
+        //    if (this.X == tile.X + 1 && (this.Y == tile.Y + 1 || this.X == tile.X - 1))
+        //        return true;
+        //    if (this.X == tile.X - 1 && (this.Y == tile.Y + 1 || this.X == tile.X - 1))
+        //        return true;
+        //}
 
-        return false;
+        //return false;
     }
 
 }

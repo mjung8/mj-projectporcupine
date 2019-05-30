@@ -47,7 +47,7 @@ public class Character
             // Grab a new job
             myJob = currTile.world.jobQueue.Dequeue();
 
-            if(myJob != null)
+            if (myJob != null)
             {
                 // We have job
                 destTile = myJob.tile;
@@ -59,7 +59,7 @@ public class Character
         // Are we there
         if (currTile == destTile)
         {
-            if(myJob != null)
+            if (myJob != null)
             {
                 myJob.DoWork(deltaTime);
             }
@@ -68,7 +68,11 @@ public class Character
         }
 
         // Total distance between A and B
-        float distToTravel = Mathf.Sqrt(Mathf.Pow(currTile.X - destTile.X, 2) + Mathf.Pow(currTile.Y - destTile.Y, 2));
+        // Euclidean distance for now; for pathfinding change to Manhattan or something else
+        float distToTravel = Mathf.Sqrt(
+            Mathf.Pow(currTile.X - destTile.X, 2) +
+            Mathf.Pow(currTile.Y - destTile.Y, 2)
+        );
 
         // How much distance can be travelled this Update
         float distThisFrame = speed * deltaTime;
