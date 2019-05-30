@@ -90,27 +90,31 @@ public class World
         );
     }
 
-    /// <summary>
-    /// A function for testing.
-    /// </summary>
-    //public void RandomizeTiles()
-    //{
-    //    Debug.Log("RandomizeTiles");
-    //    for (int x = 0; x < Width; x++)
-    //    {
-    //        for (int y = 0; y < Height; y++)
-    //        {
-    //            if (UnityEngine.Random.Range(0, 2) == 0)
-    //            {
-    //                tiles[x, y].Type = TileType.Empty;
-    //            }
-    //            else
-    //            {
-    //                tiles[x, y].Type = TileType.Floor;
-    //            }
-    //        }
-    //    }
-    //}
+    public void SetupPathfindingExample()
+    {
+        Debug.Log("SetupPathfindingExample");
+
+        // Make a set of floor/walls to test pathfinding with
+
+        int l = Width / 2 - 5;
+        int b = Height / 2 - 5;
+
+        for (int x = l - 5; x < l + 15; x++)
+        {
+            for (int y = b -5; y < b + 15; y++)
+            {
+                tiles[x, y].Type = TileType.Floor;
+
+                if (x == l || x == (l + 9) || y ==b || y == (b + 9))
+                {
+                    if(x != (l + 9) && y != (b + 4))
+                    {
+                        PlaceFurniture("Wall", tiles[x, y]);
+                    }
+                }
+            }
+        }
+    }
 
     /// <summary>
     /// Get the tile data at x and y.
