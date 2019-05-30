@@ -37,6 +37,8 @@ public class Tile
         get; protected set;
     }
 
+    public Job pendingFunitureJob;
+
     // Know the context in which this exists...
     public World world { get; protected set; }
     public int X { get; protected set; }
@@ -87,7 +89,7 @@ public class Tile
 
         // objInstance isn't null
 
-        if(furniture != null)
+        if (furniture != null)
         {
             Debug.LogError("Trying to assign a furniture to a tile that already has one!");
             return false;
@@ -97,4 +99,25 @@ public class Tile
         furniture = objInstance;
         return true;
     }
+
+    // Tells us if two tiles are adjaccent
+    public bool IsNeighbour(Tile tile, bool diagOkay = false)
+    {
+        if (this.X == tile.X && (this.Y == tile.Y + 1 || this.Y == tile.Y - 1))
+            return true;
+
+        if (this.Y == tile.Y && (this.X == tile.X + 1 || this.X == tile.X - 1))
+            return true;
+
+        if (diagOkay)
+        {
+            if (this.X == tile.X + 1 && (this.Y == tile.Y + 1 || this.X == tile.X - 1))
+                return true;
+            if (this.X == tile.X - 1 && (this.Y == tile.Y + 1 || this.X == tile.X - 1))
+                return true;
+        }
+
+        return false;
+    }
+
 }

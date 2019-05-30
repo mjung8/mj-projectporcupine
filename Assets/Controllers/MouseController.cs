@@ -6,10 +6,6 @@ public class MouseController : MonoBehaviour
 {
     public GameObject circleCursorPrefab;
 
-    bool buildModeIsObjects = false;
-    TileType buildModeTile = TileType.Floor;
-    string buildModeObjectType;
-
     // The world-position of the mouse last frame.
     Vector3 lastFramePosition;
     Vector3 currentFramePosition;
@@ -38,23 +34,6 @@ public class MouseController : MonoBehaviour
         lastFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         lastFramePosition.z = 0;
     }
-
-    //void UpdateCursor()
-    //{
-    //    // Update the circle cursor position
-    //    Tile tileUnderMouse = WorldController.Instance.GetTileAtWorldCoord(currentFramePosition);
-    //    if (tileUnderMouse != null)
-    //    {
-    //        circleCursor.SetActive(true);
-    //        Vector3 cursorPosition = new Vector3(tileUnderMouse.X, tileUnderMouse.Y, 0);
-    //        circleCursor.transform.position = cursorPosition;
-    //    }
-    //    else
-    //    {
-    //        // Mouse is outside of the world space, so hide the cursor.
-    //        circleCursor.SetActive(false);
-    //    }
-    //}
 
     void UpdateDragging()
     {
@@ -105,7 +84,7 @@ public class MouseController : MonoBehaviour
             {
                 for (int y = start_y; y <= end_y; y++)
                 {
-                    Tile t = WorldController.Instance.World.GetTileAt(x, y);
+                    Tile t = WorldController.Instance.world.GetTileAt(x, y);
                     if (t != null)
                     {
                         // Display the building hint on top of this tile position
@@ -120,27 +99,18 @@ public class MouseController : MonoBehaviour
         // End Drag
         if (Input.GetMouseButtonUp(0))
         {
+            BuildModeController bmc = GameObject.FindObjectOfType<BuildModeController>();
             // Loop through all tiles.
             for (int x = start_x; x <= end_x; x++)
             {
                 for (int y = start_y; y <= end_y; y++)
                 {
-                    Tile t = WorldController.Instance.World.GetTileAt(x, y);
+                    Tile t = WorldController.Instance.world.GetTileAt(x, y);
 
                     if (t != null)
                     {
-                        if (buildModeIsObjects == true)
-                        {
-                            // Create the furniture and assign it to the tile
-
-                            // FIXME: Right now, we're just going to assume walls
-                            WorldController.Instance.World.PlaceFurniture(buildModeObjectType, t);
-
-                        } else
-                        {
-                            // We are in tile-changing mode
-                            t.Type = buildModeTile;
-                        }
+                        // Call BuildModeController::DoBuild
+                        bmc.DoBuild(t);
                     }
                 }
             }
@@ -159,25 +129,6 @@ public class MouseController : MonoBehaviour
         Camera.main.orthographicSize -= Camera.main.orthographicSize * Input.GetAxis("Mouse ScrollWheel");
 
         Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, 3f, 25f);
-    }
-
-    public void SetMode_BuildFloor()
-    {
-        buildModeIsObjects = false;
-        buildModeTile = TileType.Floor;
-    }
-
-    public void SetMode_Bulldoze()
-    {
-        buildModeIsObjects = false;
-        buildModeTile = TileType.Empty;
-    }
-
-    public void SetMode_BuildFurniture(string objectType)
-    {
-        // Wall is not a Tile. Wall is an furniture that exists on top of a tile.
-        buildModeIsObjects = true;
-        buildModeObjectType = objectType;
     }
 
 }
