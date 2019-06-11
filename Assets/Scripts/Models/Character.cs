@@ -86,6 +86,9 @@ public class Character
         if (movementPercentage >= 1)
         {
             // Reached destination
+
+            // TODO: get the next tile from pathfinding system
+
             currTile = destTile;
             movementPercentage = 0;
 

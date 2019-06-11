@@ -37,14 +37,41 @@ public class Path_TileGraph {
             }
         }
 
+        Debug.Log("Path_TileGraph: Created " + nodes.Count + " nodes.");
+
         // Now loop through all nodes again
         // Create edges for neighbours
 
+        int edgeCount = 0;
+
         foreach(Tile t in nodes.Keys)
         {
+            Path_Node<Tile> n = nodes[t];
+
+            List<Path_Edge<Tile>> edges = new List<Path_Edge<Tile>>();
+
             // Get a lis tof neighbours for the tile
+            Tile[] neighbours = t.GetNeighbours(true);  // Note: some array spots could be null
+
             // If neighbour is walkable, create an edge to the relevant node.
+            for (int i = 0; i < neighbours.Length; i++)
+            {
+                if (neighbours[i] != null && neighbours[i].movementCost > 0)
+                {
+                    // Neighbour exists and is walkable, create an edge
+                    Path_Edge<Tile> e = new Path_Edge<Tile>();
+                    e.cost = neighbours[i].movementCost;
+                    e.node = nodes[neighbours[i]];
+                    edges.Add(e);
+
+                    edgeCount++;
+                }
+            }
+
+            n.edges = edges.ToArray();
         }
+
+        Debug.Log("Path_TileGraph: Created " + edgeCount + " edges.");
     }
 
 }
