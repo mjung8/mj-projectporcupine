@@ -38,17 +38,15 @@ public class CharacterSpriteController : MonoBehaviour
         characterSprites = new Dictionary<string, Sprite>();
         Sprite[] sprites = Resources.LoadAll<Sprite>("Images/Characters/");
 
-        Debug.Log("LOADED RESOURCE: ");
         foreach (Sprite s in sprites)
         {
-            Debug.Log(s);
             characterSprites[s.name] = s;
         }
     }
 
     public void OnCharacterCreated(Character c)
     {
-        //Debug.Log("OnfurnitureCreated");
+        Debug.Log("OnCharacterCreated");
         // Create a visual GameObject linked to this data
 
         // FIXME: does not consider multi-tile objects nor rotated objects

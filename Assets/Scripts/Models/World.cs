@@ -9,6 +9,9 @@ public class World
     Tile[,] tiles;
     List<Character> characters;
 
+    // The pathfinding graph used to navigate the world
+    public Path_TileGraph tileGraph;
+
     Dictionary<string, Furniture> furniturePrototypes;
 
     // The tile width of world.
@@ -90,27 +93,31 @@ public class World
         );
     }
 
-    /// <summary>
-    /// A function for testing.
-    /// </summary>
-    //public void RandomizeTiles()
-    //{
-    //    Debug.Log("RandomizeTiles");
-    //    for (int x = 0; x < Width; x++)
-    //    {
-    //        for (int y = 0; y < Height; y++)
-    //        {
-    //            if (UnityEngine.Random.Range(0, 2) == 0)
-    //            {
-    //                tiles[x, y].Type = TileType.Empty;
-    //            }
-    //            else
-    //            {
-    //                tiles[x, y].Type = TileType.Floor;
-    //            }
-    //        }
-    //    }
-    //}
+    public void SetupPathfindingExample()
+    {
+        Debug.Log("SetupPathfindingExample");
+
+        // Make a set of floor/walls to test pathfinding with
+
+        int l = Width / 2 - 5;
+        int b = Height / 2 - 5;
+
+        for (int x = l - 5; x < l + 15; x++)
+        {
+            for (int y = b -5; y < b + 15; y++)
+            {
+                tiles[x, y].Type = TileType.Floor;
+
+                if (x == l || x == (l + 9) || y ==b || y == (b + 9))
+                {
+                    if(x != (l + 9) && y != (b + 4))
+                    {
+                        PlaceFurniture("Wall", tiles[x, y]);
+                    }
+                }
+            }
+        }
+    }
 
     /// <summary>
     /// Get the tile data at x and y.
@@ -120,9 +127,9 @@ public class World
     /// <returns>The Tile.</returns>
 	public Tile GetTileAt(int x, int y)
     {
-        if (x > Width || x < 0 || y > Height || y < 0)
+        if (x >= Width || x < 0 || y >= Height || y < 0)
         {
-            Debug.LogError("Tile (" + x + "," + y + ") is out of range.");
+            //Debug.LogError("Tile (" + x + "," + y + ") is out of range.");
             return null;
         }
         return tiles[x, y];
@@ -148,6 +155,7 @@ public class World
         if (cbFurnitureCreated != null)
         {
             cbFurnitureCreated(obj);
+            InvalidateTileGraph();
         }
 
     }
@@ -182,12 +190,22 @@ public class World
         cbTileChanged -= callbackfunc;
     }
 
+    // Gets called when any tile changes
     void OnTileChanged(Tile t)
     {
         if (cbTileChanged == null)
             return;
 
         cbTileChanged(t);
+
+        InvalidateTileGraph();
+    }
+
+    // This should be called whenever a change to the world
+    // means that our old pathfinding info is invalid.
+    public void InvalidateTileGraph()
+    {
+        tileGraph = null;
     }
 
     public bool IsFurniturePlacementValid(string furnitureType, Tile t)

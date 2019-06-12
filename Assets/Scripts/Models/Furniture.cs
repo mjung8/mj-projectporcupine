@@ -19,7 +19,7 @@ public class Furniture
     // This is a multiplier. Value of 2 means move twice as slow (at half speed)
     // Tile type and other environmental effects (fire) may be combined.
     // SPECIAL: If movementCost = 0 then the tile is impassible (e.g. a wall).
-    float movementCost;
+    public float movementCost { get; protected set; }
 
     // For example, a sofa might be 3x2 but graphics are only 3x1 (extra row for leg room)
     int width;

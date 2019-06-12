@@ -30,10 +30,8 @@ public class FurnitureSpriteController : MonoBehaviour {
         furnitureSprites = new Dictionary<string, Sprite>();
         Sprite[] sprites = Resources.LoadAll<Sprite>("Images/Furniture/");
 
-        Debug.Log("LOADED RESOURCE: ");
         foreach (Sprite s in sprites)
         {
-            Debug.Log(s);
             furnitureSprites[s.name] = s;
         }
     }
