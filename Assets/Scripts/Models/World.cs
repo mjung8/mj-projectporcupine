@@ -127,9 +127,9 @@ public class World
     /// <returns>The Tile.</returns>
 	public Tile GetTileAt(int x, int y)
     {
-        if (x > Width || x < 0 || y > Height || y < 0)
+        if (x >= Width || x < 0 || y >= Height || y < 0)
         {
-            Debug.LogError("Tile (" + x + "," + y + ") is out of range.");
+            //Debug.LogError("Tile (" + x + "," + y + ") is out of range.");
             return null;
         }
         return tiles[x, y];
@@ -205,7 +205,7 @@ public class World
     // means that our old pathfinding info is invalid.
     public void InvalidateTileGraph()
     {
-        Path_TileGraph tileGraph = new Path_TileGraph(WorldController.Instance.world);
+        tileGraph = null;
     }
 
     public bool IsFurniturePlacementValid(string furnitureType, Tile t)

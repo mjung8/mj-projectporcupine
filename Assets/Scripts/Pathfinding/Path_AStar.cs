@@ -20,21 +20,23 @@ public class Path_AStar
         // Dictionary of all valid, walkable nodes
         Dictionary<Tile, Path_Node<Tile>> nodes = world.tileGraph.nodes;
 
-        Path_Node<Tile> start = nodes[tileStart];
-        Path_Node<Tile> goal = nodes[tileEnd];
-
         // Make sure start/end tiles are in the list of nodes
         if (nodes.ContainsKey(tileStart) == false)
         {
             Debug.LogError("Path_AStar: the starting tile isn't in the list of nodes.");
+
+            // FIXME: for now, manually add start tile into the list of valid nodes
+
             return;
         }
-
         if (nodes.ContainsKey(tileEnd) == false)
         {
             Debug.LogError("Path_AStar: the ending tile isn't in the list of nodes.");
             return;
         }
+
+        Path_Node<Tile> start = nodes[tileStart];
+        Path_Node<Tile> goal = nodes[tileEnd];
 
         // Mostly following wikipedia A* search algorithm
         List<Path_Node<Tile>> ClosedSet = new List<Path_Node<Tile>>();
@@ -84,7 +86,9 @@ public class Path_AStar
                     continue;
                 }
 
-                float tentative_g_score = g_score[current] + dist_between(current, neighbour);
+                float movement_cost_to_neighbour = neighbour.data.movementCost * dist_between(current, neighbour);
+
+                float tentative_g_score = g_score[current] + movement_cost_to_neighbour;
 
                 if (OpenSet.Contains(neighbour) && tentative_g_score >= g_score[neighbour])
                     continue;
@@ -161,8 +165,18 @@ public class Path_AStar
 
     }
 
-    public Tile GetNextTile()
+    public Tile Dequeue()
     {
         return path.Dequeue();
+    }
+
+    public int Length()
+    {
+        if(path == null)
+        {
+            return 0;
+        }
+
+        return path.Count;
     }
 }

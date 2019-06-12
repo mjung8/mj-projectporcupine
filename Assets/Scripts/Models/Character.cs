@@ -10,7 +10,7 @@ public class Character
     {
         get
         {
-            return Mathf.Lerp(currTile.X, destTile.X, movementPercentage);
+            return Mathf.Lerp(currTile.X, nextTile.X, movementPercentage);
         }
     }
 
@@ -18,12 +18,16 @@ public class Character
     {
         get
         {
-            return Mathf.Lerp(currTile.Y, destTile.Y, movementPercentage);
+            return Mathf.Lerp(currTile.Y, nextTile.Y, movementPercentage);
         }
     }
 
     public Tile currTile { get; protected set; }
+
     Tile destTile;  // If we aren't moving then destTile = currTile
+    Tile nextTile;  // The next tile in the pathfinding sequence
+    Path_AStar pathAStar;
+
     float movementPercentage;   // 0-1 as we move from currTile to destTile
 
     float speed = 2f;   // Tiles per second
@@ -34,13 +38,11 @@ public class Character
 
     public Character(Tile tile)
     {
-        currTile = destTile = tile;
+        currTile = destTile = nextTile = tile;
     }
 
-    public void Update(float deltaTime)
+    void Update_DoJob(float deltaTime)
     {
-        //Debug.Log("Character Update");
-
         // Do I have a job?
         if (myJob == null)
         {
@@ -50,6 +52,9 @@ public class Character
             if (myJob != null)
             {
                 // We have job
+
+                // TODO: Check to see if job is reachable
+
                 destTile = myJob.tile;
                 myJob.RegisterJobCompleteCallback(OnJobEnded);
                 myJob.RegisterJobCancelCallback(OnJobEnded);
@@ -58,20 +63,64 @@ public class Character
 
         // Are we there
         if (currTile == destTile)
+        //if(pathAStar != null && pathAStar.Length() == 1) // We are adjacent to the job site 
         {
             if (myJob != null)
             {
                 myJob.DoWork(deltaTime);
             }
-
-            return;
         }
+    }
+
+    public void AbandonJob()
+    {
+        nextTile = destTile = currTile;
+        pathAStar = null;
+        currTile.world.jobQueue.Enqueue(myJob);
+        myJob = null;
+    }
+
+    void Update_DoMovement(float deltaTime)
+    {
+        if (currTile == destTile)
+        {
+            pathAStar = null;
+            return; // Already there
+        }
+
+        if(nextTile == null || nextTile == currTile)
+        {
+            // Get the next tile from the pathfinder
+            if(pathAStar == null || pathAStar.Length() == 0)
+            {
+                // Generate a path to our destination
+                pathAStar = new Path_AStar(currTile.world, currTile, destTile);  // This will calculate path from curr to dest
+                if(pathAStar.Length() == 0)
+                {
+                    Debug.LogError("Path_AStar returned no path to destination!");
+                    // FIXME: maybe job should be requeued
+                    AbandonJob();
+                    pathAStar = null;
+                    return;
+                }
+            }
+
+            // Grab the next waypoint from the pathing system!
+            nextTile = pathAStar.Dequeue();
+
+            if(nextTile == currTile)
+            {
+                Debug.LogError("Update_DoMovement - nextTIle is currTile?");
+            }
+        }
+
+        // At this point we should have a valid nextTile to move to
 
         // Total distance between A and B
         // Euclidean distance for now; for pathfinding change to Manhattan or something else
         float distToTravel = Mathf.Sqrt(
-            Mathf.Pow(currTile.X - destTile.X, 2) +
-            Mathf.Pow(currTile.Y - destTile.Y, 2)
+            Mathf.Pow(currTile.X - nextTile.X, 2) +
+            Mathf.Pow(currTile.Y - nextTile.Y, 2)
         );
 
         // How much distance can be travelled this Update
@@ -89,14 +138,24 @@ public class Character
 
             // TODO: get the next tile from pathfinding system
 
-            currTile = destTile;
+            currTile = nextTile;
             movementPercentage = 0;
 
             // FIXME: Overshot movement?
-        }
+        }        
+    }
+
+    public void Update(float deltaTime)
+    {
+        //Debug.Log("Character Update");
+
+        Update_DoJob(deltaTime);
+
+        Update_DoMovement(deltaTime);
 
         if (cbCharacterChanged != null)
             cbCharacterChanged(this);
+
     }
 
     public void SetDestination(Tile tile)

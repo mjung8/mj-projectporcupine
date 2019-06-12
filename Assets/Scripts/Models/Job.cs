@@ -17,7 +17,7 @@ public class Job {
     Action<Job> cbJobComplete;
     Action<Job> cbJobCancel;
 
-    public Job(Tile tile, string jobObjectType, Action<Job> cbJobComplete, float jobTime = 1f)
+    public Job(Tile tile, string jobObjectType, Action<Job> cbJobComplete, float jobTime = 0.1f)
     {
         this.tile = tile;
         this.jobObjectType = jobObjectType;
