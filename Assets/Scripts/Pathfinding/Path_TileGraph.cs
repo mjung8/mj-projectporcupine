@@ -9,9 +9,7 @@ using UnityEngine;
 /// </summary>
 public class Path_TileGraph {
 
-    Dictionary<Tile, Path_Node<Tile>> nodes;
-
-
+    public Dictionary<Tile, Path_Node<Tile>> nodes;
 
     public Path_TileGraph(World world)
     {

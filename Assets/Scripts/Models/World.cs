@@ -10,7 +10,7 @@ public class World
     List<Character> characters;
 
     // The pathfinding graph used to navigate the world
-    Path_TileGraph tileGraph;
+    public Path_TileGraph tileGraph;
 
     Dictionary<string, Furniture> furniturePrototypes;
 
