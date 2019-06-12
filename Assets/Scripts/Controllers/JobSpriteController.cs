@@ -26,6 +26,12 @@ public class JobSpriteController : MonoBehaviour
 
         GameObject job_go = new GameObject();
 
+        if (jobGameObjectMap.ContainsKey(job))
+        {
+            Debug.LogError("OnJobCreated for a jobGO that already exists -- most likely job requeue");
+            return;
+        }
+
         // Add the tile/GO pair to the dictionary
         jobGameObjectMap.Add(job, job_go);
 

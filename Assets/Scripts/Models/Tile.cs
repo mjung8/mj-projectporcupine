@@ -122,6 +122,11 @@ public class Tile
             (diagOkay && (Mathf.Abs(this.X - tile.X) == 1 && Mathf.Abs(this.Y - tile.Y) == 1));
     }
 
+    /// <summary>
+    /// Gets the neighbours.
+    /// </summary>
+    /// <param name="diagOkay">Is diagonal movement ok?</param>
+    /// <returns>The neighbours.</returns>
     public Tile[] GetNeighbours(bool diagOkay = false)
     {
         Tile[] ns;
