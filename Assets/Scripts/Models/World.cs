@@ -94,17 +94,34 @@ public class World : IXmlSerializable
 
     void CreateFurniturePrototypes()
     {
+        // This will be replaced by a function that reads data
+        // from a text file
+
         furniturePrototypes = new Dictionary<string, Furniture>();
 
         furniturePrototypes.Add("Wall",
-            Furniture.CreatePrototype(
-                                "Wall",
-                                0,  // Impassable
-                                1,  // Width
-                                1,  // Height
-                                true    // Links to neighbours and "sort of" becomes part of a larger object
-                            )
+            new Furniture(
+                "Wall",
+                0,  // Impassable
+                1,  // Width
+                1,  // Height
+                true    // Links to neighbours and "sort of" becomes part of a larger object
+            )
         );
+
+        furniturePrototypes.Add("Door",
+            new Furniture(
+                "Door",
+                0,  // Impassable
+                1,  // Width
+                1,  // Height
+                true    // Links to neighbours and "sort of" becomes part of a larger object
+            )
+        );
+
+        // What if object behaviours were scriptable? And part of the text file?
+        furniturePrototypes["Door"].furnParameters["openness"] = 0;
+        furniturePrototypes["Door"].updateActions += FurnitureActions.Door_UpdateAction;
     }
 
     public void SetupPathfindingExample()
@@ -118,13 +135,13 @@ public class World : IXmlSerializable
 
         for (int x = l - 5; x < l + 15; x++)
         {
-            for (int y = b -5; y < b + 15; y++)
+            for (int y = b - 5; y < b + 15; y++)
             {
                 tiles[x, y].Type = TileType.Floor;
 
-                if (x == l || x == (l + 9) || y ==b || y == (b + 9))
+                if (x == l || x == (l + 9) || y == b || y == (b + 9))
                 {
-                    if(x != (l + 9) && y != (b + 4))
+                    if (x != (l + 9) && y != (b + 4))
                     {
                         PlaceFurniture("Wall", tiles[x, y]);
                     }
@@ -276,7 +293,7 @@ public class World : IXmlSerializable
         writer.WriteEndElement();
 
         writer.WriteStartElement("Furnitures");
-        foreach(Furniture furn in furnitures)
+        foreach (Furniture furn in furnitures)
         {
             writer.WriteStartElement("Furniture");
             furn.WriteXml(writer);
@@ -310,7 +327,7 @@ public class World : IXmlSerializable
 
         while (reader.Read())
         {
-            switch(reader.Name)
+            switch (reader.Name)
             {
                 case "Tiles":
                     ReadXml_Tiles(reader);
@@ -330,7 +347,7 @@ public class World : IXmlSerializable
     {
         // We are in the "Tiles" element, so read elements
         // until we run out of "Tile" nodes
-        while(reader.Read())
+        while (reader.Read())
         {
             if (reader.Name != "Tile")
                 return; // No more tiles
@@ -339,7 +356,7 @@ public class World : IXmlSerializable
             int y = int.Parse(reader.GetAttribute("Y"));
             tiles[x, y].ReadXml(reader);
         }
-        
+
     }
 
     void ReadXml_Furnitures(XmlReader reader)

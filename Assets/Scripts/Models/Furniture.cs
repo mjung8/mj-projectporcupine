@@ -4,10 +4,21 @@ using System;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-
+using System.Collections.Generic;
 
 public class Furniture : IXmlSerializable
 {
+    public Dictionary<string, object> furnParameters;
+    public Action<Furniture, float> updateActions;
+
+    public void Update(float deltaTime)
+    {
+        if (updateActions != null)
+        {
+            updateActions(this, deltaTime);
+        }
+    }
+
     // Represents base tile of object -- but large objects will occupy
     // multiple tiles.
     public Tile tile {
@@ -41,24 +52,44 @@ public class Furniture : IXmlSerializable
     // TODO: implement larger objects
     // TODO: implement object rotation
 
+    // Empty constructor for serialization
     public Furniture()
     {
-
+        furnParameters = new Dictionary<string, object>();
     }
 
-    static public Furniture CreatePrototype(string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbour = false)
+    // Copy constructor
+    protected Furniture(Furniture other)
     {
-        Furniture obj = new Furniture();
+        this.objectType = other.objectType;
+        this.movementCost = other.movementCost;
+        this.width = other.width;
+        this.height = other.height;
+        this.linksToNeighbour = other.linksToNeighbour;
 
-        obj.objectType = objectType;
-        obj.movementCost = movementCost;
-        obj.width = width;
-        obj.height = height;
-        obj.linksToNeighbour = linksToNeighbour;
+        this.furnParameters = new Dictionary<string, object>(other.furnParameters);
 
-        obj.funcPositionValidation = obj.__IsValidPosition;
+        if (other.updateActions != null)
+            this.updateActions = (Action<Furniture, float>)other.updateActions.Clone();
+    }
 
-        return obj;
+    virtual public Furniture Clone()
+    {
+        return new Furniture(this);
+    }
+
+    // Create furniture from parameter -- this will probably only be used for prototypes
+    public Furniture (string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbour = false)
+    {
+        this.objectType = objectType;
+        this.movementCost = movementCost;
+        this.width = width;
+        this.height = height;
+        this.linksToNeighbour = linksToNeighbour;
+
+        this.funcPositionValidation = this.__IsValidPosition;
+
+        furnParameters = new Dictionary<string, object>();
     }
 
     static public Furniture PlaceInstance(Furniture proto, Tile tile)
@@ -71,14 +102,7 @@ public class Furniture : IXmlSerializable
 
         // We know our placement destination is valid
 
-        Furniture furn = new Furniture();
-
-        furn.objectType = proto.objectType;
-        furn.movementCost = proto.movementCost;
-        furn.width = proto.width;
-        furn.height = proto.height;
-        furn.linksToNeighbour = proto.linksToNeighbour;
-
+        Furniture furn = proto.Clone(); //new Furniture(proto);
         furn.tile = tile;
 
         if (tile.PlaceFurniture(furn) == false)
