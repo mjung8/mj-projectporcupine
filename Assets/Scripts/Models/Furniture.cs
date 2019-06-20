@@ -1,8 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
-public class Furniture
+
+public class Furniture : IXmlSerializable
 {
     // Represents base tile of object -- but large objects will occupy
     // multiple tiles.
@@ -37,7 +41,7 @@ public class Furniture
     // TODO: implement larger objects
     // TODO: implement object rotation
 
-    protected Furniture()
+    public Furniture()
     {
 
     }
@@ -96,24 +100,24 @@ public class Furniture
             int y = tile.Y;
 
             t = tile.world.GetTileAt(x, y + 1);
-            if (t != null && t.furniture != null && t.furniture.objectType == furn.objectType)
+            if (t != null && t.furniture != null && t.furniture.cbOnChanged != null && t.furniture.objectType == furn.objectType)
             {
                 // We have a northern neighbour with the same object type as us, so
                 // tell it that it has changed by firing its callback
                 t.furniture.cbOnChanged(t.furniture);
             }
             t = tile.world.GetTileAt(x + 1, y);
-            if (t != null && t.furniture != null && t.furniture.objectType == furn.objectType)
+            if (t != null && t.furniture != null && t.furniture.cbOnChanged != null && t.furniture.objectType == furn.objectType)
             {
                 t.furniture.cbOnChanged(t.furniture);
             }
             t = tile.world.GetTileAt(x, y - 1);
-            if (t != null && t.furniture != null && t.furniture.objectType == furn.objectType)
+            if (t != null && t.furniture != null && t.furniture.cbOnChanged != null && t.furniture.objectType == furn.objectType)
             {
                 t.furniture.cbOnChanged(t.furniture);
             }
             t = tile.world.GetTileAt(x - 1, y);
-            if (t != null && t.furniture != null && t.furniture.objectType == furn.objectType)
+            if (t != null && t.furniture != null && t.furniture.cbOnChanged != null && t.furniture.objectType == furn.objectType)
             {
                 t.furniture.cbOnChanged(t.furniture);
             }
@@ -163,4 +167,24 @@ public class Furniture
         return true;
     }
 
+    public XmlSchema GetSchema()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void WriteXml(XmlWriter writer)
+    {
+        writer.WriteAttributeString("X", tile.X.ToString());
+        writer.WriteAttributeString("Y", tile.Y.ToString());
+        writer.WriteAttributeString("objectType", objectType);
+        writer.WriteAttributeString("movementCost", movementCost.ToString());
+    }
+
+    public void ReadXml(XmlReader reader)
+    {
+        // X, Y, and objectType have already been set 
+        // and should be assigned to a tile
+        movementCost = int.Parse(reader.GetAttribute("movementCost"));
+    }
+    
 }

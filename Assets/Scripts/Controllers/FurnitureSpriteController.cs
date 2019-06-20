@@ -23,6 +23,12 @@ public class FurnitureSpriteController : MonoBehaviour {
         furnitureGameObjectMap = new Dictionary<Furniture, GameObject>();
 
         world.RegisterFurnitureCreated(OnFurnitureCreated);
+
+        // Go through any existing furniture (ie. from a save file) and call the OnCreated event manually?
+        foreach(Furniture furn in world.furnitures)
+        {
+            OnFurnitureCreated(furn);
+        }
 	}
 
     void LoadSprites()
