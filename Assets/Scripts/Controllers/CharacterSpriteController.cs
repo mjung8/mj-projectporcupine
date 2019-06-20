@@ -25,11 +25,12 @@ public class CharacterSpriteController : MonoBehaviour
         // Reigster a callback so we know when a character is created
         world.RegisterCharacterCreated(OnCharacterCreated);
 
-
-        //DEBUG
-        //DEBUG
-        Character c = world.CreateCharacter(world.GetTileAt(world.Width / 2, world.Height / 2));
-
+        // Check for pre-existing characters which won't be do the callback
+        foreach (Character c in world.characters)
+        {
+            OnCharacterCreated(c);
+        }
+        
         //c.SetDestination(world.GetTileAt(world.Width / 2 + 5, world.Height / 2));
     }
 
