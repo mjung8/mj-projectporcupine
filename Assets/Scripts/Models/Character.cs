@@ -96,14 +96,18 @@ public class Character : IXmlSerializable
             return; // Already there
         }
 
-        if(nextTile == null || nextTile == currTile)
+        // currTile = the tile I'm currently in (and may be leaving)
+        // nextTile = the tile I'm currently entering
+        // destTile = Our final destination -- we never walk here directly, but instead use it for the pathfinder
+
+        if (nextTile == null || nextTile == currTile)
         {
             // Get the next tile from the pathfinder
-            if(pathAStar == null || pathAStar.Length() == 0)
+            if (pathAStar == null || pathAStar.Length() == 0)
             {
                 // Generate a path to our destination
                 pathAStar = new Path_AStar(currTile.world, currTile, destTile);  // This will calculate path from curr to dest
-                if(pathAStar.Length() == 0)
+                if (pathAStar.Length() == 0)
                 {
                     Debug.LogError("Path_AStar returned no path to destination!");
                     // FIXME: maybe job should be requeued
@@ -119,9 +123,9 @@ public class Character : IXmlSerializable
             // Grab the next waypoint from the pathing system!
             nextTile = pathAStar.Dequeue();
 
-            if(nextTile == currTile)
+            if (nextTile == currTile)
             {
-                Debug.LogError("Update_DoMovement - nextTIle is currTile?");
+                Debug.LogError("Update_DoMovement - nextTile is currTile?");
             }
         }
 
@@ -134,11 +138,20 @@ public class Character : IXmlSerializable
             Mathf.Pow(currTile.Y - nextTile.Y, 2)
         );
 
-        if (nextTile.movementCost == 0)
+        if (nextTile.IsEnterable() == ENTERABILITY.Never)
         {
+            // Most likely a wall got built, so we need to reset pathfinding
+            // FIXME: when a wall gets spanwed, invalidate path immediately. or check sometimes to save CPU.
+            // or register a callback to ontilechanged event
             Debug.LogError("Fix me - character trying to walk through unwalkable  tile");
             nextTile = null;    // our next tile is a no-go
             pathAStar = null;   // pathfinding info is out of date
+            return;
+        }
+        else if(nextTile.IsEnterable() == ENTERABILITY.Soon)
+        {
+            // Can't enter now but should be able to in the future.(Door?)
+            // Don't bail on movement path but return now and don't process movement.
             return;
         }
 
@@ -161,7 +174,7 @@ public class Character : IXmlSerializable
             movementPercentage = 0;
 
             // FIXME: Overshot movement?
-        }        
+        }
     }
 
     public void Update(float deltaTime)
@@ -222,6 +235,6 @@ public class Character : IXmlSerializable
 
     public void ReadXml(XmlReader reader)
     {
-        
+
     }
 }

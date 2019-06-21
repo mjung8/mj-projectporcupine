@@ -117,7 +117,7 @@ public class World : IXmlSerializable
         furniturePrototypes.Add("Door",
             new Furniture(
                 "Door",
-                1,  // Impassable
+                1,  // Door pathfinding cost
                 1,  // Width
                 1,  // Height
                 false    // Links to neighbours and "sort of" becomes part of a larger object
@@ -126,7 +126,10 @@ public class World : IXmlSerializable
 
         // What if object behaviours were scriptable? And part of the text file?
         furniturePrototypes["Door"].furnParameters["openness"] = 0;
+        furniturePrototypes["Door"].furnParameters["is_opening"] = 0;
         furniturePrototypes["Door"].updateActions += FurnitureActions.Door_UpdateAction;
+
+        furniturePrototypes["Door"].IsEnterable = FurnitureActions.Door_IsEnterable;
     }
 
     public void SetupPathfindingExample()
@@ -290,9 +293,12 @@ public class World : IXmlSerializable
         {
             for (int y = 0; y < Height; y++)
             {
-                writer.WriteStartElement("Tile");
-                tiles[x, y].WriteXml(writer);
-                writer.WriteEndElement();
+                if (tiles[x, y].Type != TileType.Empty)
+                {
+                    writer.WriteStartElement("Tile");
+                    tiles[x, y].WriteXml(writer);
+                    writer.WriteEndElement();
+                }
             }
         }
         writer.WriteEndElement();

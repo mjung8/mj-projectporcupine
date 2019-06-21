@@ -11,6 +11,7 @@ using System.Xml.Serialization;
 // and floor (aka the station structure/scaffold). Walls/Doors/etc... will be
 // furnitures sitting on top of the floor
 public enum TileType { Empty, Floor };
+public enum ENTERABILITY { Yes, Never, Soon };
 
 public class Tile : IXmlSerializable
 {
@@ -185,6 +186,22 @@ public class Tile : IXmlSerializable
     public void ReadXml(XmlReader reader)
     {
         Type = (TileType)int.Parse(reader.GetAttribute("Type"));
+    }
+
+    public ENTERABILITY IsEnterable()
+    {
+        if (movementCost == 0)
+        {
+            return ENTERABILITY.Never;
+        }
+
+        // Check furniture to see if it's enterable
+        if (furniture != null && furniture.IsEnterable != null)
+        {
+            return furniture.IsEnterable(furniture);
+        }
+
+        return ENTERABILITY.Yes;
     }
 
 }
