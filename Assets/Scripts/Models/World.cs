@@ -78,6 +78,11 @@ public class World : IXmlSerializable
         {
             c.Update(deltaTime);
         }
+
+        foreach (Furniture f in furnitures)
+        {
+            f.Update(deltaTime);
+        }
     }
 
     public Character CreateCharacter(Tile t)
@@ -94,17 +99,37 @@ public class World : IXmlSerializable
 
     void CreateFurniturePrototypes()
     {
+        // This will be replaced by a function that reads data
+        // from a text file
+
         furniturePrototypes = new Dictionary<string, Furniture>();
 
         furniturePrototypes.Add("Wall",
-            Furniture.CreatePrototype(
-                                "Wall",
-                                0,  // Impassable
-                                1,  // Width
-                                1,  // Height
-                                true    // Links to neighbours and "sort of" becomes part of a larger object
-                            )
+            new Furniture(
+                "Wall",
+                0,  // Impassable
+                1,  // Width
+                1,  // Height
+                true    // Links to neighbours and "sort of" becomes part of a larger object
+            )
         );
+
+        furniturePrototypes.Add("Door",
+            new Furniture(
+                "Door",
+                1,  // Door pathfinding cost
+                1,  // Width
+                1,  // Height
+                false    // Links to neighbours and "sort of" becomes part of a larger object
+            )
+        );
+
+        // What if object behaviours were scriptable? And part of the text file?
+        furniturePrototypes["Door"].furnParameters["openness"] = 0;
+        furniturePrototypes["Door"].furnParameters["is_opening"] = 0;
+        furniturePrototypes["Door"].updateActions += FurnitureActions.Door_UpdateAction;
+
+        furniturePrototypes["Door"].IsEnterable = FurnitureActions.Door_IsEnterable;
     }
 
     public void SetupPathfindingExample()
@@ -118,13 +143,13 @@ public class World : IXmlSerializable
 
         for (int x = l - 5; x < l + 15; x++)
         {
-            for (int y = b -5; y < b + 15; y++)
+            for (int y = b - 5; y < b + 15; y++)
             {
                 tiles[x, y].Type = TileType.Floor;
 
-                if (x == l || x == (l + 9) || y ==b || y == (b + 9))
+                if (x == l || x == (l + 9) || y == b || y == (b + 9))
                 {
-                    if(x != (l + 9) && y != (b + 4))
+                    if (x != (l + 9) && y != (b + 4))
                     {
                         PlaceFurniture("Wall", tiles[x, y]);
                     }
@@ -268,15 +293,18 @@ public class World : IXmlSerializable
         {
             for (int y = 0; y < Height; y++)
             {
-                writer.WriteStartElement("Tile");
-                tiles[x, y].WriteXml(writer);
-                writer.WriteEndElement();
+                if (tiles[x, y].Type != TileType.Empty)
+                {
+                    writer.WriteStartElement("Tile");
+                    tiles[x, y].WriteXml(writer);
+                    writer.WriteEndElement();
+                }
             }
         }
         writer.WriteEndElement();
 
         writer.WriteStartElement("Furnitures");
-        foreach(Furniture furn in furnitures)
+        foreach (Furniture furn in furnitures)
         {
             writer.WriteStartElement("Furniture");
             furn.WriteXml(writer);
@@ -310,7 +338,7 @@ public class World : IXmlSerializable
 
         while (reader.Read())
         {
-            switch(reader.Name)
+            switch (reader.Name)
             {
                 case "Tiles":
                     ReadXml_Tiles(reader);
@@ -330,51 +358,52 @@ public class World : IXmlSerializable
     {
         // We are in the "Tiles" element, so read elements
         // until we run out of "Tile" nodes
-        while(reader.Read())
-        {
-            if (reader.Name != "Tile")
-                return; // No more tiles
 
-            int x = int.Parse(reader.GetAttribute("X"));
-            int y = int.Parse(reader.GetAttribute("Y"));
-            tiles[x, y].ReadXml(reader);
+        if (reader.ReadToDescendant("Tile"))
+        {
+            do
+            {
+                int x = int.Parse(reader.GetAttribute("X"));
+                int y = int.Parse(reader.GetAttribute("Y"));
+                tiles[x, y].ReadXml(reader);
+            } while (reader.ReadToNextSibling("Tile"));
         }
-        
+
     }
 
     void ReadXml_Furnitures(XmlReader reader)
     {
         // We are in the "Furnitures" element, so read elements
         // until we run out of "Tile" nodes
-        while (reader.Read())
+
+        if (reader.ReadToDescendant("Furniture"))
         {
-            if (reader.Name != "Furniture")
-                return; // No more tiles
+            do
+            {
+                int x = int.Parse(reader.GetAttribute("X"));
+                int y = int.Parse(reader.GetAttribute("Y"));
 
-            int x = int.Parse(reader.GetAttribute("X"));
-            int y = int.Parse(reader.GetAttribute("Y"));
-
-            Furniture furn = PlaceFurniture(reader.GetAttribute("objectType"), tiles[x, y]);
-            furn.ReadXml(reader);
+                Furniture furn = PlaceFurniture(reader.GetAttribute("objectType"), tiles[x, y]);
+                furn.ReadXml(reader);
+            } while (reader.ReadToNextSibling("Furniture"));
         }
-
     }
 
     void ReadXml_Characters(XmlReader reader)
     {
         // We are in the "Characters" element, so read elements
         // until we run out of "Tile" nodes
-        while (reader.Read())
+        if (reader.ReadToDescendant("Character"))
         {
-            if (reader.Name != "Character")
-                return; // No more tiles
+            do
+            {
+                int x = int.Parse(reader.GetAttribute("X"));
+                int y = int.Parse(reader.GetAttribute("Y"));
 
-            int x = int.Parse(reader.GetAttribute("X"));
-            int y = int.Parse(reader.GetAttribute("Y"));
-
-            Character c = CreateCharacter(tiles[x, y]);
-            c.ReadXml(reader);
+                Character c = CreateCharacter(tiles[x, y]);
+                c.ReadXml(reader);
+            } while (reader.ReadToNextSibling("Character"));
         }
-
     }
+
 }

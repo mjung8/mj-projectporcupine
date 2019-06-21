@@ -1,11 +1,14 @@
 fileFormatVersion: 2
 guid: 08f3be664581d2c47bf95c35d69a1e91
-timeCreated: 1449593516
+timeCreated: 1457724905
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: Door_EW
+    21300000: Door
     21300002: Door_NS
+    21300004: Door_openness_1
+    21300006: Door_openness_2
+    21300008: Door_openness_3
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -46,13 +49,13 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   alphaIsTransparency: 1
   textureType: 8
   buildTargetSettings: []
   spriteSheet:
     sprites:
-    - name: Door_EW
+    - name: Door
       rect:
         serializedVersion: 2
         x: 32
@@ -82,6 +85,57 @@ TextureImporter:
         - {x: 20, y: 32}
         - {x: 12, y: 32}
         - {x: 12, y: 0}
+    - name: Door_openness_1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 192
+        width: 32
+        height: 32
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: 20}
+        - {x: 0, y: 12}
+        - {x: 23, y: 12}
+        - {x: 25, y: 14}
+        - {x: 25, y: 18}
+        - {x: 23, y: 20}
+    - name: Door_openness_2
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 160
+        width: 32
+        height: 32
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: 20}
+        - {x: 0, y: 12}
+        - {x: 13, y: 12}
+        - {x: 15, y: 14}
+        - {x: 15, y: 18}
+        - {x: 13, y: 20}
+    - name: Door_openness_3
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 128
+        width: 32
+        height: 32
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: 20}
+        - {x: 0, y: 12}
+        - {x: 2, y: 12}
+        - {x: 4, y: 14}
+        - {x: 4, y: 18}
+        - {x: 2, y: 20}
     outline: []
   spritePackingTag: 
   userData: 
