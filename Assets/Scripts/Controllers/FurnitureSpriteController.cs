@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 
-public class FurnitureSpriteController : MonoBehaviour {
+public class FurnitureSpriteController : MonoBehaviour
+{
 
     Dictionary<Furniture, GameObject> furnitureGameObjectMap;
 
@@ -14,8 +15,9 @@ public class FurnitureSpriteController : MonoBehaviour {
         get { return WorldController.Instance.world; }
     }
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
 
         LoadSprites();
 
@@ -25,11 +27,11 @@ public class FurnitureSpriteController : MonoBehaviour {
         world.RegisterFurnitureCreated(OnFurnitureCreated);
 
         // Go through any existing furniture (ie. from a save file) and call the OnCreated event manually?
-        foreach(Furniture furn in world.furnitures)
+        foreach (Furniture furn in world.furnitures)
         {
             OnFurnitureCreated(furn);
         }
-	}
+    }
 
     void LoadSprites()
     {
@@ -59,8 +61,22 @@ public class FurnitureSpriteController : MonoBehaviour {
         furn_go.transform.position = new Vector3(furn.tile.X, furn.tile.Y, 0);
         furn_go.transform.SetParent(this.transform, true);
 
-        // FIXME: we assume the object must be a wall so use the hardcoded
-        // reference to the wall sprite
+        // FIXME: This hardcoding is not good
+        if (furn.objectType == "Door")
+        {
+            // By default, door graphic is meant for walls EW
+            // Check to see if we actually have a wall NS and then rotate
+            Tile northTile = world.GetTileAt(furn.tile.X, furn.tile.Y + 1);
+            Tile southhTile = world.GetTileAt(furn.tile.X, furn.tile.Y - 1);
+            if (northTile != null && southhTile != null && northTile.furniture != null
+                && southhTile.furniture != null && northTile.furniture.objectType == "Wall"
+                && southhTile.furniture.objectType == "Wall")
+            {
+                furn_go.transform.rotation = Quaternion.Euler(0, 0, 90);
+                furn_go.transform.Translate(1f, 0, 0, Space.World); // ugly hack
+            }
+        }
+
         SpriteRenderer sr = furn_go.AddComponent<SpriteRenderer>();
         sr.sprite = GetSpriteForFurniture(furn);
         sr.sortingLayerName = "Furniture";
@@ -81,46 +97,71 @@ public class FurnitureSpriteController : MonoBehaviour {
 
         GameObject furn_go = furnitureGameObjectMap[furn];
         furn_go.GetComponent<SpriteRenderer>().sprite = GetSpriteForFurniture(furn);
+
     }
 
     public Sprite GetSpriteForFurniture(Furniture furn)
     {
+        string spriteName = furn.objectType;
         if (furn.linksToNeighbour == false)
         {
-            return furnitureSprites[furn.objectType];
+            // If this is a door check openness and update the sprite
+            // FIXME: hardcoding needs to be generalized later
+            if (furn.objectType == "Door")
+            {
+                if (furn.furnParameters["openness"] < 0.1f)
+                {
+                    // Door is closed
+                    spriteName = "Door";
+                }
+                else if (furn.furnParameters["openness"] < 0.5f)
+                {
+                    spriteName = "Door_openness_1";
+                }
+                else if (furn.furnParameters["openness"] < 0.9f)
+                {
+                    spriteName = "Door_openness_2";
+                }
+                else
+                {
+                    spriteName = "Door_openness_3";
+                }
+            }
+
+            return furnitureSprites[spriteName];
         }
 
         // Otherwise, the sprite name is more complicated.
-        string spriteName = furn.objectType + "_";
+        spriteName = furn.objectType + "_";
 
         // Check for neighbours North, East, South, West
         int x = furn.tile.X;
         int y = furn.tile.Y;
 
         Tile t;
-        
-        t = world.GetTileAt(x, y+1);
+
+        t = world.GetTileAt(x, y + 1);
         if (t != null && t.furniture != null && t.furniture.objectType == furn.objectType)
         {
             spriteName += "N";
         }
-        t = world.GetTileAt(x+1, y);
+        t = world.GetTileAt(x + 1, y);
         if (t != null && t.furniture != null && t.furniture.objectType == furn.objectType)
         {
             spriteName += "E";
         }
-        t = world.GetTileAt(x, y-1);
+        t = world.GetTileAt(x, y - 1);
         if (t != null && t.furniture != null && t.furniture.objectType == furn.objectType)
         {
             spriteName += "S";
         }
-        t = world.GetTileAt(x-1, y);
+        t = world.GetTileAt(x - 1, y);
         if (t != null && t.furniture != null && t.furniture.objectType == furn.objectType)
         {
             spriteName += "W";
         }
 
-        if(furnitureSprites[spriteName] == false)
+        if (furnitureSprites[spriteName] == false)
         {
             Debug.LogError("GetSpriteForfurniture -- no sprites with name: " + spriteName);
             return null;
@@ -136,7 +177,7 @@ public class FurnitureSpriteController : MonoBehaviour {
         {
             return furnitureSprites[objectType];
         }
-        
+
         if (furnitureSprites.ContainsKey(objectType + "_"))
         {
             return furnitureSprites[objectType + "_"];

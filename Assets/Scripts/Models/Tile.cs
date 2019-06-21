@@ -49,17 +49,19 @@ public class Tile : IXmlSerializable
     public int X { get; protected set; }
     public int Y { get; protected set; }
 
+    float baseTileMovementCost = 1; // FIXME: bad hardcoded
+
     public float movementCost
     {
         get
         {
             if (Type == TileType.Empty)
-                return 0;
+                return 0;   // Unwalkable
 
             if (furniture == null)
-                return 1;
+                return baseTileMovementCost;
 
-            return 1 * furniture.movementCost;
+            return baseTileMovementCost * furniture.movementCost;
         }
     }
 

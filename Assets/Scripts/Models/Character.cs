@@ -70,13 +70,9 @@ public class Character : IXmlSerializable
         }
 
         // Are we there
-        if (currTile == destTile)
-        //if(pathAStar != null && pathAStar.Length() == 1) // We are adjacent to the job site 
+        if (myJob != null && currTile == myJob.tile)
         {
-            if (myJob != null)
-            {
-                myJob.DoWork(deltaTime);
-            }
+            myJob.DoWork(deltaTime);
         }
     }
 
@@ -148,7 +144,7 @@ public class Character : IXmlSerializable
             pathAStar = null;   // pathfinding info is out of date
             return;
         }
-        else if(nextTile.IsEnterable() == ENTERABILITY.Soon)
+        else if (nextTile.IsEnterable() == ENTERABILITY.Soon)
         {
             // Can't enter now but should be able to in the future.(Door?)
             // Don't bail on movement path but return now and don't process movement.

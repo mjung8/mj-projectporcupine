@@ -49,6 +49,22 @@ public class JobSpriteController : MonoBehaviour
         // Make sorting order in layer above tiles (builds have a bug where wall sprite is below tile sprite)
         sr.sortingOrder = 1;
 
+        // FIXME: This hardcoding is not good
+        if (job.jobObjectType == "Door")
+        {
+            // By default, door graphic is meant for walls EW
+            // Check to see if we actually have a wall NS and then rotate
+            Tile northTile = job.tile.world.GetTileAt(job.tile.X, job.tile.Y + 1);
+            Tile southhTile = job.tile.world.GetTileAt(job.tile.X, job.tile.Y - 1);
+            if (northTile != null && southhTile != null && northTile.furniture != null
+                && southhTile.furniture != null && northTile.furniture.objectType == "Wall"
+                && southhTile.furniture.objectType == "Wall")
+            {
+                job_go.transform.rotation = Quaternion.Euler(0, 0, 90);
+                job_go.transform.Translate(1f, 0, 0, Space.World); // ugly hack
+            }
+        }
+
         job.RegisterJobCompleteCallback(OnJobEnded);
         job.RegisterJobCancelCallback(OnJobEnded);
     }
