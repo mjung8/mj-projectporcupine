@@ -111,6 +111,9 @@ public class Character : IXmlSerializable
                     pathAStar = null;
                     return;
                 }
+
+                // Let's ignore the first tile because that's the tile we're currently in
+                nextTile = pathAStar.Dequeue();
             }
 
             // Grab the next waypoint from the pathing system!
@@ -131,8 +134,16 @@ public class Character : IXmlSerializable
             Mathf.Pow(currTile.Y - nextTile.Y, 2)
         );
 
+        if (nextTile.movementCost == 0)
+        {
+            Debug.LogError("Fix me - character trying to walk through unwalkable  tile");
+            nextTile = null;    // our next tile is a no-go
+            pathAStar = null;   // pathfinding info is out of date
+            return;
+        }
+
         // How much distance can be travelled this Update
-        float distThisFrame = speed * deltaTime;
+        float distThisFrame = speed / nextTile.movementCost * deltaTime;
 
         // How much is that in terms of percentage
         float percThisFrame = distThisFrame / distToTravel;

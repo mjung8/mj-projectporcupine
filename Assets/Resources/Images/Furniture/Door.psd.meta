@@ -2,7 +2,7 @@ fileFormatVersion: 2
 guid: 08f3be664581d2c47bf95c35d69a1e91
 TextureImporter:
   fileIDToRecycleName:
-    21300000: Door_EW
+    21300000: Door
     21300002: Door_NS
   externalObjects: {}
   serializedVersion: 7
@@ -119,7 +119,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Door_EW
+      name: Door
       rect:
         serializedVersion: 2
         x: 32
@@ -161,7 +161,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: c70e6c3f785ebc842ac58b083f37d518
     vertices: []
     indices: 
     edges: []

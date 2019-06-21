@@ -24,13 +24,13 @@ public class JobSpriteController : MonoBehaviour
     {
         // FIXME we can only do furniture building jobs
 
-        GameObject job_go = new GameObject();
-
         if (jobGameObjectMap.ContainsKey(job))
         {
             Debug.LogError("OnJobCreated for a jobGO that already exists -- most likely job requeue");
             return;
         }
+
+        GameObject job_go = new GameObject();
 
         // Add the tile/GO pair to the dictionary
         jobGameObjectMap.Add(job, job_go);
