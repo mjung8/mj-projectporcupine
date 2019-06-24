@@ -38,6 +38,8 @@ public class Furniture : IXmlSerializable
     // SPECIAL: If movementCost = 0 then the tile is impassible (e.g. a wall).
     public float movementCost { get; protected set; }
 
+    public bool roomEnclosure { get; protected set; }
+
     // For example, a sofa might be 3x2 but graphics are only 3x1 (extra row for leg room)
     int width;
     int height;
@@ -65,6 +67,7 @@ public class Furniture : IXmlSerializable
     {
         this.objectType = other.objectType;
         this.movementCost = other.movementCost;
+        this.roomEnclosure = other.roomEnclosure;
         this.width = other.width;
         this.height = other.height;
         this.linksToNeighbour = other.linksToNeighbour;
@@ -83,10 +86,11 @@ public class Furniture : IXmlSerializable
     }
 
     // Create furniture from parameter -- this will probably only be used for prototypes
-    public Furniture (string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbour = false)
+    public Furniture (string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbour = false, bool roomEnclosure = false)
     {
         this.objectType = objectType;
         this.movementCost = movementCost;
+        this.roomEnclosure = roomEnclosure;
         this.width = width;
         this.height = height;
         this.linksToNeighbour = linksToNeighbour;

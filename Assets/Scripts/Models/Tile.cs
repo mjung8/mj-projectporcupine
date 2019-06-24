@@ -36,6 +36,9 @@ public class Tile : IXmlSerializable
 
     // LooseObject is like a stack of something
     Inventory inventory;
+
+    public Room room;
+
     // furniture is a wall, door, furniture
     public Furniture furniture
     {
