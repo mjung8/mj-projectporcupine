@@ -8,8 +8,16 @@ using System.Collections.Generic;
 
 public class Furniture : IXmlSerializable
 {
-    public Dictionary<string, float> furnParameters;
-    public Action<Furniture, float> updateActions;
+    /// <summary>
+    /// Custom parameter for this particular piece of furniture.
+    /// </summary>
+    protected Dictionary<string, float> furnParameters;
+
+    /// <summary>
+    /// These actions are called every update. They get passed the furniture
+    /// they belong to and a deltaTime.
+    /// </summary>
+    protected Action<Furniture, float> updateActions;
 
     public Func<Furniture, ENTERABILITY> IsEnterable;
 
@@ -62,7 +70,8 @@ public class Furniture : IXmlSerializable
         furnParameters = new Dictionary<string, float>();
     }
 
-    // Copy constructor
+    // Copy constructor -- don't call this directly unless we never
+    // do any subclassing. Use Clone() which is more virtual.
     protected Furniture(Furniture other)
     {
         this.objectType = other.objectType;
@@ -80,6 +89,8 @@ public class Furniture : IXmlSerializable
         this.IsEnterable = other.IsEnterable;
     }
 
+    // Make a copy of the current furniture
+    // Subclasses should overide this if a different copy constructure should be run.
     virtual public Furniture Clone()
     {
         return new Furniture(this);
@@ -95,7 +106,7 @@ public class Furniture : IXmlSerializable
         this.height = height;
         this.linksToNeighbour = linksToNeighbour;
 
-        this.funcPositionValidation = this.__IsValidPosition;
+        this.funcPositionValidation = this.DEFAULT__IsValidPosition;
 
         furnParameters = new Dictionary<string, float>();
     }
@@ -173,7 +184,7 @@ public class Furniture : IXmlSerializable
         return funcPositionValidation(t);
     }
 
-    public bool __IsValidPosition(Tile t)
+    protected bool DEFAULT__IsValidPosition(Tile t)
     {
         // Make sure tile is floor
         if (t.Type != TileType.Floor)
@@ -186,15 +197,6 @@ public class Furniture : IXmlSerializable
         {
             return false;
         }
-
-        return true;
-    }
-
-    public bool IsValidPosition_Door(Tile t)
-    {
-        if (__IsValidPosition(t) == false)
-            return false;
-        // Make sure we have a pair of E/W walls or N/S walls
 
         return true;
     }
@@ -236,5 +238,51 @@ public class Furniture : IXmlSerializable
             } while (reader.ReadToNextSibling("Param"));
         }
     }
-    
+
+    /// <summary>
+    /// Gets the custom furniture parameter from a string key.
+    /// </summary>
+    /// <param name="key">The key</param>
+    /// <param name="default_value"></param>
+    /// <returns>The parameter</returns>
+    public float GetParameter(string key, float default_value = 0)
+    {
+        if (furnParameters.ContainsKey(key) == false)
+        {
+            return default_value;
+        }
+
+        return furnParameters[key];
+    }
+
+    public void SetParameter(string key, float value)
+    {
+        furnParameters[key] = value;
+    }
+
+    public void ChangeParameter(string key, float value)
+    {
+        if (furnParameters.ContainsKey(key) == false)
+        {
+            furnParameters[key] = value;
+        }
+
+        furnParameters[key] += value;
+    }
+
+    /// <summary>
+    /// Registers a function that will be called every Update.
+    /// </summary>
+    /// <param name="a">The function</param>
+    public void RegisterUpdateAction(Action<Furniture, float> a)
+    {
+        updateActions += a;
+    }
+
+
+    public void UnregisterUpdateAction(Action<Furniture, float> a)
+    {
+        updateActions -= a;
+    }
+
 }

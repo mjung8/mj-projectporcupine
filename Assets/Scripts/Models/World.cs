@@ -42,7 +42,7 @@ public class World : IXmlSerializable
         SetupWorld(width, height);
 
         // Make one character
-        Character c = CreateCharacter(GetTileAt(Width / 2, Height / 2));
+        CreateCharacter(GetTileAt(Width / 2, Height / 2));
 
     }
 
@@ -99,7 +99,7 @@ public class World : IXmlSerializable
 
         characters = new List<Character>();
         furnitures = new List<Furniture>();
-        
+
     }
 
     // Tick
@@ -158,9 +158,9 @@ public class World : IXmlSerializable
         );
 
         // What if object behaviours were scriptable? And part of the text file?
-        furniturePrototypes["Door"].furnParameters["openness"] = 0;
-        furniturePrototypes["Door"].furnParameters["is_opening"] = 0;
-        furniturePrototypes["Door"].updateActions += FurnitureActions.Door_UpdateAction;
+        furniturePrototypes["Door"].SetParameter("openness", 0);
+        furniturePrototypes["Door"].SetParameter("is_opening", 0);
+        furniturePrototypes["Door"].RegisterUpdateAction(FurnitureActions.Door_UpdateAction);
 
         furniturePrototypes["Door"].IsEnterable = FurnitureActions.Door_IsEnterable;
     }
