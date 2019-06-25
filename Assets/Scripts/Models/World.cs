@@ -51,6 +51,11 @@ public class World : IXmlSerializable
         return rooms[0];
     }
 
+    public void AddRoom(Room r)
+    {
+        rooms.Add(r);
+    }
+
     public void DeleteRoom(Room r)
     {
         if (r == GetOutsideRoom())
@@ -58,9 +63,12 @@ public class World : IXmlSerializable
             Debug.LogError("Tried to delete the outside room.");
             return;
         }
-
-        r.UnAssignAllTiles();
+        // Remove this room from our rooms list
         rooms.Remove(r);
+
+        // All tiles that belonged to this room should be reassigned to
+        // the outside
+        r.UnAssignAllTiles();
     }
 
     void SetupWorld(int width, int height)
