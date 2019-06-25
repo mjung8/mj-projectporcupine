@@ -69,6 +69,8 @@ public class Path_TileGraph {
             n.edges = edges.ToArray();
         }
 
+        Debug.Log("Created " + nodes.Count + " nodes");
+        Debug.Log("Created " + edgeCount + " edges");
     }
 
     bool IsClippingCorner(Tile curr, Tile neigh)

@@ -109,9 +109,6 @@ public class Room
 
         // If we get to this point then we need to create a new room
         Room newRoom = new Room();
-
-        // The current tile belongs to this new room
-        newRoom.AssignTile(tile);
         Queue<Tile> tilesToCheck = new Queue<Tile>();
         tilesToCheck.Enqueue(tile);
 
