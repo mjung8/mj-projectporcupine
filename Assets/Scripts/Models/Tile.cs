@@ -36,6 +36,9 @@ public class Tile : IXmlSerializable
 
     // LooseObject is like a stack of something
     Inventory inventory;
+
+    public Room room;
+
     // furniture is a wall, door, furniture
     public Furniture furniture
     {
@@ -204,6 +207,26 @@ public class Tile : IXmlSerializable
         }
 
         return ENTERABILITY.Yes;
+    }
+
+    public Tile North()
+    {
+        return world.GetTileAt(X, Y + 1);
+    }
+
+    public Tile South()
+    {
+        return world.GetTileAt(X, Y - 1);
+    }
+
+    public Tile East()
+    {
+        return world.GetTileAt(X + 1, Y);
+    }
+
+    public Tile West()
+    {
+        return world.GetTileAt(X - 1, Y);
     }
 
 }

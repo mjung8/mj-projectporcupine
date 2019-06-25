@@ -20,6 +20,19 @@ public class MouseController : MonoBehaviour
         dragPreviewGameObjects = new List<GameObject>();
     }
 
+    /// <summary>
+    /// Gets the mouse position in world space.
+    /// </summary>
+    public Vector3 GetMousePosition()
+    {
+        return currentFramePosition;
+    }
+
+    public Tile GetMouseOverTile()
+    {
+        return WorldController.Instance.world.GetTileAt((int)currentFramePosition.x, (int)currentFramePosition.y);
+    }
+
     // Update is called once per frame
     void Update()
     {
