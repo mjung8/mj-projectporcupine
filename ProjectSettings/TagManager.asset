@@ -53,6 +53,9 @@ TagManager:
   - name: Jobs
     uniqueID: 1376447999
     locked: 0
+  - name: Inventory
+    uniqueID: 912270939
+    locked: 0
   - name: Characters
     uniqueID: 3631606553
     locked: 0

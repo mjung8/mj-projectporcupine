@@ -13,6 +13,7 @@ public class World : IXmlSerializable
     public List<Character> characters;
     public List<Furniture> furnitures;
     public List<Room> rooms;
+    public InventoryManager inventoryManager;
 
     // The pathfinding graph used to navigate the world
     public Path_TileGraph tileGraph;
@@ -26,6 +27,7 @@ public class World : IXmlSerializable
 
     Action<Furniture> cbFurnitureCreated;
     Action<Character> cbCharacterCreated;
+    Action<Inventory> cbInventoryCreated;
     Action<Tile> cbTileChanged;
 
     // TODO: most likely replaced with dedicated class
@@ -43,6 +45,14 @@ public class World : IXmlSerializable
 
         // Make one character
         CreateCharacter(GetTileAt(Width / 2, Height / 2));
+
+    }
+
+    /// <summary>
+    /// Default constructor used when loading a world from a file.
+    /// </summary>
+    public World()
+    {
 
     }
 
@@ -99,6 +109,7 @@ public class World : IXmlSerializable
 
         characters = new List<Character>();
         furnitures = new List<Furniture>();
+        inventoryManager = new InventoryManager();
 
     }
 
@@ -268,6 +279,16 @@ public class World : IXmlSerializable
         cbCharacterCreated -= callbackfunc;
     }
 
+    public void RegisterInventoryCreated(Action<Inventory> callbackfunc)
+    {
+        cbInventoryCreated += callbackfunc;
+    }
+
+    public void UnregisterInventoryCreated(Action<Inventory> callbackfunc)
+    {
+        cbInventoryCreated -= callbackfunc;
+    }
+
     public void RegisterTileChanged(Action<Tile> callbackfunc)
     {
         cbTileChanged += callbackfunc;
@@ -316,11 +337,6 @@ public class World : IXmlSerializable
      *  SAVING & LOADING
      * 
      *********************************/
-
-    public World()
-    {
-
-    }
 
     public XmlSchema GetSchema()
     {
@@ -397,6 +413,34 @@ public class World : IXmlSerializable
             }
         }
 
+        //DEBUG ONLY REMOVE ME LATER
+        //Create an Inventory item
+        Inventory inv = new Inventory();
+        inv.stackSize = 10;
+        Tile t = GetTileAt(Width / 2, Height / 2);
+        inventoryManager.PlaceInventory(t, inv);
+        if (cbInventoryCreated != null)
+        {
+            cbInventoryCreated(t.Inventory);
+        }
+
+        inv = new Inventory();
+        inv.stackSize = 18;
+        t = GetTileAt(Width / 2 + 2, Height / 2);
+        inventoryManager.PlaceInventory(t, inv);
+        if (cbInventoryCreated != null)
+        {
+            cbInventoryCreated(t.Inventory);
+        }
+
+        inv = new Inventory();
+        inv.stackSize = 45;
+        t = GetTileAt(Width / 2 + 1, Height / 2 + 2);
+        inventoryManager.PlaceInventory(t, inv);
+        if (cbInventoryCreated != null)
+        {
+            cbInventoryCreated(t.Inventory);
+        }
     }
 
     void ReadXml_Tiles(XmlReader reader)
