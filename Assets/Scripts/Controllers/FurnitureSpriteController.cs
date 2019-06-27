@@ -73,7 +73,6 @@ public class FurnitureSpriteController : MonoBehaviour
                 && southhTile.furniture.objectType == "Wall")
             {
                 furn_go.transform.rotation = Quaternion.Euler(0, 0, 90);
-                furn_go.transform.Translate(1f, 0, 0, Space.World); // ugly hack
             }
         }
 

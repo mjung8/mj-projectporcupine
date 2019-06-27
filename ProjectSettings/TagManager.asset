@@ -56,6 +56,9 @@ TagManager:
   - name: Inventory
     uniqueID: 912270939
     locked: 0
+  - name: InventoryUI
+    uniqueID: 1431039039
+    locked: 0
   - name: Characters
     uniqueID: 3631606553
     locked: 0

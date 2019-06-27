@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InventorySpriteController : MonoBehaviour
 {
+    public GameObject inventoryUIPrefab;
 
     Dictionary<Inventory, GameObject> inventoryGameObjectMap;
 
@@ -28,12 +30,12 @@ public class InventorySpriteController : MonoBehaviour
         // Check for pre-existing characters which won't be do the callback
         foreach (string objectType in world.inventoryManager.inventories.Keys)
         {
-            foreach(Inventory inv in world.inventoryManager.inventories[objectType])
+            foreach (Inventory inv in world.inventoryManager.inventories[objectType])
             {
                 OnInventoryCreated(inv);
             }
         }
-        
+
         //c.SetDestination(world.GetTileAt(world.Width / 2 + 5, world.Height / 2));
     }
 
@@ -68,6 +70,15 @@ public class InventorySpriteController : MonoBehaviour
         SpriteRenderer sr = inv_go.AddComponent<SpriteRenderer>();
         sr.sprite = inventorySprites[inv.objectType];
         sr.sortingLayerName = "Inventory";
+
+        if (inv.maxStackSize > 1)
+        {
+            // This is a stackable object so add the InventoryUI component
+            GameObject ui_go = Instantiate(inventoryUIPrefab);
+            ui_go.transform.SetParent(inv_go.transform);
+            ui_go.transform.localPosition = Vector3.zero;
+            ui_go.GetComponentInChildren<Text>().text = inv.stackSize.ToString();
+        }
 
         // Register our callback so that or GameObject gets updated whenever
         // the object's info changes
