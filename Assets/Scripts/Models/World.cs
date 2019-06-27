@@ -13,6 +13,7 @@ public class World : IXmlSerializable
     public List<Character> characters;
     public List<Furniture> furnitures;
     public List<Room> rooms;
+    public InventoryManager inventoryManager;
 
     // The pathfinding graph used to navigate the world
     public Path_TileGraph tileGraph;
@@ -26,6 +27,7 @@ public class World : IXmlSerializable
 
     Action<Furniture> cbFurnitureCreated;
     Action<Character> cbCharacterCreated;
+    Action<Inventory> cbInventoryCreated;
     Action<Tile> cbTileChanged;
 
     // TODO: most likely replaced with dedicated class
@@ -42,7 +44,15 @@ public class World : IXmlSerializable
         SetupWorld(width, height);
 
         // Make one character
-        Character c = CreateCharacter(GetTileAt(Width / 2, Height / 2));
+        CreateCharacter(GetTileAt(Width / 2, Height / 2));
+
+    }
+
+    /// <summary>
+    /// Default constructor used when loading a world from a file.
+    /// </summary>
+    public World()
+    {
 
     }
 
@@ -99,7 +109,8 @@ public class World : IXmlSerializable
 
         characters = new List<Character>();
         furnitures = new List<Furniture>();
-        
+        inventoryManager = new InventoryManager();
+
     }
 
     // Tick
@@ -158,9 +169,9 @@ public class World : IXmlSerializable
         );
 
         // What if object behaviours were scriptable? And part of the text file?
-        furniturePrototypes["Door"].furnParameters["openness"] = 0;
-        furniturePrototypes["Door"].furnParameters["is_opening"] = 0;
-        furniturePrototypes["Door"].updateActions += FurnitureActions.Door_UpdateAction;
+        furniturePrototypes["Door"].SetParameter("openness", 0);
+        furniturePrototypes["Door"].SetParameter("is_opening", 0);
+        furniturePrototypes["Door"].RegisterUpdateAction(FurnitureActions.Door_UpdateAction);
 
         furniturePrototypes["Door"].IsEnterable = FurnitureActions.Door_IsEnterable;
     }
@@ -268,6 +279,16 @@ public class World : IXmlSerializable
         cbCharacterCreated -= callbackfunc;
     }
 
+    public void RegisterInventoryCreated(Action<Inventory> callbackfunc)
+    {
+        cbInventoryCreated += callbackfunc;
+    }
+
+    public void UnregisterInventoryCreated(Action<Inventory> callbackfunc)
+    {
+        cbInventoryCreated -= callbackfunc;
+    }
+
     public void RegisterTileChanged(Action<Tile> callbackfunc)
     {
         cbTileChanged += callbackfunc;
@@ -316,11 +337,6 @@ public class World : IXmlSerializable
      *  SAVING & LOADING
      * 
      *********************************/
-
-    public World()
-    {
-
-    }
 
     public XmlSchema GetSchema()
     {
@@ -397,6 +413,34 @@ public class World : IXmlSerializable
             }
         }
 
+        //DEBUG ONLY REMOVE ME LATER
+        //Create an Inventory item
+        Inventory inv = new Inventory();
+        inv.stackSize = 10;
+        Tile t = GetTileAt(Width / 2, Height / 2);
+        inventoryManager.PlaceInventory(t, inv);
+        if (cbInventoryCreated != null)
+        {
+            cbInventoryCreated(t.Inventory);
+        }
+
+        inv = new Inventory();
+        inv.stackSize = 18;
+        t = GetTileAt(Width / 2 + 2, Height / 2);
+        inventoryManager.PlaceInventory(t, inv);
+        if (cbInventoryCreated != null)
+        {
+            cbInventoryCreated(t.Inventory);
+        }
+
+        inv = new Inventory();
+        inv.stackSize = 45;
+        t = GetTileAt(Width / 2 + 1, Height / 2 + 2);
+        inventoryManager.PlaceInventory(t, inv);
+        if (cbInventoryCreated != null)
+        {
+            cbInventoryCreated(t.Inventory);
+        }
     }
 
     void ReadXml_Tiles(XmlReader reader)
