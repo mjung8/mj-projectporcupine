@@ -39,4 +39,10 @@ public static class FurnitureActions
         return ENTERABILITY.Soon;
     }
 
+    public static void JobComplete_FurnitureBuilding(Job theJob)
+    {
+        WorldController.Instance.world.PlaceFurniture(theJob.jobObjectType, theJob.tile);
+        theJob.tile.pendingFunitureJob = null;
+    }
+
 }

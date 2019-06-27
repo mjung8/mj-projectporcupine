@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Inventory are things that are lying on the floor/stockpile like a bunch of metal bars
+/// or uninstalled furniture.
+/// </summary>
 public class Inventory
 {
     public string objectType = "Steel Plate";
@@ -13,6 +17,13 @@ public class Inventory
     public Inventory()
     {
 
+    }
+
+    public Inventory(string objectType, int maxStackSize, int stackSize)
+    {
+        this.objectType = objectType;
+        this.maxStackSize = maxStackSize;
+        this.stackSize = stackSize;
     }
 
     protected Inventory(Inventory other)

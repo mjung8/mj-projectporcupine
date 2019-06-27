@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Job {
+public class Job
+{
 
     // This class holds info for a queued job, which can include
     // things like placing furniture, moving stored inventory,
     // working at a desk, and maybe even fighting enemies.
 
-    public Tile tile { get; protected set; }
+    public Tile tile;
     float jobTime;
 
     public string jobObjectType { get; protected set; }
@@ -17,12 +18,45 @@ public class Job {
     Action<Job> cbJobComplete;
     Action<Job> cbJobCancel;
 
-    public Job(Tile tile, string jobObjectType, Action<Job> cbJobComplete, float jobTime = 0.1f)
+    Dictionary<string, Inventory> inventoryRequirements;
+
+    public Job(Tile tile, string jobObjectType, Action<Job> cbJobComplete, float jobTime, Inventory[] inventoryRequirements)
     {
         this.tile = tile;
         this.jobObjectType = jobObjectType;
         this.cbJobComplete += cbJobComplete;
         this.jobTime = jobTime;
+
+        this.inventoryRequirements = new Dictionary<string, Inventory>();
+        if (inventoryRequirements != null)
+        {
+            foreach (Inventory inv in inventoryRequirements)
+            {
+                this.inventoryRequirements[inv.objectType] = inv.Clone();
+            }
+        }
+    }
+
+    protected Job(Job other)
+    {
+        this.tile = other.tile;
+        this.jobObjectType = other.jobObjectType;
+        this.cbJobComplete += other.cbJobComplete;
+        this.jobTime = other.jobTime;
+
+        this.inventoryRequirements = new Dictionary<string, Inventory>();
+        if (inventoryRequirements != null)
+        {
+            foreach (Inventory inv in other.inventoryRequirements.Values)
+            {
+                this.inventoryRequirements[inv.objectType] = inv.Clone();
+            }
+        }
+    }
+
+    public virtual Job Clone()
+    {
+        return new Job(this);
     }
 
     public void RegisterJobCompleteCallback(Action<Job> cb)
@@ -52,13 +86,13 @@ public class Job {
         if (jobTime <= 0)
         {
             if (cbJobComplete != null)
-            cbJobComplete(this);
+                cbJobComplete(this);
         }
     }
 
     public void CancelJob()
     {
-        if(cbJobCancel != null)
+        if (cbJobCancel != null)
         {
             cbJobCancel(this);
         }

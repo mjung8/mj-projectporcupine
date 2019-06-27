@@ -63,6 +63,10 @@ public class Character : IXmlSerializable
 
                 // TODO: Check to see if job is reachable
 
+                // TODO: Does the job still need materials? 
+                //       If so, we need to go fetch them rather
+                //       than just walk to the job site.
+
                 destTile = myJob.tile;
                 myJob.RegisterJobCompleteCallback(OnJobEnded);
                 myJob.RegisterJobCancelCallback(OnJobEnded);
@@ -72,6 +76,9 @@ public class Character : IXmlSerializable
         // Are we there
         if (myJob != null && currTile == myJob.tile)
         {
+            // We are at the correct tile for our job so execute
+            // the job's DoWork which is mostly going to couintdown
+            // jobTime and potentially call its JobCompleteCallback
             myJob.DoWork(deltaTime);
         }
     }
