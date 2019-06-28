@@ -27,7 +27,21 @@ public class Character : IXmlSerializable
 
     public Tile currTile { get; protected set; }
 
-    Tile destTile;  // If we aren't moving then destTile = currTile
+    // If we aren't moving then destTile = currTile
+    Tile _destTile;
+    Tile destTile
+    {
+        get { return _destTile; }
+        set
+        {
+            if (_destTile != value)
+            {
+                _destTile = value;
+                pathAStar = null;  // If this is a new destination then we need to invalidate pathfinding
+            }
+        }
+    }
+
     Tile nextTile;  // The next tile in the pathfinding sequence
     Path_AStar pathAStar;
 
@@ -39,6 +53,8 @@ public class Character : IXmlSerializable
 
     Job myJob;
 
+    public Inventory inventory;
+
     public Character()
     {
         // Use only for serialization
@@ -49,44 +65,139 @@ public class Character : IXmlSerializable
         currTile = destTile = nextTile = tile;
     }
 
+    void GetNewJob()
+    {
+        myJob = currTile.world.jobQueue.Dequeue();
+
+        if (myJob == null)
+            return;
+
+        destTile = myJob.tile;
+        myJob.RegisterJobCompleteCallback(OnJobEnded);
+        myJob.RegisterJobCancelCallback(OnJobEnded);
+
+        // Immediately check to see if the job tile is reachable
+        pathAStar = new Path_AStar(currTile.world, currTile, destTile);  // This will calculate path from curr to dest
+        if (pathAStar.Length() == 0)
+        {
+            Debug.LogError("Path_AStar returned no path to destination!");
+            AbandonJob();
+            destTile = currTile;
+        }
+    }
+
     void Update_DoJob(float deltaTime)
     {
         // Do I have a job?
         if (myJob == null)
         {
-            // Grab a new job
-            myJob = currTile.world.jobQueue.Dequeue();
+            GetNewJob();
 
-            if (myJob != null)
+            if (myJob == null)
             {
-                // We have job
-
-                // TODO: Check to see if job is reachable
-
-                // TODO: Does the job still need materials? 
-                //       If so, we need to go fetch them rather
-                //       than just walk to the job site.
-
-                destTile = myJob.tile;
-                myJob.RegisterJobCompleteCallback(OnJobEnded);
-                myJob.RegisterJobCancelCallback(OnJobEnded);
+                // There was no job in the queue so just return
+                destTile = currTile;
+                return;
             }
         }
 
-        // Are we there
-        if (myJob != null && currTile == myJob.tile)
+        // We have job. Do job?
+        if (myJob.HasAllMaterial() == false)
+        {
+            // No we are missing something
+            // Am I carrying anything the job location wants?
+            if (inventory != null)
+            {
+                if (myJob.DesiresInventoryType(inventory) > 0)
+                {
+                    // If so, deliver
+                    // Walk to the job tile then drop off the stack into the job
+                    if (currTile == myJob.tile)
+                    {
+                        // We are at the job site so drop the inventory
+                        currTile.world.inventoryManager.PlaceInventory(myJob, inventory);
+                        // Are we still carrying things?
+                        if (inventory.stackSize == 0)
+                        {
+                            inventory = null;
+                        }
+                        else
+                        {
+                            Debug.LogError("Character is still carrying inventory but shouldn't be. Set to NULL for now");
+                            inventory = null;
+                        }
+                    }
+                    else
+                    {
+                        destTile = myJob.tile;
+                        return;
+                    }
+                }
+                else
+                {
+                    // We are carrying something but the job doesn't want it
+                    // Dump it
+                    // TODO: Walk to nearest empty tile and dump it
+                    if (currTile.world.inventoryManager.PlaceInventory(currTile, inventory) == false)
+                    {
+                        Debug.LogError("Character tried to dump inventory into an invalid tile");
+                        // FIXME: Dump any reference to current inventory
+                        inventory = null;
+                    }
+                }
+            }
+            else
+            {
+                // Are we standing on a tile with goods desired by job?
+                if (currTile.Inventory != null && myJob.DesiresInventoryType(currTile.Inventory) > 0)
+                {
+                    // Pick up the stuff
+                    currTile.world.inventoryManager.PlaceInventory(this, currTile.Inventory, myJob.DesiresInventoryType(currTile.Inventory));
+                }
+                else
+                {
+                    // If not, walk towards a tile containing the required goods
+
+                    // Find the first thing in the job that isn't satisfied
+                    Inventory desired = myJob.GetFirstDesiredInventory();
+                    Inventory supplier = currTile.world.inventoryManager.GetClosestInventoryOfType(
+                        desired.objectType,
+                        currTile,
+                        desired.maxStackSize - desired.stackSize
+                    );
+
+                    if (supplier == null)
+                    {
+                        Debug.Log("No tile contains objects of type " + desired.objectType + "to satisfy job requirements");
+                        AbandonJob();
+                        return;
+                    }
+
+                    destTile = supplier.tile;
+                    return;
+                }
+            }
+
+            return; // Can't continue until all materials are satisifed
+        }
+
+        // Materials acquired. Go to job and do job.
+        destTile = myJob.tile;
+
+        if (currTile == myJob.tile)
         {
             // We are at the correct tile for our job so execute
             // the job's DoWork which is mostly going to couintdown
             // jobTime and potentially call its JobCompleteCallback
             myJob.DoWork(deltaTime);
         }
+
+        // DoMovement gets called in the master Update
     }
 
     public void AbandonJob()
     {
         nextTile = destTile = currTile;
-        pathAStar = null;
         currTile.world.jobQueue.Enqueue(myJob);
         myJob = null;
     }
@@ -115,7 +226,6 @@ public class Character : IXmlSerializable
                     Debug.LogError("Path_AStar returned no path to destination!");
                     // FIXME: maybe job should be requeued
                     AbandonJob();
-                    pathAStar = null;
                     return;
                 }
 

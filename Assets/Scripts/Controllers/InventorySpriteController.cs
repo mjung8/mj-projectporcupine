@@ -82,7 +82,7 @@ public class InventorySpriteController : MonoBehaviour
 
         // Register our callback so that or GameObject gets updated whenever
         // the object's info changes
-        //inv.RegisterOnChangedCallback(OnCharacterChanged);
+        inv.RegisterChangedCallback(OnInventoryChanged);
     }
 
     void OnInventoryChanged(Inventory inv)
@@ -95,7 +95,11 @@ public class InventorySpriteController : MonoBehaviour
         }
 
         GameObject inv_go = inventoryGameObjectMap[inv];
-        //furn_go.GetComponent<SpriteRenderer>().sprite = GetSpriteForFurniture(furn);
-        inv_go.transform.position = new Vector3(inv.tile.X, inv.tile.Y, 0);
+        Text text = inv_go.GetComponentInChildren<Text>();
+        // FIXME: if maxstacksize changed to/from 1 then we need to create or destroy the text
+        if (text != null)
+        {
+            text.text = inv.stackSize.ToString();
+        }
     }
 }

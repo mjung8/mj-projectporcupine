@@ -35,7 +35,7 @@ public class Tile : IXmlSerializable
     }
 
     // LooseObject is like a stack of something
-    public Inventory Inventory { get; protected set; }
+    public Inventory Inventory { get; set; }
 
     public Room room;
 
