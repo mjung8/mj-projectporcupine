@@ -4,25 +4,41 @@ using UnityEngine.EventSystems;
 
 public class BuildModeController : MonoBehaviour
 {
-    bool buildModeIsObjects = false;
+    public bool buildModeIsObjects = false;
     TileType buildModeTile = TileType.Floor;
-    string buildModeObjectType;
+    public string buildModeObjectType;
 
     // Use this for initialization
     void Start()
     {
+        
+    }
+
+    public bool IsObjectDraggable()
+    {
+        if (buildModeIsObjects == false)
+        {
+            // floors are draggable
+            return true;
+        }
+
+        Furniture proto = WorldController.Instance.world.furniturePrototypes[buildModeObjectType];
+
+        return proto.Width == 1 && proto.Height == 1;
     }
 
     public void SetMode_BuildFloor()
     {
         buildModeIsObjects = false;
         buildModeTile = TileType.Floor;
+        GameObject.FindObjectOfType<MouseController>().StartBuildMode();
     }
 
     public void SetMode_Bulldoze()
     {
         buildModeIsObjects = false;
         buildModeTile = TileType.Empty;
+        GameObject.FindObjectOfType<MouseController>().StartBuildMode();
     }
 
     public void SetMode_BuildFurniture(string objectType)
@@ -30,6 +46,7 @@ public class BuildModeController : MonoBehaviour
         // Wall is not a Tile. Wall is an furniture that exists on top of a tile.
         buildModeIsObjects = true;
         buildModeObjectType = objectType;
+        GameObject.FindObjectOfType<MouseController>().StartBuildMode();
     }
 
     public void DoPathfindingTest()
