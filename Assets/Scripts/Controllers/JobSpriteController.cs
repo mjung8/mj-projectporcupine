@@ -45,8 +45,6 @@ public class JobSpriteController : MonoBehaviour
         job_go.transform.position = new Vector3(job.tile.X + ((job.furniturePrototype.Width -1)/2f), job.tile.Y + ((job.furniturePrototype.Height - 1) / 2f), 0);
         job_go.transform.SetParent(this.transform, true);
 
-        // FIXME: we assume the object must be a wall so use the hardcoded
-        // reference to the wall sprite
         SpriteRenderer sr = job_go.AddComponent<SpriteRenderer>();
         sr.sprite = fsc.GetSpriteForFurniture(job.jobObjectType);
         sr.color = new Color(0.5f, 1f, 0.5f, 0.25f);
