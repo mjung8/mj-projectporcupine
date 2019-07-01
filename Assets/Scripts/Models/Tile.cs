@@ -35,7 +35,7 @@ public class Tile : IXmlSerializable
     }
 
     // LooseObject is like a stack of something
-    public Inventory Inventory { get; set; }
+    public Inventory inventory { get; set; }
 
     public Room room;
 
@@ -128,26 +128,26 @@ public class Tile : IXmlSerializable
     {
         if(inv == null)
         {
-            Inventory = null;
+            inventory = null;
             return true;
         }
 
-        if(Inventory != null)
+        if(inventory != null)
         {
             // There's already inventory here. Maybe combine stack?
-            if (Inventory.objectType != inv.objectType)
+            if (inventory.objectType != inv.objectType)
             {
                 Debug.LogError("Trying to assign inventory to a tile that already has some of a different type!");
                 return false;
             }
 
             int numToMove = inv.stackSize;
-            if(Inventory.stackSize + numToMove > Inventory.maxStackSize)
+            if(inventory.stackSize + numToMove > inventory.maxStackSize)
             {
-                numToMove = Inventory.maxStackSize - Inventory.stackSize;
+                numToMove = inventory.maxStackSize - inventory.stackSize;
             }
 
-            Inventory.stackSize += numToMove;
+            inventory.stackSize += numToMove;
             inv.stackSize -= numToMove;
                         
             return true;
@@ -158,8 +158,8 @@ public class Tile : IXmlSerializable
         // the inventory manager needs to know that the old stack
         // is empty and has to be removed from previous lists.
 
-        Inventory = inv.Clone();
-        Inventory.tile = this;
+        inventory = inv.Clone();
+        inventory.tile = this;
         inv.stackSize = 0;
 
         return true;

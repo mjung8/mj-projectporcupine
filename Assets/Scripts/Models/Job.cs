@@ -11,12 +11,17 @@ public class Job
     // working at a desk, and maybe even fighting enemies.
 
     public Tile tile;
-    float jobTime;
+    public float jobTime { get; protected set; }
 
     public string jobObjectType { get; protected set; }
 
+    public bool acceptsAnyInventoryItem = false;
+
     Action<Job> cbJobComplete;
     Action<Job> cbJobCancel;
+    Action<Job> cbJobWorked;
+
+    public bool canTakeFromStockpile = true;
 
     public Dictionary<string, Inventory> inventoryRequirements;
 
@@ -79,9 +84,36 @@ public class Job
         cbJobCancel -= cb;
     }
 
+    public void RegisterJobWorkedCallback(Action<Job> cb)
+    {
+        cbJobWorked += cb;
+    }
+
+    public void UnregisterJobWorkedCallback(Action<Job> cb)
+    {
+        cbJobWorked -= cb;
+    }
+
     public void DoWork(float workTime)
     {
+        // Check to make sure we actually have everything we need
+        // If not, don't register the work time
+        if(HasAllMaterial() == false)
+        {
+            //Debug.LogError("Tried to do work on a job that doesn't have all material.");
+
+            // job can't actually be worked but still call the callbacks
+            // so that animations and what not can be updated
+            if (cbJobWorked != null)
+                cbJobWorked(this);
+
+            return;
+        }
+
         jobTime -= workTime;
+
+        if (cbJobWorked != null)
+            cbJobWorked(this);
 
         if (jobTime <= 0)
         {
@@ -96,6 +128,8 @@ public class Job
         {
             cbJobCancel(this);
         }
+
+        tile.world.jobQueue.Remove(this);
     }
 
     public bool HasAllMaterial()
@@ -113,6 +147,11 @@ public class Job
 
     public int DesiresInventoryType(Inventory inv)
     {
+        if (acceptsAnyInventoryItem)
+        {
+            return inv.maxStackSize;
+        }
+
         if (inventoryRequirements.ContainsKey(inv.objectType) == false)
             return 0;
 

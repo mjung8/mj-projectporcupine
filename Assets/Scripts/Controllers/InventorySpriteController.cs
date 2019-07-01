@@ -95,11 +95,21 @@ public class InventorySpriteController : MonoBehaviour
         }
 
         GameObject inv_go = inventoryGameObjectMap[inv];
-        Text text = inv_go.GetComponentInChildren<Text>();
-        // FIXME: if maxstacksize changed to/from 1 then we need to create or destroy the text
-        if (text != null)
+        if (inv.stackSize > 0)
         {
-            text.text = inv.stackSize.ToString();
+            Text text = inv_go.GetComponentInChildren<Text>();
+            // FIXME: if maxstacksize changed to/from 1 then we need to create or destroy the text
+            if (text != null)
+            {
+                text.text = inv.stackSize.ToString();
+            }
+        }
+        else
+        {
+            // This stack has gone to zero, so remove sprite
+            Destroy(inv_go);
+            inventoryGameObjectMap.Remove(inv);
+            inv.UnregisterChangedCallback(OnInventoryChanged);
         }
     }
 }

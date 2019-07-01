@@ -22,7 +22,7 @@ public class InventoryManager
             }
             if (inv.tile != null)
             {
-                inv.tile.Inventory = null;
+                inv.tile.inventory = null;
                 inv.tile = null;
             }
             if (inv.character != null)
@@ -35,7 +35,7 @@ public class InventoryManager
 
     public bool PlaceInventory(Tile tile, Inventory inv)
     {
-        bool tileWasEmpty = tile.Inventory == null;
+        bool tileWasEmpty = tile.inventory == null;
 
         if (tile.PlaceInventory(inv) == false)
         {
@@ -48,12 +48,14 @@ public class InventoryManager
         // may have also created a new stack on the tile if the tile was previously empty
         if (tileWasEmpty)
         {
-            if (inventories.ContainsKey(tile.Inventory.objectType) == false)
+            if (inventories.ContainsKey(tile.inventory.objectType) == false)
             {
-                inventories[tile.Inventory.objectType] = new List<Inventory>();
+                inventories[tile.inventory.objectType] = new List<Inventory>();
             }
 
-            inventories[tile.Inventory.objectType].Add(tile.Inventory);
+            inventories[tile.inventory.objectType].Add(tile.inventory);
+
+            tile.world.OnInventoryCreated(tile.inventory);
         }
 
         return true;
@@ -86,7 +88,13 @@ public class InventoryManager
     public bool PlaceInventory(Character character, Inventory sourceInventory, int amount = -1)
     {
         if (amount < 0)
+        {
             amount = sourceInventory.stackSize;
+        }
+        else
+        {
+            amount = Mathf.Min(amount, sourceInventory.stackSize);
+        }
 
         if (character.inventory == null)
         {
@@ -124,7 +132,7 @@ public class InventoryManager
     /// <param name="t"></param>
     /// <param name="desiredAmount"></param>
     /// <returns></returns>
-    public Inventory GetClosestInventoryOfType(string objectType, Tile t, int desiredAmount)
+    public Inventory GetClosestInventoryOfType(string objectType, Tile t, int desiredAmount, bool canTakeFromStockpile)
     {
         // FIXME: a) we are lying about returning the closest item;
         // b) there's no way to return the closest item in an optimal manner until 
@@ -138,7 +146,8 @@ public class InventoryManager
 
         foreach (Inventory inv in inventories[objectType])
         {
-            if (inv.tile != null)
+            if (inv.tile != null &&
+                (canTakeFromStockpile || inv.tile.furniture == null || inv.tile.furniture.IsStockpile() == false))
             {
                 return inv;
             }

@@ -159,7 +159,13 @@ public class World : IXmlSerializable
             )
         );
         furnitureJobPrototypes.Add("Wall",
-            new Job(null, "Wall", FurnitureActions.JobComplete_FurnitureBuilding, 1f, new Inventory[] { new Inventory("Steel Plate", 5, 0) })
+            new Job(
+                null, 
+                "Wall", 
+                FurnitureActions.JobComplete_FurnitureBuilding, 
+                1f, 
+                new Inventory[] { new Inventory("Steel Plate", 5, 0) }
+            )
         );
 
         furniturePrototypes.Add("Door",
@@ -179,6 +185,29 @@ public class World : IXmlSerializable
         furniturePrototypes["Door"].RegisterUpdateAction(FurnitureActions.Door_UpdateAction);
 
         furniturePrototypes["Door"].IsEnterable = FurnitureActions.Door_IsEnterable;
+
+
+        furniturePrototypes.Add("Stockpile",
+            new Furniture(
+                "Stockpile",
+                1,  // Impassable
+                1,  // Width
+                1,  // Height
+                true,   // Links to neighbours and "sort of" becomes part of a larger object
+                false    // Enclose rooms
+            )
+        );
+        furniturePrototypes["Stockpile"].RegisterUpdateAction(FurnitureActions.Stockpile_UpdateAction);
+        furniturePrototypes["Stockpile"].tint = new Color32(186, 31, 31, 255);
+        furnitureJobPrototypes.Add("Stockpile",
+            new Job(
+                null,
+                "Stockpile",
+                FurnitureActions.JobComplete_FurnitureBuilding,
+                -1,
+                null
+            )
+        );
     }
 
     public void SetupPathfindingExample()
@@ -420,31 +449,28 @@ public class World : IXmlSerializable
 
         //DEBUG ONLY REMOVE ME LATER
         //Create an Inventory item
-        Inventory inv = new Inventory();
-        inv.stackSize = 10;
+        Inventory inv = new Inventory("Steel Plate", 50, 50);
         Tile t = GetTileAt(Width / 2, Height / 2);
         inventoryManager.PlaceInventory(t, inv);
         if (cbInventoryCreated != null)
         {
-            cbInventoryCreated(t.Inventory);
+            cbInventoryCreated(t.inventory);
         }
 
-        inv = new Inventory();
-        inv.stackSize = 18;
+        inv = new Inventory("Steel Plate", 50, 4);
         t = GetTileAt(Width / 2 + 2, Height / 2);
         inventoryManager.PlaceInventory(t, inv);
         if (cbInventoryCreated != null)
         {
-            cbInventoryCreated(t.Inventory);
+            cbInventoryCreated(t.inventory);
         }
 
-        inv = new Inventory();
-        inv.stackSize = 45;
+        inv = new Inventory("Steel Plate", 50, 3);
         t = GetTileAt(Width / 2 + 1, Height / 2 + 2);
         inventoryManager.PlaceInventory(t, inv);
         if (cbInventoryCreated != null)
         {
-            cbInventoryCreated(t.Inventory);
+            cbInventoryCreated(t.inventory);
         }
     }
 
@@ -498,6 +524,12 @@ public class World : IXmlSerializable
                 c.ReadXml(reader);
             } while (reader.ReadToNextSibling("Character"));
         }
+    }
+
+    public void OnInventoryCreated(Inventory inv)
+    {
+        if (cbInventoryCreated != null)
+            cbInventoryCreated(inv);
     }
 
 }

@@ -79,6 +79,7 @@ public class FurnitureSpriteController : MonoBehaviour
         SpriteRenderer sr = furn_go.AddComponent<SpriteRenderer>();
         sr.sprite = GetSpriteForFurniture(furn);
         sr.sortingLayerName = "Furniture";
+        sr.color = furn.tint;
 
         // Register our callback so that or GameObject gets updated whenever
         // the object's info changes

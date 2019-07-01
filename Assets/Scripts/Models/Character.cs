@@ -116,6 +116,8 @@ public class Character : IXmlSerializable
                     {
                         // We are at the job site so drop the inventory
                         currTile.world.inventoryManager.PlaceInventory(myJob, inventory);
+                        myJob.DoWork(0);  // This will call all cbJobWorked callbacks
+
                         // Are we still carrying things?
                         if (inventory.stackSize == 0)
                         {
@@ -149,10 +151,16 @@ public class Character : IXmlSerializable
             else
             {
                 // Are we standing on a tile with goods desired by job?
-                if (currTile.Inventory != null && myJob.DesiresInventoryType(currTile.Inventory) > 0)
+                if (currTile.inventory != null &&
+                    (myJob.canTakeFromStockpile || currTile.furniture == null || currTile.furniture.IsStockpile() == false) &&
+                    myJob.DesiresInventoryType(currTile.inventory) > 0)
                 {
                     // Pick up the stuff
-                    currTile.world.inventoryManager.PlaceInventory(this, currTile.Inventory, myJob.DesiresInventoryType(currTile.Inventory));
+                    currTile.world.inventoryManager.PlaceInventory(
+                        this,
+                        currTile.inventory,
+                        myJob.DesiresInventoryType(currTile.inventory)
+                    );
                 }
                 else
                 {
@@ -163,7 +171,8 @@ public class Character : IXmlSerializable
                     Inventory supplier = currTile.world.inventoryManager.GetClosestInventoryOfType(
                         desired.objectType,
                         currTile,
-                        desired.maxStackSize - desired.stackSize
+                        desired.maxStackSize - desired.stackSize,
+                        myJob.canTakeFromStockpile
                     );
 
                     if (supplier == null)
@@ -326,6 +335,10 @@ public class Character : IXmlSerializable
     void OnJobEnded(Job j)
     {
         //Job completed or cancelled
+
+        j.UnregisterJobCancelCallback(OnJobEnded);
+        j.UnregisterJobCompleteCallback(OnJobEnded);
+
         if (j != myJob)
         {
             Debug.LogError("Character being told about job that isn't his. You forgot to unregister something");
