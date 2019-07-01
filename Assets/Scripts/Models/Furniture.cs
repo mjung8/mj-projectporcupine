@@ -21,6 +21,8 @@ public class Furniture : IXmlSerializable
 
     public Func<Furniture, ENTERABILITY> IsEnterable;
 
+    List<Job> jobs;
+
     public void Update(float deltaTime)
     {
         if (updateActions != null)
@@ -31,7 +33,8 @@ public class Furniture : IXmlSerializable
 
     // Represents base tile of object -- but large objects will occupy
     // multiple tiles.
-    public Tile tile {
+    public Tile tile
+    {
         get; protected set;
     }
 
@@ -49,8 +52,10 @@ public class Furniture : IXmlSerializable
     public bool roomEnclosure { get; protected set; }
 
     // For example, a sofa might be 3x2 but graphics are only 3x1 (extra row for leg room)
-    int width;
-    int height;
+    public int Width { get; protected set; }
+    public int Height { get; protected set; }
+
+    public Color tint = Color.white;
 
     public bool linksToNeighbour
     {
@@ -68,6 +73,7 @@ public class Furniture : IXmlSerializable
     public Furniture()
     {
         furnParameters = new Dictionary<string, float>();
+        jobs = new List<Job>();
     }
 
     // Copy constructor -- don't call this directly unless we never
@@ -77,14 +83,19 @@ public class Furniture : IXmlSerializable
         this.objectType = other.objectType;
         this.movementCost = other.movementCost;
         this.roomEnclosure = other.roomEnclosure;
-        this.width = other.width;
-        this.height = other.height;
+        this.Width = other.Width;
+        this.Height = other.Height;
+        this.tint = other.tint;
         this.linksToNeighbour = other.linksToNeighbour;
 
         this.furnParameters = new Dictionary<string, float>(other.furnParameters);
+        jobs = new List<Job>();
 
         if (other.updateActions != null)
             this.updateActions = (Action<Furniture, float>)other.updateActions.Clone();
+
+        if (other.funcPositionValidation != null)
+            this.funcPositionValidation = (Func<Tile, bool>)other.funcPositionValidation.Clone();
 
         this.IsEnterable = other.IsEnterable;
     }
@@ -97,13 +108,13 @@ public class Furniture : IXmlSerializable
     }
 
     // Create furniture from parameter -- this will probably only be used for prototypes
-    public Furniture (string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbour = false, bool roomEnclosure = false)
+    public Furniture(string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbour = false, bool roomEnclosure = false)
     {
         this.objectType = objectType;
         this.movementCost = movementCost;
         this.roomEnclosure = roomEnclosure;
-        this.width = width;
-        this.height = height;
+        this.Width = width;
+        this.Height = height;
         this.linksToNeighbour = linksToNeighbour;
 
         this.funcPositionValidation = this.DEFAULT__IsValidPosition;
@@ -124,6 +135,7 @@ public class Furniture : IXmlSerializable
         Furniture furn = proto.Clone(); //new Furniture(proto);
         furn.tile = tile;
 
+        // FIXME: this assumes 1x1
         if (tile.PlaceFurniture(furn) == false)
         {
             // For some reason we weren't able t place the object in this tile
@@ -133,7 +145,7 @@ public class Furniture : IXmlSerializable
             return null;
         }
 
-        if(furn.linksToNeighbour)
+        if (furn.linksToNeighbour)
         {
             // This type of furniture links itself to its neighbours,
             // so we should inform our neighbours of a new neighbour.
@@ -179,23 +191,31 @@ public class Furniture : IXmlSerializable
         cbOnChanged -= callbackfunc;
     }
 
-    public bool IsValidPosition (Tile t)
+    public bool IsValidPosition(Tile t)
     {
         return funcPositionValidation(t);
     }
 
     protected bool DEFAULT__IsValidPosition(Tile t)
     {
-        // Make sure tile is floor
-        if (t.Type != TileType.Floor)
+        for (int x_off = t.X; x_off < (t.X + Width); x_off++)
         {
-            return false;
-        }
+            for (int y_off = t.Y; y_off < (t.Y + Height); y_off++)
+            {
+                Tile t2 = t.world.GetTileAt(x_off, y_off);
 
-        // Make sure tile doesn't already have furniture
-        if (t.furniture != null)
-        {
-            return false;
+                // Make sure tile is floor
+                if (t2.Type != TileType.Floor)
+                {
+                    return false;
+                }
+
+                // Make sure tile doesn't already have furniture
+                if (t2.furniture != null)
+                {
+                    return false;
+                }
+            }
         }
 
         return true;
@@ -228,7 +248,7 @@ public class Furniture : IXmlSerializable
         // and should be assigned to a tile
         //movementCost = int.Parse(reader.GetAttribute("movementCost"));
 
-        if(reader.ReadToDescendant("Param"))
+        if (reader.ReadToDescendant("Param"))
         {
             do
             {
@@ -285,4 +305,34 @@ public class Furniture : IXmlSerializable
         updateActions -= a;
     }
 
+    public int JobCount()
+    {
+        return jobs.Count;
+    }
+
+    public void AddJob(Job j)
+    {
+        jobs.Add(j);
+        tile.world.jobQueue.Enqueue(j);
+    }
+
+    public void RemoveJob(Job j)
+    {
+        jobs.Remove(j);
+        j.CancelJob();
+        tile.world.jobQueue.Remove(j);
+    }
+
+    public void ClearJobs()
+    {
+        foreach (Job j in jobs)
+        {
+            RemoveJob(j);
+        }
+    }
+
+    public bool IsStockpile()
+    {
+        return objectType == "Stockpile";
+    }
 }

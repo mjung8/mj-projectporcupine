@@ -58,7 +58,7 @@ public class FurnitureSpriteController : MonoBehaviour
         furnitureGameObjectMap.Add(furn, furn_go);
 
         furn_go.name = furn.objectType + "_ " + furn.tile.X + "_" + furn.tile.Y;
-        furn_go.transform.position = new Vector3(furn.tile.X, furn.tile.Y, 0);
+        furn_go.transform.position = new Vector3(furn.tile.X + ((furn.Width - 1)/2f), furn.tile.Y + ((furn.Height - 1) / 2f), 0);
         furn_go.transform.SetParent(this.transform, true);
 
         // FIXME: This hardcoding is not good
@@ -79,6 +79,7 @@ public class FurnitureSpriteController : MonoBehaviour
         SpriteRenderer sr = furn_go.AddComponent<SpriteRenderer>();
         sr.sprite = GetSpriteForFurniture(furn);
         sr.sortingLayerName = "Furniture";
+        sr.color = furn.tint;
 
         // Register our callback so that or GameObject gets updated whenever
         // the object's info changes

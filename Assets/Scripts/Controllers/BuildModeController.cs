@@ -55,12 +55,22 @@ public class BuildModeController : MonoBehaviour
             {
                 // This tile position is valid for this furniture
                 // Create a job for it to be built
-                Job j = new Job(t, furnitureType, (theJob) =>
+                Job j;
+
+                if (WorldController.Instance.world.furnitureJobPrototypes.ContainsKey(furnitureType))
                 {
-                    WorldController.Instance.world.PlaceFurniture(furnitureType, theJob.tile);
-                    t.pendingFunitureJob = null;
+                    // Make a clone of the job prototype
+                    j = WorldController.Instance.world.furnitureJobPrototypes[furnitureType].Clone();
+                    // assign the correct tile
+                    j.tile = t;
                 }
-                );
+                else
+                {
+                    Debug.LogError("There is no furnitureJobPrototype for: " + furnitureType);
+                    j = new Job(t, furnitureType, FurnitureActions.JobComplete_FurnitureBuilding, 0.1f, null);
+                }
+
+                j.furniturePrototype = WorldController.Instance.world.furniturePrototypes[furnitureType];
 
                 // not good to explicitly set stuff like this
                 t.pendingFunitureJob = j;

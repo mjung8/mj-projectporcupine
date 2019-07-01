@@ -35,7 +35,7 @@ public class Tile : IXmlSerializable
     }
 
     // LooseObject is like a stack of something
-    public Inventory Inventory { get; protected set; }
+    public Inventory inventory { get; set; }
 
     public Room room;
 
@@ -102,54 +102,64 @@ public class Tile : IXmlSerializable
         cbTileChanged -= callback;
     }
 
+    public bool UninstallFurniture()
+    {
+        // Just uninstalling. FIXME: what if we have a multi-tile furniture?
+        furniture = null;
+        return true;
+    }
+    
     public bool PlaceFurniture(Furniture objInstance)
     {
         if (objInstance == null)
         {
-            // We are uninstalling whatever was here
-            furniture = null;
-            return true;
+            return UninstallFurniture();
         }
 
-        // objInstance isn't null
-
-        if (furniture != null)
+        if (objInstance.IsValidPosition(this) == false)
         {
-            Debug.LogError("Trying to assign a furniture to a tile that already has one!");
+            Debug.LogError("Trying to assign a furniture to a tile that isn't valid!");
             return false;
         }
 
-        // At this point, everything's fine!
-        furniture = objInstance;
+        for (int x_off = X; x_off < (X + objInstance.Width); x_off++)
+        {
+            for (int y_off = Y; y_off < (Y + objInstance.Height); y_off++)
+            {
+                Tile t = world.GetTileAt(x_off, y_off);
+                t.furniture = objInstance;
+            }
+        }
+
         return true;
     }
 
     public bool PlaceInventory(Inventory inv)
     {
-        if(inv == null)
+        if (inv == null)
         {
-            Inventory = null;
+            inventory = null;
             return true;
         }
 
-        if(Inventory != null)
+        if (inventory != null)
         {
             // There's already inventory here. Maybe combine stack?
-            if (Inventory.objectType != inv.objectType)
+            if (inventory.objectType != inv.objectType)
             {
                 Debug.LogError("Trying to assign inventory to a tile that already has some of a different type!");
                 return false;
             }
 
             int numToMove = inv.stackSize;
-            if(Inventory.stackSize + numToMove > Inventory.maxStackSize)
+            if (inventory.stackSize + numToMove > inventory.maxStackSize)
             {
-                numToMove = Inventory.maxStackSize - Inventory.stackSize;
+                numToMove = inventory.maxStackSize - inventory.stackSize;
             }
 
-            Inventory.stackSize += numToMove;
+            inventory.stackSize += numToMove;
             inv.stackSize -= numToMove;
-                        
+
             return true;
         }
 
@@ -158,8 +168,8 @@ public class Tile : IXmlSerializable
         // the inventory manager needs to know that the old stack
         // is empty and has to be removed from previous lists.
 
-        Inventory = inv.Clone();
-        Inventory.tile = this;
+        inventory = inv.Clone();
+        inventory.tile = this;
         inv.stackSize = 0;
 
         return true;
