@@ -42,7 +42,7 @@ public class JobSpriteController : MonoBehaviour
         jobGameObjectMap.Add(job, job_go);
 
         job_go.name = "JOB_" + job.jobObjectType + "_ " + job.tile.X + "_" + job.tile.Y;
-        job_go.transform.position = new Vector3(job.tile.X, job.tile.Y, 0);
+        job_go.transform.position = new Vector3(job.tile.X + ((job.furniturePrototype.Width -1)/2f), job.tile.Y + ((job.furniturePrototype.Height - 1) / 2f), 0);
         job_go.transform.SetParent(this.transform, true);
 
         // FIXME: we assume the object must be a wall so use the hardcoded

@@ -102,37 +102,47 @@ public class Tile : IXmlSerializable
         cbTileChanged -= callback;
     }
 
+    public bool UninstallFurniture()
+    {
+        // Just uninstalling. FIXME: what if we have a multi-tile furniture?
+        furniture = null;
+        return true;
+    }
+    
     public bool PlaceFurniture(Furniture objInstance)
     {
         if (objInstance == null)
         {
-            // We are uninstalling whatever was here
-            furniture = null;
-            return true;
+            return UninstallFurniture();
         }
 
-        // objInstance isn't null
-
-        if (furniture != null)
+        if (objInstance.IsValidPosition(this) == false)
         {
-            Debug.LogError("Trying to assign a furniture to a tile that already has one!");
+            Debug.LogError("Trying to assign a furniture to a tile that isn't valid!");
             return false;
         }
 
-        // At this point, everything's fine!
-        furniture = objInstance;
+        for (int x_off = X; x_off < (X + objInstance.Width); x_off++)
+        {
+            for (int y_off = Y; y_off < (Y + objInstance.Height); y_off++)
+            {
+                Tile t = world.GetTileAt(x_off, y_off);
+                t.furniture = objInstance;
+            }
+        }
+
         return true;
     }
 
     public bool PlaceInventory(Inventory inv)
     {
-        if(inv == null)
+        if (inv == null)
         {
             inventory = null;
             return true;
         }
 
-        if(inventory != null)
+        if (inventory != null)
         {
             // There's already inventory here. Maybe combine stack?
             if (inventory.objectType != inv.objectType)
@@ -142,14 +152,14 @@ public class Tile : IXmlSerializable
             }
 
             int numToMove = inv.stackSize;
-            if(inventory.stackSize + numToMove > inventory.maxStackSize)
+            if (inventory.stackSize + numToMove > inventory.maxStackSize)
             {
                 numToMove = inventory.maxStackSize - inventory.stackSize;
             }
 
             inventory.stackSize += numToMove;
             inv.stackSize -= numToMove;
-                        
+
             return true;
         }
 

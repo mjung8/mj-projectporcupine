@@ -70,6 +70,8 @@ public class BuildModeController : MonoBehaviour
                     j = new Job(t, furnitureType, FurnitureActions.JobComplete_FurnitureBuilding, 0.1f, null);
                 }
 
+                j.furniturePrototype = WorldController.Instance.world.furniturePrototypes[furnitureType];
+
                 // not good to explicitly set stuff like this
                 t.pendingFunitureJob = j;
                 j.RegisterJobCompleteCallback((theJob) => theJob.tile.pendingFunitureJob = null);
