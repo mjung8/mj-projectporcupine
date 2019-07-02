@@ -63,6 +63,7 @@ public class Furniture : IXmlSerializable
     }
 
     public Action<Furniture> cbOnChanged;
+    public Action<Furniture> cbOnRemoved;
 
     Func<Tile, bool> funcPositionValidation;
 
@@ -189,6 +190,16 @@ public class Furniture : IXmlSerializable
     public void UnregisterOnChangedCallback(Action<Furniture> callbackfunc)
     {
         cbOnChanged -= callbackfunc;
+    }
+
+    public void RegisterOnRemovedCallback(Action<Furniture> callbackfunc)
+    {
+        cbOnRemoved += callbackfunc;
+    }
+
+    public void UnregisterOnRemovedCallback(Action<Furniture> callbackfunc)
+    {
+        cbOnRemoved -= callbackfunc;
     }
 
     public bool IsValidPosition(Tile t)
@@ -334,5 +345,18 @@ public class Furniture : IXmlSerializable
     public bool IsStockpile()
     {
         return objectType == "Stockpile";
+    }
+
+    public void Deconstruct()
+    {
+        Debug.Log("Deconstruct");
+
+        tile.UnplaceFurniture();
+
+        if (cbOnRemoved != null)
+            cbOnRemoved(this);
+
+        // At this point, no DATA structures should be pointing to us, so we
+        // should get garbage-collected
     }
 }
