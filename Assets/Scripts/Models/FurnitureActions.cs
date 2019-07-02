@@ -87,7 +87,7 @@ public static class FurnitureActions
         // Two possibilities: either we have some inventory or we have no inventory
 
         // Third possibility: Something is whack
-        if(furn.tile.inventory != null && furn.tile.inventory.stackSize == 0)
+        if (furn.tile.inventory != null && furn.tile.inventory.stackSize == 0)
         {
             Debug.LogError("Stockpile has a zero-size stack. This is wrong!");
             furn.ClearJobs();
@@ -147,6 +147,19 @@ public static class FurnitureActions
             }
         }
 
+    }
+
+    public static void OxygenGenerator_UpdateAction(Furniture furn, float deltaTime)
+    {
+        if (furn.tile.room.GetGasAmount("O2") < 0.20f)
+        {
+            furn.tile.room.ChangeGas("O2", 0.01f * deltaTime);   // TODO: Replace hardcoded value
+            // TODO: consume electricity while running
+        }
+        else
+        {
+            // TODO: standby electric usage?
+        }
     }
 
 }
