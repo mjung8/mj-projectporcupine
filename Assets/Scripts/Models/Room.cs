@@ -1,18 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class Room
 {
-    public float atmosO2 = 0;
-    public float atmosN = 0;
-    public float atmosCO2 = 0;
+    Dictionary<string, float> atmosphericGasses;
 
     List<Tile> tiles;
 
-    public Room()
+    World world;
+
+    public Room(World world)
     {
+        this.world = world;
         tiles = new List<Tile>();
+        atmosphericGasses = new Dictionary<string, float>();
     }
 
     public void AssignTile(Tile t)
@@ -41,6 +44,59 @@ public class Room
         tiles = new List<Tile>();
     }
 
+    public bool IsOutsideRoom()
+    {
+        return this == world.GetOutsideRoom();
+    }
+
+    public void ChangeGas(string name, float amount)
+    {
+        if (IsOutsideRoom())
+            return;
+
+        if (atmosphericGasses.ContainsKey(name))
+        {
+            atmosphericGasses[name] += amount;
+        }
+        else
+        {
+            atmosphericGasses[name] = amount;
+        }
+
+        if (atmosphericGasses[name] < 0)
+            atmosphericGasses[name] = 0;
+    }
+
+    public float GetGasAmount(string name)
+    {
+        if (atmosphericGasses.ContainsKey(name))
+        {
+            return atmosphericGasses[name];
+        }
+
+        return 0;
+    }
+
+    public float GetGasPercentage(string name)
+    {
+        if (atmosphericGasses.ContainsKey(name) == false)
+            return 0;
+
+        float t = 0;
+
+        foreach (string n in atmosphericGasses.Keys)
+        {
+            t += atmosphericGasses[n];
+        }
+
+        return atmosphericGasses[name] / t;
+    }
+
+    public string[] GetGasNames()
+    {
+        return atmosphericGasses.Keys.ToArray();
+    }
+
     public static void DoRoomFloodFill(Furniture sourceFurniture)
     {
         // sourceFurniture is the piece of furniture that may be
@@ -66,7 +122,7 @@ public class Room
         // (which should always be true assuming the outside is considered a room)
         // delete that room and assign all tiles within to be outside for now
 
-        if (oldRoom != world.GetOutsideRoom())
+        if (oldRoom.IsOutsideRoom() == false)
         {
             // At this point, oldRoom shouldn't have any more tiles left in it
             // so in practice "DeleteRoom" should mostly only need to remove
@@ -108,7 +164,7 @@ public class Room
         }
 
         // If we get to this point then we need to create a new room
-        Room newRoom = new Room();
+        Room newRoom = new Room(oldRoom.world);
         Queue<Tile> tilesToCheck = new Queue<Tile>();
         tilesToCheck.Enqueue(tile);
 
@@ -143,12 +199,18 @@ public class Room
         }
 
         // Copy data
-        newRoom.atmosCO2 = oldRoom.atmosCO2;
-        newRoom.atmosN = oldRoom.atmosN;
-        newRoom.atmosO2 = oldRoom.atmosO2;
+        newRoom.CopyGas(oldRoom);
 
         // Tell the world that a new room has formed
         tile.world.AddRoom(newRoom);
+    }
+
+    void CopyGas(Room other)
+    {
+        foreach(string n in other.atmosphericGasses.Keys)
+        {
+            this.atmosphericGasses[n] = other.atmosphericGasses[n];
+        }
     }
 
 }
