@@ -153,6 +153,7 @@ public static class FurnitureActions
     {
         if (furn.tile.room.GetGasAmount("O2") < 0.20f)
         {
+            // TODO: Change the gas contribution based on volume of room
             furn.tile.room.ChangeGas("O2", 0.01f * deltaTime);   // TODO: Replace hardcoded value
             // TODO: consume electricity while running
         }

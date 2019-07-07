@@ -79,7 +79,7 @@ public class World : IXmlSerializable
 
         // All tiles that belonged to this room should be reassigned to
         // the outside
-        r.UnAssignAllTiles();
+        r.ReturnTilesToOutsideRoom();
     }
 
     void SetupWorld(int width, int height)
@@ -266,7 +266,7 @@ public class World : IXmlSerializable
         return tiles[x, y];
     }
 
-    public Furniture PlaceFurniture(string objectType, Tile t)
+    public Furniture PlaceFurniture(string objectType, Tile t, bool doRoomFloodFill = true)
     {
         //Debug.Log("Placefurniture");
         //TODO: This function assumes 1x1 tiles -- change this later
@@ -289,9 +289,9 @@ public class World : IXmlSerializable
         furnitures.Add(furn);
 
         // Do we need to recalculate our rooms?
-        if (furn.roomEnclosure)
+        if (doRoomFloodFill && furn.roomEnclosure)
         {
-            Room.DoRoomFloodFill(furn);
+            Room.DoRoomFloodFill(furn.tile);
         }
 
         if (cbFurnitureCreated != null)
@@ -519,9 +519,14 @@ public class World : IXmlSerializable
                 int x = int.Parse(reader.GetAttribute("X"));
                 int y = int.Parse(reader.GetAttribute("Y"));
 
-                Furniture furn = PlaceFurniture(reader.GetAttribute("objectType"), tiles[x, y]);
+                Furniture furn = PlaceFurniture(reader.GetAttribute("objectType"), tiles[x, y], false);
                 furn.ReadXml(reader);
             } while (reader.ReadToNextSibling("Furniture"));
+
+            foreach(Furniture furn in furnitures)
+            {
+                Room.DoRoomFloodFill(furn.tile, true);
+            }
         }
     }
 
