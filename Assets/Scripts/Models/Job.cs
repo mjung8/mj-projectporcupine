@@ -17,6 +17,8 @@ public class Job
 
     public Furniture furniturePrototype;
 
+    public Furniture furniture; // The piece of furniture that owns this job. Frequently will be null.
+
     public bool acceptsAnyInventoryItem = false;
 
     Action<Job> cbJobComplete;

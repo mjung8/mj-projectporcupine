@@ -13,6 +13,9 @@ public class Character : IXmlSerializable
     {
         get
         {
+            if (nextTile == null)
+                return currTile.X;
+
             return Mathf.Lerp(currTile.X, nextTile.X, movementPercentage);
         }
     }
@@ -21,6 +24,9 @@ public class Character : IXmlSerializable
     {
         get
         {
+            if (nextTile == null)
+                return currTile.Y;
+
             return Mathf.Lerp(currTile.Y, nextTile.Y, movementPercentage);
         }
     }

@@ -163,4 +163,38 @@ public static class FurnitureActions
         }
     }
 
+    public static void MiningDroneStation_UpdateAction(Furniture furn, float deltaTime)
+    {
+        if (furn.JobCount() > 0)
+        {
+            // We already have a job, so nothign nto do
+            return;
+        }
+
+        Tile jobSpot = furn.GetJobSpotTile();
+
+        if (jobSpot.inventory != null && (jobSpot.inventory.stackSize >= jobSpot.inventory.maxStackSize))
+        {
+            // Our drop spot is already full, so don't create a job.
+            return;
+        }
+
+        Job j = new Job(
+            furn.GetJobSpotTile(),
+            null,
+            MiningDroneStation_JobComplete,
+            1f,
+            null
+        );
+
+        furn.AddJob(j);
+    }
+
+    public static void MiningDroneStation_JobComplete(Job j)
+    {
+        j.tile.world.inventoryManager.PlaceInventory(j.tile, new Inventory("Steel Plate", 50, 2));
+
+        j.furniture.RemoveJob(j);
+    }
+
 }

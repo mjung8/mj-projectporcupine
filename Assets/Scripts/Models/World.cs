@@ -160,10 +160,10 @@ public class World : IXmlSerializable
         );
         furnitureJobPrototypes.Add("Wall",
             new Job(
-                null, 
-                "Wall", 
-                FurnitureActions.JobComplete_FurnitureBuilding, 
-                1f, 
+                null,
+                "Wall",
+                FurnitureActions.JobComplete_FurnitureBuilding,
+                1f,
                 new Inventory[] { new Inventory("Steel Plate", 5, 0) }
             )
         );
@@ -213,7 +213,7 @@ public class World : IXmlSerializable
         furniturePrototypes.Add("Oxygen Generator",
             new Furniture(
                 "Oxygen Generator",
-                10,  // Door pathfinding cost
+                10,  // pathfinding cost
                 2,  // Width
                 2,  // Height
                 false,  // Links to neighbours and "sort of" becomes part of a larger object
@@ -221,6 +221,21 @@ public class World : IXmlSerializable
             )
         );
         furniturePrototypes["Oxygen Generator"].RegisterUpdateAction(FurnitureActions.OxygenGenerator_UpdateAction);
+
+
+        furniturePrototypes.Add("Mining Drone Station",
+           new Furniture(
+               "Mining Drone Station",
+               1,  // pathfinding cost
+               3,  // Width
+               3,  // Height    // TODO: in the future, the mining drone station will be a 3x2 object with an offset work spot
+               false,  // Links to neighbours and "sort of" becomes part of a larger object
+               false    // Enclose rooms
+           )
+        );
+        furniturePrototypes["Mining Drone Station"].jobSpotOffset = new Vector2(1, 0);
+
+        furniturePrototypes["Mining Drone Station"].RegisterUpdateAction(FurnitureActions.MiningDroneStation_UpdateAction);
 
     }
 
@@ -523,7 +538,7 @@ public class World : IXmlSerializable
                 furn.ReadXml(reader);
             } while (reader.ReadToNextSibling("Furniture"));
 
-            foreach(Furniture furn in furnitures)
+            foreach (Furniture furn in furnitures)
             {
                 Room.DoRoomFloodFill(furn.tile, true);
             }
