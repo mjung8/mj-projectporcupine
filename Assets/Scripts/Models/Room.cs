@@ -39,7 +39,7 @@ public class Room
     {
         for (int i = 0; i < tiles.Count; i++)
         {
-            tiles[i].room = tiles[i].world.GetOutsideRoom();    // Assign to outside
+            tiles[i].room = World.Current.GetOutsideRoom();    // Assign to outside
         }
         tiles = new List<Tile>();
     }
@@ -105,7 +105,7 @@ public class Room
 
         // Check the NESW neighbours of the furniture's tile and flood fill.
 
-        World world = sourceTile.world;
+        World world = World.Current;
 
         Room oldRoom = sourceTile.room;
 
@@ -184,7 +184,7 @@ public class Room
         }
 
         // If we get to this point then we need to create a new room
-        Room newRoom = new Room(tile.world);
+        Room newRoom = new Room(World.Current);
         Queue<Tile> tilesToCheck = new Queue<Tile>();
         tilesToCheck.Enqueue(tile);
 
@@ -260,7 +260,7 @@ public class Room
 
 
         // Tell the world that a new room has formed
-        tile.world.AddRoom(newRoom);
+        World.Current.AddRoom(newRoom);
     }
 
     void CopyGas(Room other)

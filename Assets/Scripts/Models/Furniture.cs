@@ -163,24 +163,24 @@ public class Furniture : IXmlSerializable
             int x = tile.X;
             int y = tile.Y;
 
-            t = tile.world.GetTileAt(x, y + 1);
+            t = World.Current.GetTileAt(x, y + 1);
             if (t != null && t.furniture != null && t.furniture.cbOnChanged != null && t.furniture.objectType == furn.objectType)
             {
                 // We have a northern neighbour with the same object type as us, so
                 // tell it that it has changed by firing its callback
                 t.furniture.cbOnChanged(t.furniture);
             }
-            t = tile.world.GetTileAt(x + 1, y);
+            t = World.Current.GetTileAt(x + 1, y);
             if (t != null && t.furniture != null && t.furniture.cbOnChanged != null && t.furniture.objectType == furn.objectType)
             {
                 t.furniture.cbOnChanged(t.furniture);
             }
-            t = tile.world.GetTileAt(x, y - 1);
+            t = World.Current.GetTileAt(x, y - 1);
             if (t != null && t.furniture != null && t.furniture.cbOnChanged != null && t.furniture.objectType == furn.objectType)
             {
                 t.furniture.cbOnChanged(t.furniture);
             }
-            t = tile.world.GetTileAt(x - 1, y);
+            t = World.Current.GetTileAt(x - 1, y);
             if (t != null && t.furniture != null && t.furniture.cbOnChanged != null && t.furniture.objectType == furn.objectType)
             {
                 t.furniture.cbOnChanged(t.furniture);
@@ -221,7 +221,7 @@ public class Furniture : IXmlSerializable
         {
             for (int y_off = t.Y; y_off < (t.Y + Height); y_off++)
             {
-                Tile t2 = t.world.GetTileAt(x_off, y_off);
+                Tile t2 = World.Current.GetTileAt(x_off, y_off);
 
                 // Make sure tile is floor
                 if (t2.Type != TileType.Floor)
@@ -333,7 +333,7 @@ public class Furniture : IXmlSerializable
     {
         j.furniture = this;
         jobs.Add(j);
-        tile.world.jobQueue.Enqueue(j);
+        World.Current.jobQueue.Enqueue(j);
     }
 
     public void RemoveJob(Job j)
@@ -341,7 +341,7 @@ public class Furniture : IXmlSerializable
         jobs.Remove(j);
         j.CancelJob();
         j.furniture = null;
-        tile.world.jobQueue.Remove(j);
+        World.Current.jobQueue.Remove(j);
     }
 
     public void ClearJobs()
@@ -372,7 +372,7 @@ public class Furniture : IXmlSerializable
             Room.DoRoomFloodFill(this.tile);
         }
 
-        tile.world.InvalidateTileGraph();
+        World.Current.InvalidateTileGraph();
 
         // At this point, no DATA structures should be pointing to us, so we
         // should get garbage-collected
@@ -380,6 +380,6 @@ public class Furniture : IXmlSerializable
 
     public Tile GetJobSpotTile()
     {
-        return tile.world.GetTileAt(tile.X + (int)jobSpotOffset.x, tile.Y + (int)jobSpotOffset.y);
+        return World.Current.GetTileAt(tile.X + (int)jobSpotOffset.x, tile.Y + (int)jobSpotOffset.y);
     }
 }

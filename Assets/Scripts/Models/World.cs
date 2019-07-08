@@ -34,6 +34,8 @@ public class World : IXmlSerializable
     // TODO: most likely replaced with dedicated class
     public JobQueue jobQueue;
 
+    public static World Current { get; protected set; }
+
     /// <summary>
     /// Initializes a new instance of the World class.
     /// </summary>
@@ -86,6 +88,10 @@ public class World : IXmlSerializable
     {
         jobQueue = new JobQueue();
 
+        // Set the current world to be this world
+        // TODO: do we need to do any cleanup of the old world?
+        Current = this;
+
         Width = width;
         Height = height;
 
@@ -98,7 +104,7 @@ public class World : IXmlSerializable
         {
             for (int y = 0; y < Height; y++)
             {
-                tiles[x, y] = new Tile(this, x, y);
+                tiles[x, y] = new Tile(x, y);
                 tiles[x, y].RegisterTileTypeChangedCallback(OnTileChanged);
                 tiles[x, y].room = GetOutsideRoom();  // Rooms 0 is always going to be outside, the default room
             }

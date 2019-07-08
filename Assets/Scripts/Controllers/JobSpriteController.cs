@@ -58,8 +58,8 @@ public class JobSpriteController : MonoBehaviour
         {
             // By default, door graphic is meant for walls EW
             // Check to see if we actually have a wall NS and then rotate
-            Tile northTile = job.tile.world.GetTileAt(job.tile.X, job.tile.Y + 1);
-            Tile southhTile = job.tile.world.GetTileAt(job.tile.X, job.tile.Y - 1);
+            Tile northTile = World.Current.GetTileAt(job.tile.X, job.tile.Y + 1);
+            Tile southhTile = World.Current.GetTileAt(job.tile.X, job.tile.Y - 1);
             if (northTile != null && southhTile != null && northTile.furniture != null
                 && southhTile.furniture != null && northTile.furniture.objectType == "Wall"
                 && southhTile.furniture.objectType == "Wall")

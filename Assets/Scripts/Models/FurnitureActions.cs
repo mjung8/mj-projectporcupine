@@ -142,7 +142,7 @@ public static class FurnitureActions
         {
             if (inv.stackSize > 0)
             {
-                j.tile.world.inventoryManager.PlaceInventory(j.tile, inv);
+                World.Current.inventoryManager.PlaceInventory(j.tile, inv);
                 return;  // There should be no way we ever end up with more than one inventory req with stackSize > 0
             }
         }
@@ -192,7 +192,7 @@ public static class FurnitureActions
 
     public static void MiningDroneStation_JobComplete(Job j)
     {
-        j.tile.world.inventoryManager.PlaceInventory(j.tile, new Inventory("Steel Plate", 50, 2));
+        World.Current.inventoryManager.PlaceInventory(j.tile, new Inventory("Steel Plate", 50, 2));
 
         j.furniture.RemoveJob(j);
     }

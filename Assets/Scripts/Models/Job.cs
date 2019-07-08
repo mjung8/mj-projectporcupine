@@ -133,7 +133,7 @@ public class Job
             cbJobCancel(this);
         }
 
-        tile.world.jobQueue.Remove(this);
+        World.Current.jobQueue.Remove(this);
     }
 
     public bool HasAllMaterial()
