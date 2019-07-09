@@ -48,7 +48,6 @@ public class Tile : IXmlSerializable
     public Job pendingFunitureJob;
 
     // Know the context in which this exists...
-    public World world { get; protected set; }
     public int X { get; protected set; }
     public int Y { get; protected set; }
 
@@ -77,9 +76,8 @@ public class Tile : IXmlSerializable
     /// <param name="world">A World instance.</param>
     /// <param name="x">The x coordinate.</param>
     /// <param name="y">The y coordinate.</param>
-    public Tile(World world, int x, int y)
+    public Tile(int x, int y)
     {
-        this.world = world;
         this.X = x;
         this.Y = y;
     }
@@ -115,14 +113,14 @@ public class Tile : IXmlSerializable
         {
             for (int y_off = Y; y_off < (Y + f.Height); y_off++)
             {
-                Tile t = world.GetTileAt(x_off, y_off);
+                Tile t = World.Current.GetTileAt(x_off, y_off);
                 t.furniture = null;
             }
         }
 
         return true;
     }
-    
+
     public bool PlaceFurniture(Furniture objInstance)
     {
         if (objInstance == null)
@@ -140,7 +138,7 @@ public class Tile : IXmlSerializable
         {
             for (int y_off = Y; y_off < (Y + objInstance.Height); y_off++)
             {
-                Tile t = world.GetTileAt(x_off, y_off);
+                Tile t = World.Current.GetTileAt(x_off, y_off);
                 t.furniture = objInstance;
             }
         }
@@ -217,24 +215,24 @@ public class Tile : IXmlSerializable
 
         Tile n;
 
-        n = world.GetTileAt(X, Y + 1);
+        n = World.Current.GetTileAt(X, Y + 1);
         ns[0] = n;  // All of these could be null and that's ok.
-        n = world.GetTileAt(X + 1, Y);
+        n = World.Current.GetTileAt(X + 1, Y);
         ns[1] = n;  // All of these could be null and that's ok.
-        n = world.GetTileAt(X, Y - 1);
+        n = World.Current.GetTileAt(X, Y - 1);
         ns[2] = n;  // All of these could be null and that's ok.
-        n = world.GetTileAt(X - 1, Y);
+        n = World.Current.GetTileAt(X - 1, Y);
         ns[3] = n;  // All of these could be null and that's ok.
 
         if (diagOkay == true)
         {
-            n = world.GetTileAt(X + 1, Y + 1);
+            n = World.Current.GetTileAt(X + 1, Y + 1);
             ns[4] = n;  // All of these could be null and that's ok.
-            n = world.GetTileAt(X + 1, Y - 1);
+            n = World.Current.GetTileAt(X + 1, Y - 1);
             ns[5] = n;  // All of these could be null and that's ok.
-            n = world.GetTileAt(X - 1, Y - 1);
+            n = World.Current.GetTileAt(X - 1, Y - 1);
             ns[6] = n;  // All of these could be null and that's ok.
-            n = world.GetTileAt(X - 1, Y + 1);
+            n = World.Current.GetTileAt(X - 1, Y + 1);
             ns[7] = n;  // All of these could be null and that's ok.
         }
 
@@ -250,11 +248,16 @@ public class Tile : IXmlSerializable
     {
         writer.WriteAttributeString("X", X.ToString());
         writer.WriteAttributeString("Y", Y.ToString());
+        writer.WriteAttributeString("RoomID", room == null ? "-1" : room.ID.ToString());
         writer.WriteAttributeString("Type", ((int)Type).ToString());
     }
 
     public void ReadXml(XmlReader reader)
     {
+        // X and Y have aleady been read/processed
+
+        room = World.Current.GetRoomFromID(int.Parse(reader.GetAttribute("RoomID")));
+
         Type = (TileType)int.Parse(reader.GetAttribute("Type"));
     }
 
@@ -276,22 +279,22 @@ public class Tile : IXmlSerializable
 
     public Tile North()
     {
-        return world.GetTileAt(X, Y + 1);
+        return World.Current.GetTileAt(X, Y + 1);
     }
 
     public Tile South()
     {
-        return world.GetTileAt(X, Y - 1);
+        return World.Current.GetTileAt(X, Y - 1);
     }
 
     public Tile East()
     {
-        return world.GetTileAt(X + 1, Y);
+        return World.Current.GetTileAt(X + 1, Y);
     }
 
     public Tile West()
     {
-        return world.GetTileAt(X - 1, Y);
+        return World.Current.GetTileAt(X - 1, Y);
     }
 
 }

@@ -2,23 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SoundController : MonoBehaviour {
-
+public class SoundController : MonoBehaviour
+{
     float soundCooldown = 0;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         WorldController.Instance.world.RegisterFurnitureCreated(OnFurnitureCreated);
         WorldController.Instance.world.RegisterTileChanged(OnTileChanged);
     }
-	
-	// Update is called once per frame
-	void Update () {
-        soundCooldown -= Time.deltaTime;
-	}
 
-    void OnTileChanged (Tile tile_data)
+    // Update is called once per frame
+    void Update()
     {
+        soundCooldown -= Time.deltaTime;
+    }
+
+    void OnTileChanged(Tile tile_data)
+    {
+        // FIXME
         if (soundCooldown > 0)
             return;
 
@@ -27,8 +30,9 @@ public class SoundController : MonoBehaviour {
         soundCooldown = 0.1f;
     }
 
-    void OnFurnitureCreated (Furniture furn)
+    void OnFurnitureCreated(Furniture furn)
     {
+        // FIXME
         if (soundCooldown > 0)
             return;
 

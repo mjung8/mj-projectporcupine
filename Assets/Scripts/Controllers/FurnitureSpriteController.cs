@@ -5,7 +5,6 @@ using System.Linq;
 
 public class FurnitureSpriteController : MonoBehaviour
 {
-
     Dictionary<Furniture, GameObject> furnitureGameObjectMap;
 
     Dictionary<string, Sprite> furnitureSprites;
@@ -26,7 +25,7 @@ public class FurnitureSpriteController : MonoBehaviour
 
         world.RegisterFurnitureCreated(OnFurnitureCreated);
 
-        // Go through any existing furniture (ie. from a save file) and call the OnCreated event manually?
+        // Go through any EXISTING furniture (ie. from a save file that was loaded OnEnable) and call the OnCreated event manually
         foreach (Furniture furn in world.furnitures)
         {
             OnFurnitureCreated(furn);
@@ -58,7 +57,7 @@ public class FurnitureSpriteController : MonoBehaviour
         furnitureGameObjectMap.Add(furn, furn_go);
 
         furn_go.name = furn.objectType + "_ " + furn.tile.X + "_" + furn.tile.Y;
-        furn_go.transform.position = new Vector3(furn.tile.X + ((furn.Width - 1)/2f), furn.tile.Y + ((furn.Height - 1) / 2f), 0);
+        furn_go.transform.position = new Vector3(furn.tile.X + ((furn.Width - 1) / 2f), furn.tile.Y + ((furn.Height - 1) / 2f), 0);
         furn_go.transform.SetParent(this.transform, true);
 
         // FIXME: This hardcoding is not good
@@ -68,6 +67,7 @@ public class FurnitureSpriteController : MonoBehaviour
             // Check to see if we actually have a wall NS and then rotate
             Tile northTile = world.GetTileAt(furn.tile.X, furn.tile.Y + 1);
             Tile southhTile = world.GetTileAt(furn.tile.X, furn.tile.Y - 1);
+
             if (northTile != null && southhTile != null && northTile.furniture != null
                 && southhTile.furniture != null && northTile.furniture.objectType == "Wall"
                 && southhTile.furniture.objectType == "Wall")
@@ -111,7 +111,7 @@ public class FurnitureSpriteController : MonoBehaviour
 
         GameObject furn_go = furnitureGameObjectMap[furn];
         furn_go.GetComponent<SpriteRenderer>().sprite = GetSpriteForFurniture(furn);
-
+        furn_go.GetComponent<SpriteRenderer>().color = furn.tint;
     }
 
     public Sprite GetSpriteForFurniture(Furniture furn)
@@ -175,6 +175,7 @@ public class FurnitureSpriteController : MonoBehaviour
             spriteName += "W";
         }
 
+        // e.g. Wall_NESW
         if (furnitureSprites[spriteName] == false)
         {
             Debug.LogError("GetSpriteForfurniture -- no sprites with name: " + spriteName);

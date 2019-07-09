@@ -50,7 +50,7 @@ public class BuildModeController : MonoBehaviour
 
     public void SetMode_BuildFurniture(string objectType)
     {
-        // Wall is not a Tile. Wall is an furniture that exists on top of a tile.
+        // Wall is not a Tile. Wall is an "Furniture" that exists on TOP of a tile.
         buildMode = BuildMode.FURNITURE;
         buildModeObjectType = objectType;
         GameObject.FindObjectOfType<MouseController>().StartBuildMode();
@@ -58,7 +58,6 @@ public class BuildModeController : MonoBehaviour
 
     public void SetMode_Deconstruct()
     {
-        // Wall is not a Tile. Wall is an furniture that exists on top of a tile.
         buildMode = BuildMode.DECONSTRUCT;
         GameObject.FindObjectOfType<MouseController>().StartBuildMode();
     }
@@ -103,9 +102,10 @@ public class BuildModeController : MonoBehaviour
 
                 j.furniturePrototype = WorldController.Instance.world.furniturePrototypes[furnitureType];
 
-                // not good to explicitly set stuff like this
+                // FIXME: not good to manually and explicitly set
+                // flags that preven conflicts. It's too easy to forget to set/clear them!
                 t.pendingFunitureJob = j;
-                j.RegisterJobCompleteCallback((theJob) => theJob.tile.pendingFunitureJob = null);
+                j.RegisterJobCompletedCallback((theJob) => theJob.tile.pendingFunitureJob = null);
 
                 // Add the job to the queue
                 WorldController.Instance.world.jobQueue.Enqueue(j);

@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class MouseOverRoomDetailsText : MonoBehaviour
 {
-
     // Every frame, this checks to see which tile is under
     // the mouse and updates the GetComponent<Text>.text param
 

@@ -72,7 +72,7 @@ public static class FurnitureActions
         if (furn.tile.inventory != null && furn.tile.inventory.stackSize >= furn.tile.inventory.maxStackSize)
         {
             // We are full
-            furn.ClearJobs();
+            furn.CancelJobs();
             return;
         }
 
@@ -90,7 +90,7 @@ public static class FurnitureActions
         if (furn.tile.inventory != null && furn.tile.inventory.stackSize == 0)
         {
             Debug.LogError("Stockpile has a zero-size stack. This is wrong!");
-            furn.ClearJobs();
+            furn.CancelJobs();
             return;
         }
 
@@ -107,10 +107,12 @@ public static class FurnitureActions
 
         if (furn.tile.inventory == null)
         {
+            Debug.Log("Creating job for new stack.");
             itemsDesired = Stockpile_GetItemsFromFilter();
         }
         else
         {
+            Debug.Log("Creating job for existing stack.");
             Inventory desInv = furn.tile.inventory.Clone();
             desInv.maxStackSize -= desInv.stackSize;
             desInv.stackSize = 0;
@@ -135,14 +137,15 @@ public static class FurnitureActions
 
     static void Stockpile_JobWorked(Job j)
     {
-        j.tile.furniture.RemoveJob(j);
+        Debug.Log("Stockpile_JobWorked");
+        j.CancelJob();
 
         // TODO: change this when we figure out what to do for all/any pickup job
         foreach (Inventory inv in j.inventoryRequirements.Values)
         {
             if (inv.stackSize > 0)
             {
-                j.tile.world.inventoryManager.PlaceInventory(j.tile, inv);
+                World.Current.inventoryManager.PlaceInventory(j.tile, inv);
                 return;  // There should be no way we ever end up with more than one inventory req with stackSize > 0
             }
         }
@@ -151,8 +154,14 @@ public static class FurnitureActions
 
     public static void OxygenGenerator_UpdateAction(Furniture furn, float deltaTime)
     {
+        if (furn.tile.room == null)
+        {
+            Debug.LogError("Why are we in a null room?");
+        }
+
         if (furn.tile.room.GetGasAmount("O2") < 0.20f)
         {
+            // TODO: Change the gas contribution based on volume of room
             furn.tile.room.ChangeGas("O2", 0.01f * deltaTime);   // TODO: Replace hardcoded value
             // TODO: consume electricity while running
         }
@@ -160,6 +169,55 @@ public static class FurnitureActions
         {
             // TODO: standby electric usage?
         }
+    }
+
+    public static void MiningDroneStation_UpdateAction(Furniture furn, float deltaTime)
+    {
+        Tile spawnSpot = furn.GetSpawnSpotTile();
+
+        if (furn.JobCount() > 0)
+        {
+            // Check to see if the Metal Plate destination tile is full
+            if (spawnSpot.inventory != null && spawnSpot.inventory.stackSize >= spawnSpot.inventory.maxStackSize)
+            {
+                // We should stop this job because it's impossible to make any more items
+                furn.CancelJobs();
+            }
+
+            return;
+        }
+
+        // If we get here we have no current job. Check to see if our destination is full
+        if (spawnSpot.inventory != null && spawnSpot.inventory.stackSize >= spawnSpot.inventory.maxStackSize)
+        {
+            // We are full, don't make a job
+            return;
+        }
+
+        // If we get here we need to create a new job
+        Tile jobSpot = furn.GetJobSpotTile();
+
+        if (jobSpot.inventory != null && (jobSpot.inventory.stackSize >= jobSpot.inventory.maxStackSize))
+        {
+            // Our drop spot is already full, so don't create a job.
+            return;
+        }
+
+        Job j = new Job(
+            jobSpot,
+            null,
+            MiningDroneStation_JobComplete,
+            1f,
+            null,
+            true    // This job repeats until the destination tile is full
+        );
+
+        furn.AddJob(j);
+    }
+
+    public static void MiningDroneStation_JobComplete(Job j)
+    {
+        World.Current.inventoryManager.PlaceInventory(j.furniture.GetSpawnSpotTile(), new Inventory("Steel Plate", 50, 20));
     }
 
 }

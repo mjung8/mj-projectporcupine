@@ -1,0 +1,82 @@
+fileFormatVersion: 2
+guid: 386e239864af06346a97fc1b288b9a7e
+timeCreated: 1464102120
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: Mining Drone Station
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 64
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: Mining Drone Station
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 320
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -31, y: -37}
+        - {x: -31, y: -79}
+        - {x: -29, y: -84}
+        - {x: 29, y: -84}
+        - {x: 30, y: -81}
+        - {x: 30, y: -37}
+      - - {x: 82, y: 95}
+        - {x: -94, y: 95}
+        - {x: -94, y: -29}
+        - {x: -87, y: -30}
+        - {x: 91, y: -30}
+        - {x: 93, y: -25}
+        - {x: 93, y: 84}
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

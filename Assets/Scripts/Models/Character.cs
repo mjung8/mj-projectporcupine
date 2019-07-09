@@ -13,6 +13,9 @@ public class Character : IXmlSerializable
     {
         get
         {
+            if (nextTile == null)
+                return currTile.X;
+
             return Mathf.Lerp(currTile.X, nextTile.X, movementPercentage);
         }
     }
@@ -21,6 +24,9 @@ public class Character : IXmlSerializable
     {
         get
         {
+            if (nextTile == null)
+                return currTile.Y;
+
             return Mathf.Lerp(currTile.Y, nextTile.Y, movementPercentage);
         }
     }
@@ -67,17 +73,16 @@ public class Character : IXmlSerializable
 
     void GetNewJob()
     {
-        myJob = currTile.world.jobQueue.Dequeue();
+        myJob = World.Current.jobQueue.Dequeue();
 
         if (myJob == null)
             return;
 
         destTile = myJob.tile;
-        myJob.RegisterJobCompleteCallback(OnJobEnded);
-        myJob.RegisterJobCancelCallback(OnJobEnded);
+        myJob.RegisterJobStoppedCallback(OnJobStopped);
 
         // Immediately check to see if the job tile is reachable
-        pathAStar = new Path_AStar(currTile.world, currTile, destTile);  // This will calculate path from curr to dest
+        pathAStar = new Path_AStar(World.Current, currTile, destTile);  // This will calculate path from curr to dest
         if (pathAStar.Length() == 0)
         {
             Debug.LogError("Path_AStar returned no path to destination!");
@@ -115,7 +120,7 @@ public class Character : IXmlSerializable
                     if (currTile == myJob.tile)
                     {
                         // We are at the job site so drop the inventory
-                        currTile.world.inventoryManager.PlaceInventory(myJob, inventory);
+                        World.Current.inventoryManager.PlaceInventory(myJob, inventory);
                         myJob.DoWork(0);  // This will call all cbJobWorked callbacks
 
                         // Are we still carrying things?
@@ -140,7 +145,7 @@ public class Character : IXmlSerializable
                     // We are carrying something but the job doesn't want it
                     // Dump it
                     // TODO: Walk to nearest empty tile and dump it
-                    if (currTile.world.inventoryManager.PlaceInventory(currTile, inventory) == false)
+                    if (World.Current.inventoryManager.PlaceInventory(currTile, inventory) == false)
                     {
                         Debug.LogError("Character tried to dump inventory into an invalid tile");
                         // FIXME: Dump any reference to current inventory
@@ -150,13 +155,14 @@ public class Character : IXmlSerializable
             }
             else
             {
+                // At this point, the job still requires inventory but we aren't carrying it
                 // Are we standing on a tile with goods desired by job?
                 if (currTile.inventory != null &&
                     (myJob.canTakeFromStockpile || currTile.furniture == null || currTile.furniture.IsStockpile() == false) &&
                     myJob.DesiresInventoryType(currTile.inventory) > 0)
                 {
                     // Pick up the stuff
-                    currTile.world.inventoryManager.PlaceInventory(
+                    World.Current.inventoryManager.PlaceInventory(
                         this,
                         currTile.inventory,
                         myJob.DesiresInventoryType(currTile.inventory)
@@ -168,7 +174,7 @@ public class Character : IXmlSerializable
 
                     // Find the first thing in the job that isn't satisfied
                     Inventory desired = myJob.GetFirstDesiredInventory();
-                    Inventory supplier = currTile.world.inventoryManager.GetClosestInventoryOfType(
+                    Inventory supplier = World.Current.inventoryManager.GetClosestInventoryOfType(
                         desired.objectType,
                         currTile,
                         desired.maxStackSize - desired.stackSize,
@@ -207,7 +213,7 @@ public class Character : IXmlSerializable
     public void AbandonJob()
     {
         nextTile = destTile = currTile;
-        currTile.world.jobQueue.Enqueue(myJob);
+        World.Current.jobQueue.Enqueue(myJob);
         myJob = null;
     }
 
@@ -229,11 +235,10 @@ public class Character : IXmlSerializable
             if (pathAStar == null || pathAStar.Length() == 0)
             {
                 // Generate a path to our destination
-                pathAStar = new Path_AStar(currTile.world, currTile, destTile);  // This will calculate path from curr to dest
+                pathAStar = new Path_AStar(World.Current, currTile, destTile);  // This will calculate path from curr to dest
                 if (pathAStar.Length() == 0)
                 {
                     Debug.LogError("Path_AStar returned no path to destination!");
-                    // FIXME: maybe job should be requeued
                     AbandonJob();
                     return;
                 }
@@ -332,12 +337,11 @@ public class Character : IXmlSerializable
         cbCharacterChanged -= cb;
     }
 
-    void OnJobEnded(Job j)
+    void OnJobStopped(Job j)
     {
-        //Job completed or cancelled
+        //Job completed (if non-repeating) or cancelled
 
-        j.UnregisterJobCancelCallback(OnJobEnded);
-        j.UnregisterJobCompleteCallback(OnJobEnded);
+        j.UnregisterJobStoppedCallback(OnJobStopped);
 
         if (j != myJob)
         {

@@ -30,9 +30,11 @@ public class JobSpriteController : MonoBehaviour
 
         // FIXME we can only do furniture building jobs
 
+        // TODO: Sprite
+
         if (jobGameObjectMap.ContainsKey(job))
         {
-            Debug.LogError("OnJobCreated for a jobGO that already exists -- most likely job requeue");
+            Debug.LogError("OnJobCreated for a jobGO that already exists -- most likely job REQUEUE");
             return;
         }
 
@@ -42,7 +44,7 @@ public class JobSpriteController : MonoBehaviour
         jobGameObjectMap.Add(job, job_go);
 
         job_go.name = "JOB_" + job.jobObjectType + "_ " + job.tile.X + "_" + job.tile.Y;
-        job_go.transform.position = new Vector3(job.tile.X + ((job.furniturePrototype.Width -1)/2f), job.tile.Y + ((job.furniturePrototype.Height - 1) / 2f), 0);
+        job_go.transform.position = new Vector3(job.tile.X + ((job.furniturePrototype.Width - 1) / 2f), job.tile.Y + ((job.furniturePrototype.Height - 1) / 2f), 0);
         job_go.transform.SetParent(this.transform, true);
 
         SpriteRenderer sr = job_go.AddComponent<SpriteRenderer>();
@@ -50,16 +52,14 @@ public class JobSpriteController : MonoBehaviour
         sr.color = new Color(0.5f, 1f, 0.5f, 0.25f);
         sr.sortingLayerName = "Jobs";
 
-        // Make sorting order in layer above tiles (builds have a bug where wall sprite is below tile sprite)
-        sr.sortingOrder = 1;
-
         // FIXME: This hardcoding is not good
         if (job.jobObjectType == "Door")
         {
             // By default, door graphic is meant for walls EW
             // Check to see if we actually have a wall NS and then rotate
-            Tile northTile = job.tile.world.GetTileAt(job.tile.X, job.tile.Y + 1);
-            Tile southhTile = job.tile.world.GetTileAt(job.tile.X, job.tile.Y - 1);
+            Tile northTile = World.Current.GetTileAt(job.tile.X, job.tile.Y + 1);
+            Tile southhTile = World.Current.GetTileAt(job.tile.X, job.tile.Y - 1);
+
             if (northTile != null && southhTile != null && northTile.furniture != null
                 && southhTile.furniture != null && northTile.furniture.objectType == "Wall"
                 && southhTile.furniture.objectType == "Wall")
@@ -68,8 +68,8 @@ public class JobSpriteController : MonoBehaviour
             }
         }
 
-        job.RegisterJobCompleteCallback(OnJobEnded);
-        job.RegisterJobCancelCallback(OnJobEnded);
+        job.RegisterJobCompletedCallback(OnJobEnded);
+        job.RegisterJobStoppedCallback(OnJobEnded);
     }
 
     void OnJobEnded(Job job)
@@ -78,8 +78,8 @@ public class JobSpriteController : MonoBehaviour
         // FIXME we can only do furniture building jobs
 
         GameObject job_go = jobGameObjectMap[job];
-        job.UnregisterJobCompleteCallback(OnJobEnded);
-        job.UnregisterJobCancelCallback(OnJobEnded);
+        job.UnregisterJobCompletedCallback(OnJobEnded);
+        job.UnregisterJobStoppedCallback(OnJobEnded);
 
         Destroy(job_go);
     }

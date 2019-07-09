@@ -14,6 +14,8 @@ public class AutomaticVerticalSizeEditor : Editor {
         if (GUILayout.Button("Recalc Size"))
         {
             ((AutomaticVerticalSize)target).AdjustSize();
+            //AutomaticVerticalSize myScript = ((AutomaticVerticalSize)target);
+            //myScript.AdjustSize();
         }
     }
 }

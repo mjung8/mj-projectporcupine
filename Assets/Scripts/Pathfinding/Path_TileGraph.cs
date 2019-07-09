@@ -7,12 +7,13 @@ using UnityEngine;
 /// of our world. Each tile is a node. Each walkable neighbour
 /// from a tile is linked via an edge connection.
 /// </summary>
-public class Path_TileGraph {
-
+public class Path_TileGraph
+{
     public Dictionary<Tile, Path_Node<Tile>> nodes;
 
     public Path_TileGraph(World world)
     {
+        Debug.Log("Path_TileGraph");
         // Loop through all tiles of the world
         // For each tile, create a node
         // Do we create nodes for non-floor tiles? No.
@@ -28,19 +29,21 @@ public class Path_TileGraph {
 
                 //if (t.movementCost > 0) // Tiles with move cost 0 are unwalkable
                 //{
-                    Path_Node<Tile> n = new Path_Node<Tile>();
-                    n.data = t;
-                    nodes.Add(t, n);
+                Path_Node<Tile> n = new Path_Node<Tile>();
+                n.data = t;
+                nodes.Add(t, n);
                 //}
             }
         }
+
+        Debug.Log("Path_TileGraph: Created " + nodes.Count + " nodes.");
 
         // Now loop through all nodes again
         // Create edges for neighbours
 
         int edgeCount = 0;
 
-        foreach(Tile t in nodes.Keys)
+        foreach (Tile t in nodes.Keys)
         {
             Path_Node<Tile> n = nodes[t];
 
@@ -69,8 +72,7 @@ public class Path_TileGraph {
             n.edges = edges.ToArray();
         }
 
-        Debug.Log("Created " + nodes.Count + " nodes");
-        Debug.Log("Created " + edgeCount + " edges");
+        Debug.Log("Path_TileGraph: Created " + edgeCount + " edges.");
     }
 
     bool IsClippingCorner(Tile curr, Tile neigh)
@@ -85,13 +87,13 @@ public class Path_TileGraph {
         {
             // We are diagonal
 
-            if(curr.world.GetTileAt(curr.X - dX, curr.Y).movementCost == 0)
+            if (World.Current.GetTileAt(curr.X - dX, curr.Y).movementCost == 0)
             {
                 // East or West is unwalkable, therefore this would be a clipped movement
                 return true;
             }
 
-            if (curr.world.GetTileAt(curr.X, curr.Y - dY).movementCost == 0)
+            if (World.Current.GetTileAt(curr.X, curr.Y - dY).movementCost == 0)
             {
                 // North or South is unwalkable, therefore this would be a clipped movement
                 return true;

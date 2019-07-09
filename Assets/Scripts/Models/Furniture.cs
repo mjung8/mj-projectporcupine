@@ -23,6 +23,14 @@ public class Furniture : IXmlSerializable
 
     List<Job> jobs;
 
+    // If this furniture gets worked by a person,
+    // where is the correct spot for them to stand,
+    // relative to the bottom-left tile of the sprite
+    // Note: This could be something outside of the actual furniture itself
+    public Vector2 jobSpotOffset = Vector2.zero;
+    // If the job causes some kind of object to be spawned, where will it appear?
+    public Vector2 jobSpawnSpotOffset = Vector2.zero;
+
     public void Update(float deltaTime)
     {
         if (updateActions != null)
@@ -88,6 +96,9 @@ public class Furniture : IXmlSerializable
         this.Height = other.Height;
         this.tint = other.tint;
         this.linksToNeighbour = other.linksToNeighbour;
+
+        this.jobSpotOffset = other.jobSpotOffset;
+        this.jobSpawnSpotOffset = other.jobSpawnSpotOffset;
 
         this.furnParameters = new Dictionary<string, float>(other.furnParameters);
         jobs = new List<Job>();
@@ -155,24 +166,24 @@ public class Furniture : IXmlSerializable
             int x = tile.X;
             int y = tile.Y;
 
-            t = tile.world.GetTileAt(x, y + 1);
+            t = World.Current.GetTileAt(x, y + 1);
             if (t != null && t.furniture != null && t.furniture.cbOnChanged != null && t.furniture.objectType == furn.objectType)
             {
                 // We have a northern neighbour with the same object type as us, so
                 // tell it that it has changed by firing its callback
                 t.furniture.cbOnChanged(t.furniture);
             }
-            t = tile.world.GetTileAt(x + 1, y);
+            t = World.Current.GetTileAt(x + 1, y);
             if (t != null && t.furniture != null && t.furniture.cbOnChanged != null && t.furniture.objectType == furn.objectType)
             {
                 t.furniture.cbOnChanged(t.furniture);
             }
-            t = tile.world.GetTileAt(x, y - 1);
+            t = World.Current.GetTileAt(x, y - 1);
             if (t != null && t.furniture != null && t.furniture.cbOnChanged != null && t.furniture.objectType == furn.objectType)
             {
                 t.furniture.cbOnChanged(t.furniture);
             }
-            t = tile.world.GetTileAt(x - 1, y);
+            t = World.Current.GetTileAt(x - 1, y);
             if (t != null && t.furniture != null && t.furniture.cbOnChanged != null && t.furniture.objectType == furn.objectType)
             {
                 t.furniture.cbOnChanged(t.furniture);
@@ -213,7 +224,7 @@ public class Furniture : IXmlSerializable
         {
             for (int y_off = t.Y; y_off < (t.Y + Height); y_off++)
             {
-                Tile t2 = t.world.GetTileAt(x_off, y_off);
+                Tile t2 = World.Current.GetTileAt(x_off, y_off);
 
                 // Make sure tile is floor
                 if (t2.Type != TileType.Floor)
@@ -323,22 +334,39 @@ public class Furniture : IXmlSerializable
 
     public void AddJob(Job j)
     {
+        j.furniture = this;
         jobs.Add(j);
-        tile.world.jobQueue.Enqueue(j);
+        j.RegisterJobStoppedCallback(OnJobStopped);
+        World.Current.jobQueue.Enqueue(j);
     }
 
-    public void RemoveJob(Job j)
+    void OnJobStopped(Job j)
     {
+        RemoveJob(j);
+    }
+
+    protected void RemoveJob(Job j)
+    {
+        j.UnregisterJobStoppedCallback(OnJobStopped);
         jobs.Remove(j);
-        j.CancelJob();
-        tile.world.jobQueue.Remove(j);
+        j.furniture = null;
     }
 
-    public void ClearJobs()
+    protected void ClearJobs()
     {
-        foreach (Job j in jobs)
+        Job[] jobs_array = jobs.ToArray();
+        foreach (Job j in jobs_array)
         {
             RemoveJob(j);
+        }
+    }
+
+    public void CancelJobs()
+    {
+        Job[] jobs_array = jobs.ToArray();
+        foreach (Job j in jobs_array)
+        {
+            j.CancelJob();
         }
     }
 
@@ -356,7 +384,26 @@ public class Furniture : IXmlSerializable
         if (cbOnRemoved != null)
             cbOnRemoved(this);
 
+        // Do we need ot recalculate our rooms?
+        if (roomEnclosure)
+        {
+            Room.DoRoomFloodFill(this.tile);
+        }
+
+        World.Current.InvalidateTileGraph();
+
         // At this point, no DATA structures should be pointing to us, so we
         // should get garbage-collected
+    }
+
+    public Tile GetJobSpotTile()
+    {
+        return World.Current.GetTileAt(tile.X + (int)jobSpotOffset.x, tile.Y + (int)jobSpotOffset.y);
+    }
+
+    public Tile GetSpawnSpotTile()
+    {
+        // TODO: allow us to customize this
+        return World.Current.GetTileAt(tile.X + (int)jobSpawnSpotOffset.x, tile.Y + (int)jobSpawnSpotOffset.y);
     }
 }
