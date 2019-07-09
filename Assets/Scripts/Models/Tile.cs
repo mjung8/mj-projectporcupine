@@ -120,7 +120,7 @@ public class Tile : IXmlSerializable
 
         return true;
     }
-    
+
     public bool PlaceFurniture(Furniture objInstance)
     {
         if (objInstance == null)
@@ -248,11 +248,16 @@ public class Tile : IXmlSerializable
     {
         writer.WriteAttributeString("X", X.ToString());
         writer.WriteAttributeString("Y", Y.ToString());
+        writer.WriteAttributeString("RoomID", room == null ? "-1" : room.ID.ToString());
         writer.WriteAttributeString("Type", ((int)Type).ToString());
     }
 
     public void ReadXml(XmlReader reader)
     {
+        // X and Y have aleady been read/processed
+
+        room = World.Current.GetRoomFromID(int.Parse(reader.GetAttribute("RoomID")));
+
         Type = (TileType)int.Parse(reader.GetAttribute("Type"));
     }
 

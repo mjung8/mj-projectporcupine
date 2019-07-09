@@ -2,20 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
+using System;
 
-public class Room
+public class Room : IXmlSerializable
 {
     Dictionary<string, float> atmosphericGasses;
 
     List<Tile> tiles;
 
-    World world;
-
-    public Room(World world)
+    public Room()
     {
-        this.world = world;
         tiles = new List<Tile>();
         atmosphericGasses = new Dictionary<string, float>();
+    }
+
+    public int ID
+    {
+        get
+        {
+            return World.Current.GetRoomID(this);
+        }
     }
 
     public void AssignTile(Tile t)
@@ -46,7 +55,7 @@ public class Room
 
     public bool IsOutsideRoom()
     {
-        return this == world.GetOutsideRoom();
+        return this == World.Current.GetOutsideRoom();
     }
 
     public void ChangeGas(string name, float amount)
@@ -117,8 +126,8 @@ public class Room
             // Try building a new rooms for each of our NESW directions
             foreach (Tile t in sourceTile.GetNeighbours())
             {
-                if(t.room != null && (onlyIfOutside == false || t.room.IsOutsideRoom()))
-                ActualFloodFill(t, oldRoom);
+                if (t.room != null && (onlyIfOutside == false || t.room.IsOutsideRoom()))
+                    ActualFloodFill(t, oldRoom);
             }
 
             sourceTile.room = null;
@@ -149,14 +158,13 @@ public class Room
             // though this may not be the case any longer (i.e. the wall was
             // probably deconstructed. The only thing we have to try is to spawn
             // one new room starting from the tile in question
-
             ActualFloodFill(sourceTile, null);
         }
     }
 
     protected static void ActualFloodFill(Tile tile, Room oldRoom)
     {
-        Debug.Log("ActualFloodFill");
+        //Debug.Log("ActualFloodFill");
 
         if (tile == null)
         {
@@ -184,7 +192,7 @@ public class Room
         }
 
         // If we get to this point then we need to create a new room
-        Room newRoom = new Room(World.Current);
+        Room newRoom = new Room();
         Queue<Tile> tilesToCheck = new Queue<Tile>();
         tilesToCheck.Enqueue(tile);
 
@@ -268,6 +276,37 @@ public class Room
         foreach (string n in other.atmosphericGasses.Keys)
         {
             this.atmosphericGasses[n] = other.atmosphericGasses[n];
+        }
+    }
+
+    public XmlSchema GetSchema()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void WriteXml(XmlWriter writer)
+    {
+        // write out gas info
+        foreach (string k in atmosphericGasses.Keys)
+        {
+            writer.WriteStartElement("Param");
+            writer.WriteAttributeString("name", k);
+            writer.WriteAttributeString("value", atmosphericGasses[k].ToString());
+            writer.WriteEndElement();
+        }
+    }
+
+    public void ReadXml(XmlReader reader)
+    {
+        // read gas info
+        if (reader.ReadToDescendant("Param"))
+        {
+            do
+            {
+                string k = reader.GetAttribute("name");
+                float v = float.Parse(reader.GetAttribute("value"));
+                atmosphericGasses[k] = v;
+            } while (reader.ReadToNextSibling("Param"));
         }
     }
 

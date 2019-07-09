@@ -64,6 +64,19 @@ public class World : IXmlSerializable
         return rooms[0];
     }
 
+    public int GetRoomID(Room r)
+    {
+        return rooms.IndexOf(r);
+    }
+
+    public Room GetRoomFromID(int i)
+    {
+        if (i < 0 || i > rooms.Count - 1)
+            return null;
+
+        return rooms[i];
+    }
+
     public void AddRoom(Room r)
     {
         rooms.Add(r);
@@ -98,7 +111,7 @@ public class World : IXmlSerializable
         tiles = new Tile[Width, Height];
 
         rooms = new List<Room>();
-        rooms.Add(new Room(this));  // Create the outside
+        rooms.Add(new Room());  // Create the outside
 
         for (int x = 0; x < Width; x++)
         {
@@ -420,6 +433,18 @@ public class World : IXmlSerializable
         writer.WriteAttributeString("Width", Width.ToString());
         writer.WriteAttributeString("Height", Height.ToString());
 
+        writer.WriteStartElement("Rooms");
+        foreach (Room r in rooms)
+        {
+            if (GetOutsideRoom() == r)
+                continue;   // Skip the outside room. Alternatively, should SetupWorld be changed not to create one?
+
+            writer.WriteStartElement("Room");
+            r.WriteXml(writer);
+            writer.WriteEndElement();
+        }
+        writer.WriteEndElement();
+
         writer.WriteStartElement("Tiles");
         for (int x = 0; x < Width; x++)
         {
@@ -472,6 +497,9 @@ public class World : IXmlSerializable
         {
             switch (reader.Name)
             {
+                case "Rooms":
+                    ReadXml_Rooms(reader);
+                    break;
                 case "Tiles":
                     ReadXml_Tiles(reader);
                     break;
@@ -486,33 +514,34 @@ public class World : IXmlSerializable
 
         //DEBUG ONLY REMOVE ME LATER
         //Create an Inventory item
-        Inventory inv = new Inventory("Steel Plate", 50, 50);
-        Tile t = GetTileAt(Width / 2, Height / 2);
-        inventoryManager.PlaceInventory(t, inv);
-        if (cbInventoryCreated != null)
-        {
-            cbInventoryCreated(t.inventory);
-        }
+        //Inventory inv = new Inventory("Steel Plate", 50, 50);
+        //Tile t = GetTileAt(Width / 2, Height / 2);
+        //inventoryManager.PlaceInventory(t, inv);
+        //if (cbInventoryCreated != null)
+        //{
+        //    cbInventoryCreated(t.inventory);
+        //}
 
-        inv = new Inventory("Steel Plate", 50, 4);
-        t = GetTileAt(Width / 2 + 2, Height / 2);
-        inventoryManager.PlaceInventory(t, inv);
-        if (cbInventoryCreated != null)
-        {
-            cbInventoryCreated(t.inventory);
-        }
+        //inv = new Inventory("Steel Plate", 50, 4);
+        //t = GetTileAt(Width / 2 + 2, Height / 2);
+        //inventoryManager.PlaceInventory(t, inv);
+        //if (cbInventoryCreated != null)
+        //{
+        //    cbInventoryCreated(t.inventory);
+        //}
 
-        inv = new Inventory("Steel Plate", 50, 3);
-        t = GetTileAt(Width / 2 + 1, Height / 2 + 2);
-        inventoryManager.PlaceInventory(t, inv);
-        if (cbInventoryCreated != null)
-        {
-            cbInventoryCreated(t.inventory);
-        }
+        //inv = new Inventory("Steel Plate", 50, 3);
+        //t = GetTileAt(Width / 2 + 1, Height / 2 + 2);
+        //inventoryManager.PlaceInventory(t, inv);
+        //if (cbInventoryCreated != null)
+        //{
+        //    cbInventoryCreated(t.inventory);
+        //}
     }
 
     void ReadXml_Tiles(XmlReader reader)
     {
+        Debug.Log("ReadXml_Tiles");
         // We are in the "Tiles" element, so read elements
         // until we run out of "Tile" nodes
 
@@ -530,6 +559,7 @@ public class World : IXmlSerializable
 
     void ReadXml_Furnitures(XmlReader reader)
     {
+        Debug.Log("ReadXml_Furnitures");
         // We are in the "Furnitures" element, so read elements
         // until we run out of "Tile" nodes
 
@@ -544,15 +574,39 @@ public class World : IXmlSerializable
                 furn.ReadXml(reader);
             } while (reader.ReadToNextSibling("Furniture"));
 
-            foreach (Furniture furn in furnitures)
+            // Don't need this on load beacuse we're getting room info from save file
+            //foreach (Furniture furn in furnitures)
+            //{
+            //    Room.DoRoomFloodFill(furn.tile, true);
+            //}
+        }
+    }
+
+    void ReadXml_Rooms(XmlReader reader)
+    {
+        Debug.Log("ReadXml_Rooms");
+
+        if (reader.ReadToDescendant("Room"))
+        {
+            do
             {
-                Room.DoRoomFloodFill(furn.tile, true);
-            }
+                //int x = int.Parse(reader.GetAttribute("X"));
+                //int y = int.Parse(reader.GetAttribute("Y"));
+
+                //Furniture furn = PlaceFurniture(reader.GetAttribute("objectType"), tiles[x, y], false);
+                //furn.ReadXml(reader);
+                Room r = new Room();
+                rooms.Add(r);
+                r.ReadXml(reader);
+
+            } while (reader.ReadToNextSibling("Room"));
+
         }
     }
 
     void ReadXml_Characters(XmlReader reader)
     {
+        Debug.Log("ReadXml_Characters");
         // We are in the "Characters" element, so read elements
         // until we run out of "Tile" nodes
         if (reader.ReadToDescendant("Character"))
