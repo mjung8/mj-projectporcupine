@@ -2,23 +2,24 @@ fileFormatVersion: 2
 guid: 2ea5616137df8e94cb8121c3c00e509a
 TextureImporter:
   fileIDToRecycleName:
-    21300000: Wall_
-    21300002: Wall_ES
-    21300004: Wall_NESW
-    21300006: Wall_NE
-    21300008: Wall_SW
-    21300010: Wall_NW
-    21300012: Wall_EW
-    21300014: Wall_NS
-    21300016: Wall_
-    21300018: Wall_E
-    21300020: Wall_S
-    21300022: Wall_N
-    21300024: Wall_NES
-    21300026: Wall_NEW
-    21300028: Wall_W
-    21300030: Wall_NSW
+    21300000: furn_SteelWall_
+    21300002: furn_SteelWall_ES
+    21300004: furn_SteelWall_NESW
+    21300006: furn_SteelWall_NE
+    21300008: furn_SteelWall_SW
+    21300010: furn_SteelWall_NW
+    21300012: furn_SteelWall_EW
+    21300014: furn_SteelWall_NS
+    21300016: furn_SteelWall_
+    21300018: furn_SteelWall_E
+    21300020: furn_SteelWall_S
+    21300022: furn_SteelWall_N
+    21300024: furn_SteelWall_NES
+    21300026: furn_SteelWall_NEW
+    21300028: furn_SteelWall_W
+    21300030: furn_SteelWall_NSW
     21300032: Wall_ESW
+    21300034: furn_SteelWall_ESW
   externalObjects: {}
   serializedVersion: 7
   mipmaps:
@@ -90,7 +91,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Wall_
+      name: furn_SteelWall_
       rect:
         serializedVersion: 2
         x: 0
@@ -110,7 +111,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_ES
+      name: furn_SteelWall_ES
       rect:
         serializedVersion: 2
         x: 0
@@ -130,7 +131,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_E
+      name: furn_SteelWall_E
       rect:
         serializedVersion: 2
         x: 160
@@ -150,7 +151,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_S
+      name: furn_SteelWall_S
       rect:
         serializedVersion: 2
         x: 192
@@ -170,7 +171,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_N
+      name: furn_SteelWall_N
       rect:
         serializedVersion: 2
         x: 128
@@ -190,7 +191,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_NES
+      name: furn_SteelWall_NES
       rect:
         serializedVersion: 2
         x: 128
@@ -210,7 +211,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_NESW
+      name: furn_SteelWall_NESW
       rect:
         serializedVersion: 2
         x: 352
@@ -230,7 +231,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_NE
+      name: furn_SteelWall_NE
       rect:
         serializedVersion: 2
         x: 0
@@ -250,7 +251,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_SW
+      name: furn_SteelWall_SW
       rect:
         serializedVersion: 2
         x: 64
@@ -270,7 +271,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_NW
+      name: furn_SteelWall_NW
       rect:
         serializedVersion: 2
         x: 64
@@ -290,7 +291,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_EW
+      name: furn_SteelWall_EW
       rect:
         serializedVersion: 2
         x: 32
@@ -310,7 +311,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_NS
+      name: furn_SteelWall_NS
       rect:
         serializedVersion: 2
         x: 64
@@ -330,7 +331,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_W
+      name: furn_SteelWall_W
       rect:
         serializedVersion: 2
         x: 224
@@ -350,7 +351,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_NEW
+      name: furn_SteelWall_NEW
       rect:
         serializedVersion: 2
         x: 192
@@ -370,7 +371,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_NSW
+      name: furn_SteelWall_NSW
       rect:
         serializedVersion: 2
         x: 256
@@ -390,7 +391,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Wall_ESW
+      name: furn_SteelWall_ESW
       rect:
         serializedVersion: 2
         x: 192

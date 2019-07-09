@@ -52,6 +52,24 @@ public class Furniture : IXmlSerializable
         get; protected set;
     }
 
+    private string _Name = null;
+    public string Name
+    {
+        get
+        {
+            if (_Name == null || _Name.Length == 0)
+            {
+                return objectType;
+            }
+
+            return _Name;
+        }
+        set
+        {
+            _Name = value;
+        }
+    }
+
     // This is a multiplier. Value of 2 means move twice as slow (at half speed)
     // Tile type and other environmental effects (fire) may be combined.
     // SPECIAL: If movementCost = 0 then the tile is impassible (e.g. a wall).
@@ -90,6 +108,7 @@ public class Furniture : IXmlSerializable
     protected Furniture(Furniture other)
     {
         this.objectType = other.objectType;
+        this.Name = other.Name;
         this.movementCost = other.movementCost;
         this.roomEnclosure = other.roomEnclosure;
         this.Width = other.Width;
@@ -264,7 +283,21 @@ public class Furniture : IXmlSerializable
         }
     }
 
+    public void ReadXmlPrototype(XmlReader reader)
+    {
+        ReadXml(reader);    // Read in the Param tag
+    }
+
     public void ReadXml(XmlReader reader)
+    {
+        // X, Y, and objectType have already been set 
+        // and should be assigned to a tile
+        //movementCost = int.Parse(reader.GetAttribute("movementCost"));
+
+        ReadXmlParams(reader);
+    }
+
+    public void ReadXmlParams(XmlReader reader)
     {
         // X, Y, and objectType have already been set 
         // and should be assigned to a tile
