@@ -25,12 +25,12 @@ public class CharacterSpriteController : MonoBehaviour
         // Reigster a callback so we know when a character is created
         world.RegisterCharacterCreated(OnCharacterCreated);
 
-        // Check for pre-existing characters which won't be do the callback
+        // Check for pre-existing characters which won't do the callback
         foreach (Character c in world.characters)
         {
             OnCharacterCreated(c);
         }
-        
+
         //c.SetDestination(world.GetTileAt(world.Width / 2 + 5, world.Height / 2));
     }
 
@@ -47,7 +47,6 @@ public class CharacterSpriteController : MonoBehaviour
 
     public void OnCharacterCreated(Character c)
     {
-        Debug.Log("OnCharacterCreated");
         // Create a visual GameObject linked to this data
 
         // FIXME: does not consider multi-tile objects nor rotated objects
@@ -73,7 +72,7 @@ public class CharacterSpriteController : MonoBehaviour
 
     void OnCharacterChanged(Character c)
     {
-        //Make sure furniture's graphics are correct
+        //Make sure character's graphics are correct
         if (characterGameObjectMap.ContainsKey(c) == false)
         {
             Debug.LogError("OnCharacterChanged -- trying to change visuals for character not in our map.");

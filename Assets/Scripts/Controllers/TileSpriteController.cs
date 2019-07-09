@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 
-public class TileSpriteController : MonoBehaviour {
-
+public class TileSpriteController : MonoBehaviour
+{
     // Simple way to handle current sprite
     public Sprite floorSprite;
     public Sprite emptySprite;
@@ -16,8 +16,9 @@ public class TileSpriteController : MonoBehaviour {
         get { return WorldController.Instance.world; }
     }
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         // Instantiate the dictionary that tracks which GameObject is rendering which Tile data
         tileGameObjectMap = new Dictionary<Tile, GameObject>();
 
@@ -49,7 +50,7 @@ public class TileSpriteController : MonoBehaviour {
 
         // Register callback so GameObject gets updated whenever tile changes
         world.RegisterTileChanged(OnTileChanged);
-	}
+    }
 
     // THIS IS AN EXAMPLE - NOT CURRENTLY USED
     void DestroyAllTileGameObjects()
@@ -57,7 +58,7 @@ public class TileSpriteController : MonoBehaviour {
         // This function might get called when we are changing floors/levels.
         // We need to destroy all visual **GameObjects** -- but not the actual tile data!
 
-        while(tileGameObjectMap.Count > 0)
+        while (tileGameObjectMap.Count > 0)
         {
             Tile tile_data = tileGameObjectMap.Keys.First();
             GameObject tile_go = tileGameObjectMap[tile_data];
@@ -96,10 +97,12 @@ public class TileSpriteController : MonoBehaviour {
         if (tile_data.Type == TileType.Floor)
         {
             tile_go.GetComponent<SpriteRenderer>().sprite = floorSprite;
-        } else if (tile_data.Type == TileType.Empty)
+        }
+        else if (tile_data.Type == TileType.Empty)
         {
             tile_go.GetComponent<SpriteRenderer>().sprite = emptySprite;
-        } else
+        }
+        else
         {
             Debug.LogError("OnTileTypeChanged - Unrecognized tile type.");
         }

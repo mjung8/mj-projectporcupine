@@ -107,10 +107,12 @@ public static class FurnitureActions
 
         if (furn.tile.inventory == null)
         {
+            Debug.Log("Creating job for new stack.");
             itemsDesired = Stockpile_GetItemsFromFilter();
         }
         else
         {
+            Debug.Log("Creating job for existing stack.");
             Inventory desInv = furn.tile.inventory.Clone();
             desInv.maxStackSize -= desInv.stackSize;
             desInv.stackSize = 0;
@@ -192,8 +194,8 @@ public static class FurnitureActions
             return;
         }
 
-            // If we get here we need to create a new job
-            Tile jobSpot = furn.GetJobSpotTile();
+        // If we get here we need to create a new job
+        Tile jobSpot = furn.GetJobSpotTile();
 
         if (jobSpot.inventory != null && (jobSpot.inventory.stackSize >= jobSpot.inventory.maxStackSize))
         {

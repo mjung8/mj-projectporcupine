@@ -30,9 +30,7 @@ public class MouseController : MonoBehaviour
     void Start()
     {
         bmc = GameObject.FindObjectOfType<BuildModeController>();
-
         fsc = GameObject.FindObjectOfType<FurnitureSpriteController>();
-
 
         dragPreviewGameObjects = new List<GameObject>();
     }

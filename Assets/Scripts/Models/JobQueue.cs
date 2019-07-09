@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class JobQueue {
-
+public class JobQueue
+{
     Queue<Job> jobQueue;
 
     Action<Job> cbJobCreated;
@@ -14,8 +14,9 @@ public class JobQueue {
         jobQueue = new Queue<Job>();
     }
 
-    public void Enqueue (Job j)
+    public void Enqueue(Job j)
     {
+        Debug.Log("Adding job to queue. Existing queue size: " + jobQueue.Count);
         if (j.jobTime < 0)
         {
             // Job has a negative job time, so it's not supposed to
@@ -57,7 +58,7 @@ public class JobQueue {
         // TODO: check docs to see if there's a less memory/swappy solution
         List<Job> jobs = new List<Job>(jobQueue);
 
-        if(jobs.Contains(j) == false)
+        if (jobs.Contains(j) == false)
         {
             //Debug.LogError("Trying to remove a job that doesn't exist on the queue.");
             // Most likely, this job wasn't on the queue because a character was working it

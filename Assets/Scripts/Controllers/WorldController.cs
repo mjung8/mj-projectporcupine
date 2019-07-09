@@ -8,7 +8,6 @@ using System.IO;
 
 public class WorldController : MonoBehaviour
 {
-
     public static WorldController Instance { get; protected set; }
 
     // World and tile data
@@ -103,7 +102,7 @@ public class WorldController : MonoBehaviour
         // Create a world from save file data
         XmlSerializer serializer = new XmlSerializer(typeof(World));
         TextReader reader = new StringReader(PlayerPrefs.GetString("SaveGame00"));
-        //Debug.Log(reader.ToString());
+        Debug.Log(reader.ToString());
         world = (World)serializer.Deserialize(reader);
         reader.Close();
 

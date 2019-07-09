@@ -155,6 +155,7 @@ public class Character : IXmlSerializable
             }
             else
             {
+                // At this point, the job still requires inventory but we aren't carrying it
                 // Are we standing on a tile with goods desired by job?
                 if (currTile.inventory != null &&
                     (myJob.canTakeFromStockpile || currTile.furniture == null || currTile.furniture.IsStockpile() == false) &&
@@ -238,7 +239,6 @@ public class Character : IXmlSerializable
                 if (pathAStar.Length() == 0)
                 {
                     Debug.LogError("Path_AStar returned no path to destination!");
-                    // FIXME: maybe job should be requeued
                     AbandonJob();
                     return;
                 }

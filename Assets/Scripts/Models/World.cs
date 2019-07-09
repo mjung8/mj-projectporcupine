@@ -560,8 +560,6 @@ public class World : IXmlSerializable
     void ReadXml_Furnitures(XmlReader reader)
     {
         Debug.Log("ReadXml_Furnitures");
-        // We are in the "Furnitures" element, so read elements
-        // until we run out of "Tile" nodes
 
         if (reader.ReadToDescendant("Furniture"))
         {
@@ -607,8 +605,7 @@ public class World : IXmlSerializable
     void ReadXml_Characters(XmlReader reader)
     {
         Debug.Log("ReadXml_Characters");
-        // We are in the "Characters" element, so read elements
-        // until we run out of "Tile" nodes
+
         if (reader.ReadToDescendant("Character"))
         {
             do

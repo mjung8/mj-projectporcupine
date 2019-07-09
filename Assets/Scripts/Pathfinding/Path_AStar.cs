@@ -24,9 +24,6 @@ public class Path_AStar
         if (nodes.ContainsKey(tileStart) == false)
         {
             Debug.LogError("Path_AStar: the starting tile isn't in the list of nodes.");
-
-            // FIXME: for now, manually add start tile into the list of valid nodes
-
             return;
         }
         if (nodes.ContainsKey(tileEnd) == false)
@@ -39,6 +36,7 @@ public class Path_AStar
         Path_Node<Tile> goal = nodes[tileEnd];
 
         // Mostly following wikipedia A* search algorithm
+        // https://en.wikipedia.org/wiki/A*_search_algorithm
         List<Path_Node<Tile>> ClosedSet = new List<Path_Node<Tile>>();
 
         //List<Path_Node<Tile>> OpenSet = new List<Path_Node<Tile>>();
@@ -112,8 +110,8 @@ public class Path_AStar
         // without reaching a point where current == goal.
         // This happens when there is no path from start to goal.
 
-        return;
-
+        // We don't have a failure state, maybe? It's just that the
+        // path list will be null.
     }
 
     float heuristic_cost_estimate(Path_Node<Tile> a, Path_Node<Tile> b)
