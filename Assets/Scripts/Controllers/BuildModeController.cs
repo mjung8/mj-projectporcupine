@@ -105,7 +105,7 @@ public class BuildModeController : MonoBehaviour
 
                 // not good to explicitly set stuff like this
                 t.pendingFunitureJob = j;
-                j.RegisterJobCompleteCallback((theJob) => theJob.tile.pendingFunitureJob = null);
+                j.RegisterJobCompletedCallback((theJob) => theJob.tile.pendingFunitureJob = null);
 
                 // Add the job to the queue
                 WorldController.Instance.world.jobQueue.Enqueue(j);

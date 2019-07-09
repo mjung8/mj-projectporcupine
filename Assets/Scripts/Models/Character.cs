@@ -79,8 +79,7 @@ public class Character : IXmlSerializable
             return;
 
         destTile = myJob.tile;
-        myJob.RegisterJobCompleteCallback(OnJobEnded);
-        myJob.RegisterJobCancelCallback(OnJobEnded);
+        myJob.RegisterJobStoppedCallback(OnJobStopped);
 
         // Immediately check to see if the job tile is reachable
         pathAStar = new Path_AStar(World.Current, currTile, destTile);  // This will calculate path from curr to dest
@@ -338,12 +337,11 @@ public class Character : IXmlSerializable
         cbCharacterChanged -= cb;
     }
 
-    void OnJobEnded(Job j)
+    void OnJobStopped(Job j)
     {
-        //Job completed or cancelled
+        //Job completed (if non-repeating) or cancelled
 
-        j.UnregisterJobCancelCallback(OnJobEnded);
-        j.UnregisterJobCompleteCallback(OnJobEnded);
+        j.UnregisterJobStoppedCallback(OnJobStopped);
 
         if (j != myJob)
         {

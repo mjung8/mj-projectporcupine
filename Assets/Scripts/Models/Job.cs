@@ -13,6 +13,10 @@ public class Job
     public Tile tile;
     public float jobTime { get; protected set; }
 
+    protected float jobTimeRequired;
+
+    protected bool jobRepeats = false;
+
     public string jobObjectType { get; protected set; }
 
     public Furniture furniturePrototype;
@@ -21,20 +25,21 @@ public class Job
 
     public bool acceptsAnyInventoryItem = false;
 
-    Action<Job> cbJobComplete;
-    Action<Job> cbJobCancel;
-    Action<Job> cbJobWorked;
+    Action<Job> cbJobCompleted; // We have finished the work cycle so things should probably get built or whatever
+    Action<Job> cbJobStopped;   // The job has been stopped, because it's non-repeating or was cancelled
+    Action<Job> cbJobWorked;    // Gets called each time some work is performed -- maybe update the UI?
 
     public bool canTakeFromStockpile = true;
 
     public Dictionary<string, Inventory> inventoryRequirements;
 
-    public Job(Tile tile, string jobObjectType, Action<Job> cbJobComplete, float jobTime, Inventory[] inventoryRequirements)
+    public Job(Tile tile, string jobObjectType, Action<Job> cbJobComplete, float jobTime, Inventory[] inventoryRequirements, bool jobRepeats = false)
     {
         this.tile = tile;
         this.jobObjectType = jobObjectType;
-        this.cbJobComplete += cbJobComplete;
-        this.jobTime = jobTime;
+        this.cbJobCompleted += cbJobComplete;
+        this.jobTimeRequired = this.jobTime = jobTime;
+        this.jobRepeats = jobRepeats;
 
         this.inventoryRequirements = new Dictionary<string, Inventory>();
         if (inventoryRequirements != null)
@@ -50,7 +55,7 @@ public class Job
     {
         this.tile = other.tile;
         this.jobObjectType = other.jobObjectType;
-        this.cbJobComplete += other.cbJobComplete;
+        this.cbJobCompleted += other.cbJobCompleted;
         this.jobTime = other.jobTime;
 
         this.inventoryRequirements = new Dictionary<string, Inventory>();
@@ -68,24 +73,24 @@ public class Job
         return new Job(this);
     }
 
-    public void RegisterJobCompleteCallback(Action<Job> cb)
+    public void RegisterJobCompletedCallback(Action<Job> cb)
     {
-        cbJobComplete += cb;
+        cbJobCompleted += cb;
     }
 
-    public void UnregisterJobCompleteCallback(Action<Job> cb)
+    public void UnregisterJobCompletedCallback(Action<Job> cb)
     {
-        cbJobComplete -= cb;
+        cbJobCompleted -= cb;
     }
 
-    public void RegisterJobCancelCallback(Action<Job> cb)
+    public void RegisterJobStoppedCallback(Action<Job> cb)
     {
-        cbJobCancel += cb;
+        cbJobStopped += cb;
     }
 
-    public void UnregisterJobCancelCallback(Action<Job> cb)
+    public void UnregisterJobStoppedCallback(Action<Job> cb)
     {
-        cbJobCancel -= cb;
+        cbJobStopped -= cb;
     }
 
     public void RegisterJobWorkedCallback(Action<Job> cb)
@@ -102,7 +107,7 @@ public class Job
     {
         // Check to make sure we actually have everything we need
         // If not, don't register the work time
-        if(HasAllMaterial() == false)
+        if (HasAllMaterial() == false)
         {
             //Debug.LogError("Tried to do work on a job that doesn't have all material.");
 
@@ -121,16 +126,29 @@ public class Job
 
         if (jobTime <= 0)
         {
-            if (cbJobComplete != null)
-                cbJobComplete(this);
+            // Do whateve ris supposesd to happen when a job cycle compeltes
+            if (cbJobCompleted != null)
+                cbJobCompleted(this);
+
+            if (jobRepeats == false)
+            {
+                // Let everyone know that the job is officially concluded
+                if (cbJobStopped != null)
+                    cbJobStopped(this);
+            }
+            else
+            {
+                // This is a repeating job and must be reset
+                jobTime += jobTimeRequired;
+            }
         }
     }
 
     public void CancelJob()
     {
-        if (cbJobCancel != null)
+        if (cbJobStopped != null)
         {
-            cbJobCancel(this);
+            cbJobStopped(this);
         }
 
         World.Current.jobQueue.Remove(this);

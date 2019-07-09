@@ -68,8 +68,8 @@ public class JobSpriteController : MonoBehaviour
             }
         }
 
-        job.RegisterJobCompleteCallback(OnJobEnded);
-        job.RegisterJobCancelCallback(OnJobEnded);
+        job.RegisterJobCompletedCallback(OnJobEnded);
+        job.RegisterJobStoppedCallback(OnJobEnded);
     }
 
     void OnJobEnded(Job job)
@@ -78,8 +78,8 @@ public class JobSpriteController : MonoBehaviour
         // FIXME we can only do furniture building jobs
 
         GameObject job_go = jobGameObjectMap[job];
-        job.UnregisterJobCompleteCallback(OnJobEnded);
-        job.UnregisterJobCancelCallback(OnJobEnded);
+        job.UnregisterJobCompletedCallback(OnJobEnded);
+        job.UnregisterJobStoppedCallback(OnJobEnded);
 
         Destroy(job_go);
     }

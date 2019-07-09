@@ -28,6 +28,8 @@ public class Furniture : IXmlSerializable
     // relative to the bottom-left tile of the sprite
     // Note: This could be something outside of the actual furniture itself
     public Vector2 jobSpotOffset = Vector2.zero;
+    // If the job causes some kind of object to be spawned, where will it appear?
+    public Vector2 jobSpawnSpotOffset = Vector2.zero;
 
     public void Update(float deltaTime)
     {
@@ -96,6 +98,7 @@ public class Furniture : IXmlSerializable
         this.linksToNeighbour = other.linksToNeighbour;
 
         this.jobSpotOffset = other.jobSpotOffset;
+        this.jobSpawnSpotOffset = other.jobSpawnSpotOffset;
 
         this.furnParameters = new Dictionary<string, float>(other.furnParameters);
         jobs = new List<Job>();
@@ -333,22 +336,37 @@ public class Furniture : IXmlSerializable
     {
         j.furniture = this;
         jobs.Add(j);
+        j.RegisterJobStoppedCallback(OnJobStopped);
         World.Current.jobQueue.Enqueue(j);
     }
 
-    public void RemoveJob(Job j)
+    void OnJobStopped(Job j)
     {
-        jobs.Remove(j);
-        j.CancelJob();
-        j.furniture = null;
-        World.Current.jobQueue.Remove(j);
+        RemoveJob(j);
     }
 
-    public void ClearJobs()
+    protected void RemoveJob(Job j)
     {
-        foreach (Job j in jobs)
+        j.UnregisterJobStoppedCallback(OnJobStopped);
+        jobs.Remove(j);
+        j.furniture = null;
+    }
+
+    protected void ClearJobs()
+    {
+        Job[] jobs_array = jobs.ToArray();
+        foreach (Job j in jobs_array)
         {
             RemoveJob(j);
+        }
+    }
+
+    public void CancelJobs()
+    {
+        Job[] jobs_array = jobs.ToArray();
+        foreach (Job j in jobs_array)
+        {
+            j.CancelJob();
         }
     }
 
@@ -381,5 +399,11 @@ public class Furniture : IXmlSerializable
     public Tile GetJobSpotTile()
     {
         return World.Current.GetTileAt(tile.X + (int)jobSpotOffset.x, tile.Y + (int)jobSpotOffset.y);
+    }
+
+    public Tile GetSpawnSpotTile()
+    {
+        // TODO: allow us to customize this
+        return World.Current.GetTileAt(tile.X + (int)jobSpawnSpotOffset.x, tile.Y + (int)jobSpawnSpotOffset.y);
     }
 }
