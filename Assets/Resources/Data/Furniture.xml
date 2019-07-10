@@ -9,13 +9,13 @@
     <EnclosesRooms>true</EnclosesRooms>
 
     <BuildingJob>
-      <Inventory objectType="Steel Plate" amount="5"></Inventory>
+      <Inventory objectType="Steel Plate" amount="5" />
     </BuildingJob>
 
     <DeconstructJob>
-      <Inventory objectType="Steel Plate" amount="3"></Inventory>
+      <Inventory objectType="Steel Plate" amount="3" />
     </DeconstructJob>
-    
+
   </Furniture>
 
   <Furniture objectType="Door">
@@ -25,19 +25,19 @@
     <Height>1</Height>
     <LinksToNeighbours>false</LinksToNeighbours>
     <EnclosesRooms>true</EnclosesRooms>
-    
+
     <Params>
-      <Param name="openness" value="0"></Param>
-      <Param name="is_opening" value="0"></Param>
+      <Param name="openness" value="0" />
+      <Param name="is_opening" value="0" />
     </Params>
 
     <BuildingJob>
-      <Inventory objectType="Steel Plate" amount="2"></Inventory>
+      <Inventory objectType="Steel Plate" amount="2" />
     </BuildingJob>
 
     <DeconstructJob>
-      <Inventory objectType="Steel Plate" amount="1"></Inventory>
+      <Inventory objectType="Steel Plate" amount="1"/>
     </DeconstructJob>
-    
+
   </Furniture>
 </Furnitures>

@@ -4,6 +4,7 @@ using System;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using System.IO;
 
 public class World : IXmlSerializable
 {
@@ -165,6 +166,39 @@ public class World : IXmlSerializable
         furnitureJobPrototypes = new Dictionary<string, Job>();
 
         // READ FURNITURE XML FILE HERE
+        // In the future, instead of using the Unity Resources system,
+        // we will be reading from a regular file on the hard drive
+        TextAsset furnText = Resources.Load<TextAsset>("Data/Furniture");
+
+        XmlTextReader reader = new XmlTextReader(new StringReader(furnText.text));
+
+        int furnCount = 0;
+        if (reader.ReadToDescendant("Furnitures"))
+        {
+            if (reader.ReadToDescendant("Furniture"))
+            {
+                do
+                {
+                    furnCount++;
+
+                    Furniture furn = new Furniture();
+                    furn.ReadXmlPrototype(reader);
+
+                    furniturePrototypes[furn.objectType] = furn;
+
+                } while (reader.ReadToNextSibling("Furniture"));
+            }
+            else
+            {
+                Debug.LogError("The furniture prototype definition file doesn't have any 'Furniture' elements.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Did not find a 'Furnitures' element in the prototype definition file.");
+        }
+
+        Debug.Log("Furniture prototypes read: " + furnCount);
 
         // This bit will come form parsing a LUA file later but for now we still need to implement
         // furniture behaviour directly
