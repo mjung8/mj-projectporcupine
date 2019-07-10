@@ -8,7 +8,7 @@
     <LinksToNeighbours>true</LinksToNeighbours>
     <EnclosesRooms>true</EnclosesRooms>
 
-    <BuildingJob>
+    <BuildingJob jobTime="1">
       <Inventory objectType="Steel Plate" amount="5" />
     </BuildingJob>
 
@@ -20,7 +20,7 @@
 
   <Furniture objectType="Door">
     <Name>Door</Name>
-    <MovementCost>0</MovementCost>
+    <MovementCost>1</MovementCost>
     <Width>1</Width>
     <Height>1</Height>
     <LinksToNeighbours>false</LinksToNeighbours>
@@ -31,7 +31,7 @@
       <Param name="is_opening" value="0" />
     </Params>
 
-    <BuildingJob>
+    <BuildingJob jobTime="1">
       <Inventory objectType="Steel Plate" amount="2" />
     </BuildingJob>
 
@@ -39,5 +39,37 @@
       <Inventory objectType="Steel Plate" amount="1"/>
     </DeconstructJob>
 
+    <IsEnterable>
+      // LUA Code?
+    </IsEnterable>
+    
   </Furniture>
+
+  <Furniture objectType="Stockpile">
+    <Name>Stockpile</Name>
+  </Furniture>
+
+  <Furniture objectType="Oxygen Generator">
+    <Name>Oxygen Generator</Name>
+    <MovementCost>10</MovementCost>
+    <Width>2</Width>
+    <Height>2</Height>
+
+    <OnUpdate luaFunctionName="OnUpdate_GasGenerator" />
+
+    <Params>
+      <Param name="gas_name" value="O2" />
+      <Param name="gas_limit" value="0.2" />
+      <Param name="gas_per_second" value="0.01" />
+    </Params>
+    
+  </Furniture>
+
+  <Furniture objectType="Mining Drone Station">
+    <Name>Mining Drone Station</Name>
+    <MovementCost>1</MovementCost>
+    <Width>3</Width>
+    <Height>3</Height>
+  </Furniture>
+
 </Furnitures>
