@@ -270,9 +270,9 @@ public class Tile : IXmlSerializable
         }
 
         // Check furniture to see if it's enterable
-        if (furniture != null && furniture.IsEnterable != null)
+        if (furniture != null)
         {
-            return furniture.IsEnterable(furniture);
+            return furniture.IsEnterable();
         }
 
         return ENTERABILITY.Yes;

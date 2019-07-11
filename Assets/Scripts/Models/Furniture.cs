@@ -22,7 +22,8 @@ public class Furniture : IXmlSerializable
     //protected Action<Furniture, float> updateActions;
     protected List<string> updateActions;
 
-    public Func<Furniture, ENTERABILITY> IsEnterable;
+    //public Func<Furniture, ENTERABILITY> IsEnterable;
+    protected string isEnterableAction;
 
     List<Job> jobs;
 
@@ -41,6 +42,17 @@ public class Furniture : IXmlSerializable
             //updateActions(this, deltaTime);
             FurnitureActions.CallFunctionsWithFurniture(updateActions.ToArray(), this, deltaTime);
         }
+    }
+
+    public ENTERABILITY IsEnterable()
+    {
+        if (isEnterableAction == null || isEnterableAction.Length == 0)
+            return ENTERABILITY.Yes;
+
+        //FurnitureActions.CallFunctionsWithFurniture(isEnterableActions.ToArray(), this);
+        DynValue ret = FurnitureActions.CallFunction(isEnterableAction, this);
+
+        return (ENTERABILITY)ret.Number;
     }
 
     // Represents base tile of object -- but large objects will occupy
@@ -131,10 +143,10 @@ public class Furniture : IXmlSerializable
         if (other.updateActions != null)
             this.updateActions = new List<string>(other.updateActions);
 
+        this.isEnterableAction = other.isEnterableAction;
+
         if (other.funcPositionValidation != null)
             this.funcPositionValidation = (Func<Tile, bool>)other.funcPositionValidation.Clone();
-
-        this.IsEnterable = other.IsEnterable;
     }
 
     // Make a copy of the current furniture
@@ -360,6 +372,9 @@ public class Furniture : IXmlSerializable
                     string functionName = reader.GetAttribute("FunctionName");
                     RegisterUpdateAction(functionName);
                     break;
+                case "IsEnterable":
+                    isEnterableAction = reader.GetAttribute("FunctionName");
+                    break;
                 case "Params":
                     ReadXmlParams(reader);
                     break;
@@ -399,7 +414,7 @@ public class Furniture : IXmlSerializable
     /// <param name="key">The key</param>
     /// <param name="default_value"></param>
     /// <returns>The parameter</returns>
-    public float GetParameter(string key, float default_value = 0)
+    public float GetParameter(string key, float default_value)
     {
         if (furnParameters.ContainsKey(key) == false)
         {
@@ -407,6 +422,16 @@ public class Furniture : IXmlSerializable
         }
 
         return furnParameters[key];
+    }
+
+    /// <summary>
+    /// for lua
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public float GetParameter(string key)
+    {
+        return GetParameter(key, 0);
     }
 
     public void SetParameter(string key, float value)
@@ -435,6 +460,17 @@ public class Furniture : IXmlSerializable
 
 
     public void UnregisterUpdateAction(string luaFunctionName)
+    {
+        updateActions.Remove(luaFunctionName);
+    }
+
+    public void RegisterIsEnterableAction(string luaFunctionName)
+    {
+        updateActions.Add(luaFunctionName);
+    }
+
+
+    public void UnregisterIsEnterableAction(string luaFunctionName)
     {
         updateActions.Remove(luaFunctionName);
     }

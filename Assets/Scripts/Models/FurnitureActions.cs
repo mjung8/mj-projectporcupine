@@ -34,9 +34,18 @@ public class FurnitureActions
                 return;
             }
 
-            DynValue result = _Instance.myLuaScript.Call(func, new object[] { furn, deltaTime });
-            Debug.Log(result);
+            DynValue result = _Instance.myLuaScript.Call(func, furn, deltaTime);
+
+            if(result.Type == DataType.String)
+                Debug.Log(result);
         }
+    }
+
+    static public DynValue CallFunction(string functionName, params object[] args)
+    {
+        object func = _Instance.myLuaScript.Globals[functionName];
+
+        return _Instance.myLuaScript.Call(func, args);
     }
 
     public static void JobComplete_FurnitureBuilding(Job theJob)

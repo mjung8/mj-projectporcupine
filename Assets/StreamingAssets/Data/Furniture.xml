@@ -39,10 +39,10 @@
       <Inventory objectType="Steel Plate" amount="1"/>
     </DeconstructJob>
 
-    <IsEnterable>
-      // LUA Code?
-    </IsEnterable>
-    
+    <OnUpdate FunctionName="OnUpdate_Door" />
+
+    <IsEnterable FunctionName="IsEnterable_Door" />
+
   </Furniture>
 
   <Furniture objectType="Stockpile">
@@ -62,7 +62,7 @@
       <Param name="gas_limit" value="0.2" />
       <Param name="gas_per_second" value="0.01" />
     </Params>
-    
+
   </Furniture>
 
   <Furniture objectType="Mining Drone Station">
