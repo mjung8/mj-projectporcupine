@@ -165,17 +165,33 @@ public class World : IXmlSerializable
         furnitureJobPrototypes[f.objectType] = j;
     }
 
+    void LoadFurnitureLua()
+    {
+        string filePath = Path.Combine(Application.streamingAssetsPath, "LUA");
+        filePath = Path.Combine(filePath, "Furniture.lua");
+        string myLuaCode = File.ReadAllText(filePath);
+
+        //Debug.Log("My LUA Code");
+        //Debug.Log(myLuaCode);
+
+        // Instantiate the singleton
+        new FurnitureActions(myLuaCode);
+    }
+
     void CreateFurniturePrototypes()
     {
+        LoadFurnitureLua();
+
         furniturePrototypes = new Dictionary<string, Furniture>();
         furnitureJobPrototypes = new Dictionary<string, Job>();
 
         // READ FURNITURE XML FILE HERE
-        // In the future, instead of using the Unity Resources system,
-        // we will be reading from a regular file on the hard drive
-        TextAsset furnText = Resources.Load<TextAsset>("Data/Furniture");
+        // TODO: should be geting passed a StreamIO handle or the raw text instead of opening file ourself
+        string filePath = Path.Combine(Application.streamingAssetsPath, "Data");
+        filePath = Path.Combine(filePath, "Furniture.xml");
+        string furnitureXmlText = File.ReadAllText(filePath);
 
-        XmlTextReader reader = new XmlTextReader(new StringReader(furnText.text));
+        XmlTextReader reader = new XmlTextReader(new StringReader(furnitureXmlText));
 
         int furnCount = 0;
         if (reader.ReadToDescendant("Furnitures"))

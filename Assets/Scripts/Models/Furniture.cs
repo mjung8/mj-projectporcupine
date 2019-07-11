@@ -5,7 +5,9 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Collections.Generic;
+using MoonSharp.Interpreter;
 
+[MoonSharpUserData]
 public class Furniture : IXmlSerializable
 {
     /// <summary>
@@ -17,7 +19,8 @@ public class Furniture : IXmlSerializable
     /// These actions are called every update. They get passed the furniture
     /// they belong to and a deltaTime.
     /// </summary>
-    protected Action<Furniture, float> updateActions;
+    //protected Action<Furniture, float> updateActions;
+    protected List<string> updateActions;
 
     public Func<Furniture, ENTERABILITY> IsEnterable;
 
@@ -35,7 +38,8 @@ public class Furniture : IXmlSerializable
     {
         if (updateActions != null)
         {
-            updateActions(this, deltaTime);
+            //updateActions(this, deltaTime);
+            FurnitureActions.CallFunctionsWithFurniture(updateActions.ToArray(), this, deltaTime);
         }
     }
 
@@ -99,6 +103,7 @@ public class Furniture : IXmlSerializable
     // Empty constructor for serialization
     public Furniture()
     {
+        updateActions = new List<string>();
         furnParameters = new Dictionary<string, float>();
         jobs = new List<Job>();
         this.funcPositionValidation = this.DEFAULT__IsValidPosition;
@@ -124,7 +129,7 @@ public class Furniture : IXmlSerializable
         jobs = new List<Job>();
 
         if (other.updateActions != null)
-            this.updateActions = (Action<Furniture, float>)other.updateActions.Clone();
+            this.updateActions = new List<string>(other.updateActions);
 
         if (other.funcPositionValidation != null)
             this.funcPositionValidation = (Func<Tile, bool>)other.funcPositionValidation.Clone();
@@ -140,19 +145,19 @@ public class Furniture : IXmlSerializable
     }
 
     // Create furniture from parameter -- this will probably only be used for prototypes
-    public Furniture(string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbour = false, bool roomEnclosure = false)
-    {
-        this.objectType = objectType;
-        this.movementCost = movementCost;
-        this.roomEnclosure = roomEnclosure;
-        this.Width = width;
-        this.Height = height;
-        this.linksToNeighbour = linksToNeighbour;
+    //public Furniture(string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbour = false, bool roomEnclosure = false)
+    //{
+    //    this.objectType = objectType;
+    //    this.movementCost = movementCost;
+    //    this.roomEnclosure = roomEnclosure;
+    //    this.Width = width;
+    //    this.Height = height;
+    //    this.linksToNeighbour = linksToNeighbour;
 
-        this.funcPositionValidation = this.DEFAULT__IsValidPosition;
+    //    this.funcPositionValidation = this.DEFAULT__IsValidPosition;
 
-        furnParameters = new Dictionary<string, float>();
-    }
+    //    furnParameters = new Dictionary<string, float>();
+    //}
 
     static public Furniture PlaceInstance(Furniture proto, Tile tile)
     {
@@ -286,7 +291,7 @@ public class Furniture : IXmlSerializable
 
     public void ReadXmlPrototype(XmlReader reader_parent)
     {
-        Debug.Log("ReadXmlPrototype");
+        //Debug.Log("ReadXmlPrototype");
 
         objectType = reader_parent.GetAttribute("objectType");
 
@@ -330,7 +335,7 @@ public class Furniture : IXmlSerializable
 
                     while (invs_reader.Read())
                     {
-                        Debug.Log("invs_reader: " + invs_reader.Name);
+                        //Debug.Log("invs_reader: " + invs_reader.Name);
                         if (invs_reader.Name == "Inventory")
                         {
                             // Found an inventory requirement, add it to the list
@@ -350,6 +355,10 @@ public class Furniture : IXmlSerializable
 
                     World.Current.SetFurnitureJobPrototype(j, this);
 
+                    break;
+                case "OnUpdate":
+                    string functionName = reader.GetAttribute("FunctionName");
+                    RegisterUpdateAction(functionName);
                     break;
                 case "Params":
                     ReadXmlParams(reader);
@@ -419,15 +428,15 @@ public class Furniture : IXmlSerializable
     /// Registers a function that will be called every Update.
     /// </summary>
     /// <param name="a">The function</param>
-    public void RegisterUpdateAction(Action<Furniture, float> a)
+    public void RegisterUpdateAction(string luaFunctionName)
     {
-        updateActions += a;
+        updateActions.Add(luaFunctionName);
     }
 
 
-    public void UnregisterUpdateAction(Action<Furniture, float> a)
+    public void UnregisterUpdateAction(string luaFunctionName)
     {
-        updateActions -= a;
+        updateActions.Remove(luaFunctionName);
     }
 
     public int JobCount()

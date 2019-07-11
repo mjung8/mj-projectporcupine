@@ -55,10 +55,10 @@
     <Width>2</Width>
     <Height>2</Height>
 
-    <OnUpdate luaFunctionName="OnUpdate_GasGenerator" />
+    <OnUpdate FunctionName="OnUpdate_GasGenerator" />
 
     <Params>
-      <Param name="gas_name" value="O2" />
+      <!--<Param name="gas_name" value="O2" />-->
       <Param name="gas_limit" value="0.2" />
       <Param name="gas_per_second" value="0.01" />
     </Params>
