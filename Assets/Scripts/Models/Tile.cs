@@ -4,7 +4,7 @@ using System;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-
+using MoonSharp.Interpreter;
 
 // TileType is  the base type of the tile. In some tile-based games, that might be
 // the terrain type. For us, we only need to differentiate between empty space
@@ -13,6 +13,7 @@ using System.Xml.Serialization;
 public enum TileType { Empty, Floor };
 public enum ENTERABILITY { Yes, Never, Soon };
 
+[MoonSharpUserData]
 public class Tile : IXmlSerializable
 {
 
@@ -269,9 +270,9 @@ public class Tile : IXmlSerializable
         }
 
         // Check furniture to see if it's enterable
-        if (furniture != null && furniture.IsEnterable != null)
+        if (furniture != null)
         {
-            return furniture.IsEnterable(furniture);
+            return furniture.IsEnterable();
         }
 
         return ENTERABILITY.Yes;

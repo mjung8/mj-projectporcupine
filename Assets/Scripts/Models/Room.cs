@@ -6,7 +6,9 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using System;
+using MoonSharp.Interpreter;
 
+[MoonSharpUserData]
 public class Room : IXmlSerializable
 {
     Dictionary<string, float> atmosphericGasses;

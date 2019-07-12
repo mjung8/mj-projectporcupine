@@ -4,7 +4,10 @@ using System;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using System.IO;
+using MoonSharp.Interpreter;
 
+[MoonSharpUserData]
 public class World : IXmlSerializable
 {
 
@@ -159,104 +162,173 @@ public class World : IXmlSerializable
         return c;
     }
 
+    public void SetFurnitureJobPrototype(Job j, Furniture f)
+    {
+        furnitureJobPrototypes[f.objectType] = j;
+    }
+
+    void LoadFurnitureLua()
+    {
+        string filePath = Path.Combine(Application.streamingAssetsPath, "LUA");
+        filePath = Path.Combine(filePath, "Furniture.lua");
+        string myLuaCode = File.ReadAllText(filePath);
+
+        //Debug.Log("My LUA Code");
+        //Debug.Log(myLuaCode);
+
+        // Instantiate the singleton
+        new FurnitureActions(myLuaCode);
+    }
+
     void CreateFurniturePrototypes()
     {
-        // This will be replaced by a function that reads data
-        // from a text file
+        LoadFurnitureLua();
 
         furniturePrototypes = new Dictionary<string, Furniture>();
         furnitureJobPrototypes = new Dictionary<string, Job>();
 
-        furniturePrototypes.Add("Wall",
-            new Furniture(
-                "Wall",
-                0,  // Impassable
-                1,  // Width
-                1,  // Height
-                true,   // Links to neighbours and "sort of" becomes part of a larger object
-                true    // Enclose rooms
-            )
-        );
-        furnitureJobPrototypes.Add("Wall",
-            new Job(
-                null,
-                "Wall",
-                FurnitureActions.JobComplete_FurnitureBuilding,
-                1f,
-                new Inventory[] { new Inventory("Steel Plate", 5, 0) }
-            )
-        );
+        // READ FURNITURE XML FILE HERE
+        // TODO: should be geting passed a StreamIO handle or the raw text instead of opening file ourself
+        string filePath = Path.Combine(Application.streamingAssetsPath, "Data");
+        filePath = Path.Combine(filePath, "Furniture.xml");
+        string furnitureXmlText = File.ReadAllText(filePath);
 
-        furniturePrototypes.Add("Door",
-            new Furniture(
-                "Door",
-                1,  // Door pathfinding cost
-                1,  // Width
-                1,  // Height
-                false,  // Links to neighbours and "sort of" becomes part of a larger object
-                true    // Enclose rooms
-            )
-        );
+        XmlTextReader reader = new XmlTextReader(new StringReader(furnitureXmlText));
 
-        // What if object behaviours were scriptable? And part of the text file?
-        furniturePrototypes["Door"].SetParameter("openness", 0);
-        furniturePrototypes["Door"].SetParameter("is_opening", 0);
-        furniturePrototypes["Door"].RegisterUpdateAction(FurnitureActions.Door_UpdateAction);
+        int furnCount = 0;
+        if (reader.ReadToDescendant("Furnitures"))
+        {
+            if (reader.ReadToDescendant("Furniture"))
+            {
+                do
+                {
+                    furnCount++;
 
-        furniturePrototypes["Door"].IsEnterable = FurnitureActions.Door_IsEnterable;
+                    Furniture furn = new Furniture();
+                    furn.ReadXmlPrototype(reader);
+
+                    furniturePrototypes[furn.objectType] = furn;
 
 
-        furniturePrototypes.Add("Stockpile",
-            new Furniture(
-                "Stockpile",
-                1,  // Impassable
-                1,  // Width
-                1,  // Height
-                true,   // Links to neighbours and "sort of" becomes part of a larger object
-                false    // Enclose rooms
-            )
-        );
-        furniturePrototypes["Stockpile"].RegisterUpdateAction(FurnitureActions.Stockpile_UpdateAction);
-        furniturePrototypes["Stockpile"].tint = new Color32(186, 31, 31, 255);
-        furnitureJobPrototypes.Add("Stockpile",
-            new Job(
-                null,
-                "Stockpile",
-                FurnitureActions.JobComplete_FurnitureBuilding,
-                -1,
-                null
-            )
-        );
+                } while (reader.ReadToNextSibling("Furniture"));
+            }
+            else
+            {
+                Debug.LogError("The furniture prototype definition file doesn't have any 'Furniture' elements.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Did not find a 'Furnitures' element in the prototype definition file.");
+        }
 
+        Debug.Log("Furniture prototypes read: " + furnCount);
 
-        furniturePrototypes.Add("Oxygen Generator",
-            new Furniture(
-                "Oxygen Generator",
-                10,  // pathfinding cost
-                2,  // Width
-                2,  // Height
-                false,  // Links to neighbours and "sort of" becomes part of a larger object
-                false    // Enclose rooms
-            )
-        );
-        furniturePrototypes["Oxygen Generator"].RegisterUpdateAction(FurnitureActions.OxygenGenerator_UpdateAction);
-
-
-        furniturePrototypes.Add("Mining Drone Station",
-           new Furniture(
-               "Mining Drone Station",
-               1,  // pathfinding cost
-               3,  // Width
-               3,  // Height    // TODO: in the future, the mining drone station will be a 3x2 object with an offset work spot
-               false,  // Links to neighbours and "sort of" becomes part of a larger object
-               false    // Enclose rooms
-           )
-        );
-        furniturePrototypes["Mining Drone Station"].jobSpotOffset = new Vector2(1, 0);
-
-        furniturePrototypes["Mining Drone Station"].RegisterUpdateAction(FurnitureActions.MiningDroneStation_UpdateAction);
-
+        // This bit will come form parsing a LUA file later but for now we still need to implement
+        // furniture behaviour directly
+        //furniturePrototypes["Door"].RegisterUpdateAction(FurnitureActions.Door_UpdateAction);
+        //furniturePrototypes["Door"].IsEnterable = FurnitureActions.Door_IsEnterable;
     }
+
+    //void CreateFurniturePrototypes()
+    //{
+    //    // This will be replaced by a function that reads data
+    //    // from a text file
+
+    //    furniturePrototypes = new Dictionary<string, Furniture>();
+    //    furnitureJobPrototypes = new Dictionary<string, Job>();
+
+    //    furniturePrototypes.Add("furn_SteelWall",
+    //        new Furniture(
+    //            "furn_SteelWall",
+    //            0,  // Impassable
+    //            1,  // Width
+    //            1,  // Height
+    //            true,   // Links to neighbours and "sort of" becomes part of a larger object
+    //            true    // Enclose rooms
+    //        )
+    //    );
+    //    furniturePrototypes["furn_SteelWall"].Name = "Basic Wall";
+    //    furnitureJobPrototypes.Add("furn_SteelWall",
+    //        new Job(
+    //            null,
+    //            "furn_SteelWall",
+    //            FurnitureActions.JobComplete_FurnitureBuilding,
+    //            1f,
+    //            new Inventory[] { new Inventory("Steel Plate", 5, 0) }
+    //        )
+    //    );
+
+    //    furniturePrototypes.Add("Door",
+    //        new Furniture(
+    //            "Door",
+    //            1,  // Door pathfinding cost
+    //            1,  // Width
+    //            1,  // Height
+    //            false,  // Links to neighbours and "sort of" becomes part of a larger object
+    //            true    // Enclose rooms
+    //        )
+    //    );
+
+    //    // What if object behaviours were scriptable? And part of the text file?
+    //    furniturePrototypes["Door"].SetParameter("openness", 0);
+    //    furniturePrototypes["Door"].SetParameter("is_opening", 0);
+    //    furniturePrototypes["Door"].RegisterUpdateAction(FurnitureActions.Door_UpdateAction);
+
+    //    furniturePrototypes["Door"].IsEnterable = FurnitureActions.Door_IsEnterable;
+
+
+    //    furniturePrototypes.Add("Stockpile",
+    //        new Furniture(
+    //            "Stockpile",
+    //            1,  // Impassable
+    //            1,  // Width
+    //            1,  // Height
+    //            true,   // Links to neighbours and "sort of" becomes part of a larger object
+    //            false    // Enclose rooms
+    //        )
+    //    );
+    //    furniturePrototypes["Stockpile"].RegisterUpdateAction(FurnitureActions.Stockpile_UpdateAction);
+    //    furniturePrototypes["Stockpile"].tint = new Color32(186, 31, 31, 255);
+    //    furnitureJobPrototypes.Add("Stockpile",
+    //        new Job(
+    //            null,
+    //            "Stockpile",
+    //            FurnitureActions.JobComplete_FurnitureBuilding,
+    //            -1,
+    //            null
+    //        )
+    //    );
+
+
+    //    furniturePrototypes.Add("Oxygen Generator",
+    //        new Furniture(
+    //            "Oxygen Generator",
+    //            10,  // pathfinding cost
+    //            2,  // Width
+    //            2,  // Height
+    //            false,  // Links to neighbours and "sort of" becomes part of a larger object
+    //            false    // Enclose rooms
+    //        )
+    //    );
+    //    furniturePrototypes["Oxygen Generator"].RegisterUpdateAction(FurnitureActions.OxygenGenerator_UpdateAction);
+
+
+    //    furniturePrototypes.Add("Mining Drone Station",
+    //       new Furniture(
+    //           "Mining Drone Station",
+    //           1,  // pathfinding cost
+    //           3,  // Width
+    //           3,  // Height    // TODO: in the future, the mining drone station will be a 3x2 object with an offset work spot
+    //           false,  // Links to neighbours and "sort of" becomes part of a larger object
+    //           false    // Enclose rooms
+    //       )
+    //    );
+    //    furniturePrototypes["Mining Drone Station"].jobSpotOffset = new Vector2(1, 0);
+
+    //    furniturePrototypes["Mining Drone Station"].RegisterUpdateAction(FurnitureActions.MiningDroneStation_UpdateAction);
+
+    //}
 
     public void SetupPathfindingExample()
     {
@@ -277,7 +349,7 @@ public class World : IXmlSerializable
                 {
                     if (x != (l + 9) && y != (b + 4))
                     {
-                        PlaceFurniture("Wall", tiles[x, y]);
+                        PlaceFurniture("furn_SteelWall", tiles[x, y]);
                     }
                 }
             }
@@ -512,31 +584,31 @@ public class World : IXmlSerializable
             }
         }
 
-        //DEBUG ONLY REMOVE ME LATER
-        //Create an Inventory item
-        //Inventory inv = new Inventory("Steel Plate", 50, 50);
-        //Tile t = GetTileAt(Width / 2, Height / 2);
-        //inventoryManager.PlaceInventory(t, inv);
-        //if (cbInventoryCreated != null)
-        //{
-        //    cbInventoryCreated(t.inventory);
-        //}
+        // DEBUG ONLY REMOVE ME LATER
+        // Create an Inventory item
+        Inventory inv = new Inventory("Steel Plate", 50, 50);
+        Tile t = GetTileAt(Width / 2, Height / 2);
+        inventoryManager.PlaceInventory(t, inv);
+        if (cbInventoryCreated != null)
+        {
+            cbInventoryCreated(t.inventory);
+        }
 
-        //inv = new Inventory("Steel Plate", 50, 4);
-        //t = GetTileAt(Width / 2 + 2, Height / 2);
-        //inventoryManager.PlaceInventory(t, inv);
-        //if (cbInventoryCreated != null)
-        //{
-        //    cbInventoryCreated(t.inventory);
-        //}
+        inv = new Inventory("Steel Plate", 50, 4);
+        t = GetTileAt(Width / 2 + 2, Height / 2);
+        inventoryManager.PlaceInventory(t, inv);
+        if (cbInventoryCreated != null)
+        {
+            cbInventoryCreated(t.inventory);
+        }
 
-        //inv = new Inventory("Steel Plate", 50, 3);
-        //t = GetTileAt(Width / 2 + 1, Height / 2 + 2);
-        //inventoryManager.PlaceInventory(t, inv);
-        //if (cbInventoryCreated != null)
-        //{
-        //    cbInventoryCreated(t.inventory);
-        //}
+        inv = new Inventory("Steel Plate", 50, 3);
+        t = GetTileAt(Width / 2 + 1, Height / 2 + 2);
+        inventoryManager.PlaceInventory(t, inv);
+        if (cbInventoryCreated != null)
+        {
+            cbInventoryCreated(t.inventory);
+        }
     }
 
     void ReadXml_Tiles(XmlReader reader)

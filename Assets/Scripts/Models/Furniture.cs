@@ -5,7 +5,9 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Collections.Generic;
+using MoonSharp.Interpreter;
 
+[MoonSharpUserData]
 public class Furniture : IXmlSerializable
 {
     /// <summary>
@@ -17,9 +19,11 @@ public class Furniture : IXmlSerializable
     /// These actions are called every update. They get passed the furniture
     /// they belong to and a deltaTime.
     /// </summary>
-    protected Action<Furniture, float> updateActions;
+    //protected Action<Furniture, float> updateActions;
+    protected List<string> updateActions;
 
-    public Func<Furniture, ENTERABILITY> IsEnterable;
+    //public Func<Furniture, ENTERABILITY> IsEnterable;
+    protected string isEnterableAction;
 
     List<Job> jobs;
 
@@ -35,8 +39,20 @@ public class Furniture : IXmlSerializable
     {
         if (updateActions != null)
         {
-            updateActions(this, deltaTime);
+            //updateActions(this, deltaTime);
+            FurnitureActions.CallFunctionsWithFurniture(updateActions.ToArray(), this, deltaTime);
         }
+    }
+
+    public ENTERABILITY IsEnterable()
+    {
+        if (isEnterableAction == null || isEnterableAction.Length == 0)
+            return ENTERABILITY.Yes;
+
+        //FurnitureActions.CallFunctionsWithFurniture(isEnterableActions.ToArray(), this);
+        DynValue ret = FurnitureActions.CallFunction(isEnterableAction, this);
+
+        return (ENTERABILITY)ret.Number;
     }
 
     // Represents base tile of object -- but large objects will occupy
@@ -50,6 +66,24 @@ public class Furniture : IXmlSerializable
     public string objectType
     {
         get; protected set;
+    }
+
+    private string _Name = null;
+    public string Name
+    {
+        get
+        {
+            if (_Name == null || _Name.Length == 0)
+            {
+                return objectType;
+            }
+
+            return _Name;
+        }
+        set
+        {
+            _Name = value;
+        }
     }
 
     // This is a multiplier. Value of 2 means move twice as slow (at half speed)
@@ -81,8 +115,10 @@ public class Furniture : IXmlSerializable
     // Empty constructor for serialization
     public Furniture()
     {
+        updateActions = new List<string>();
         furnParameters = new Dictionary<string, float>();
         jobs = new List<Job>();
+        this.funcPositionValidation = this.DEFAULT__IsValidPosition;
     }
 
     // Copy constructor -- don't call this directly unless we never
@@ -90,6 +126,7 @@ public class Furniture : IXmlSerializable
     protected Furniture(Furniture other)
     {
         this.objectType = other.objectType;
+        this.Name = other.Name;
         this.movementCost = other.movementCost;
         this.roomEnclosure = other.roomEnclosure;
         this.Width = other.Width;
@@ -104,12 +141,12 @@ public class Furniture : IXmlSerializable
         jobs = new List<Job>();
 
         if (other.updateActions != null)
-            this.updateActions = (Action<Furniture, float>)other.updateActions.Clone();
+            this.updateActions = new List<string>(other.updateActions);
+
+        this.isEnterableAction = other.isEnterableAction;
 
         if (other.funcPositionValidation != null)
             this.funcPositionValidation = (Func<Tile, bool>)other.funcPositionValidation.Clone();
-
-        this.IsEnterable = other.IsEnterable;
     }
 
     // Make a copy of the current furniture
@@ -120,19 +157,19 @@ public class Furniture : IXmlSerializable
     }
 
     // Create furniture from parameter -- this will probably only be used for prototypes
-    public Furniture(string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbour = false, bool roomEnclosure = false)
-    {
-        this.objectType = objectType;
-        this.movementCost = movementCost;
-        this.roomEnclosure = roomEnclosure;
-        this.Width = width;
-        this.Height = height;
-        this.linksToNeighbour = linksToNeighbour;
+    //public Furniture(string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbour = false, bool roomEnclosure = false)
+    //{
+    //    this.objectType = objectType;
+    //    this.movementCost = movementCost;
+    //    this.roomEnclosure = roomEnclosure;
+    //    this.Width = width;
+    //    this.Height = height;
+    //    this.linksToNeighbour = linksToNeighbour;
 
-        this.funcPositionValidation = this.DEFAULT__IsValidPosition;
+    //    this.funcPositionValidation = this.DEFAULT__IsValidPosition;
 
-        furnParameters = new Dictionary<string, float>();
-    }
+    //    furnParameters = new Dictionary<string, float>();
+    //}
 
     static public Furniture PlaceInstance(Furniture proto, Tile tile)
     {
@@ -264,7 +301,110 @@ public class Furniture : IXmlSerializable
         }
     }
 
+    public void ReadXmlPrototype(XmlReader reader_parent)
+    {
+        //Debug.Log("ReadXmlPrototype");
+
+        objectType = reader_parent.GetAttribute("objectType");
+
+        // only the content of the 'Furniture' tag (it's children)
+        XmlReader reader = reader_parent.ReadSubtree();
+
+        while (reader.Read())
+        {
+            switch (reader.Name)
+            {
+                case "Name":
+                    reader.Read();
+                    Name = reader.ReadContentAsString();
+                    break;
+                case "MovementCost":
+                    reader.Read();
+                    movementCost = reader.ReadContentAsFloat();
+                    break;
+                case "Width":
+                    reader.Read();
+                    Width = reader.ReadContentAsInt();
+                    break;
+                case "Height":
+                    reader.Read();
+                    Height = reader.ReadContentAsInt();
+                    break;
+                case "LinksToNeighbours":
+                    reader.Read();
+                    linksToNeighbour = reader.ReadContentAsBoolean();
+                    break;
+                case "EnclosesRooms":
+                    reader.Read();
+                    roomEnclosure = reader.ReadContentAsBoolean();
+                    break;
+                case "BuildingJob":
+                    float jobTime = float.Parse(reader.GetAttribute("jobTime"));
+
+                    List<Inventory> invs = new List<Inventory>();
+
+                    XmlReader invs_reader = reader.ReadSubtree();
+
+                    while (invs_reader.Read())
+                    {
+                        //Debug.Log("invs_reader: " + invs_reader.Name);
+                        if (invs_reader.Name == "Inventory")
+                        {
+                            // Found an inventory requirement, add it to the list
+                            invs.Add(new Inventory(
+                                invs_reader.GetAttribute("objectType"),
+                                int.Parse(invs_reader.GetAttribute("amount")),
+                                0
+                            ));
+                        }
+                    }
+
+                    Job j = new Job(null,
+                        objectType,
+                        FurnitureActions.JobComplete_FurnitureBuilding,
+                        jobTime,
+                        invs.ToArray(),
+                        false);
+
+                    World.Current.SetFurnitureJobPrototype(j, this);
+
+                    break;
+                case "OnUpdate":
+                    string functionName = reader.GetAttribute("FunctionName");
+                    RegisterUpdateAction(functionName);
+                    break;
+                case "IsEnterable":
+                    isEnterableAction = reader.GetAttribute("FunctionName");
+                    break;
+                case "JobSpotOffset":
+                    jobSpotOffset = new Vector2(
+                        int.Parse(reader.GetAttribute("X")),
+                        int.Parse(reader.GetAttribute("Y"))
+                    );
+                    break;
+                case "JobSpawnSpotOffset":
+                    jobSpawnSpotOffset = new Vector2(
+                        int.Parse(reader.GetAttribute("X")),
+                        int.Parse(reader.GetAttribute("Y"))
+                    );
+                    break;
+                case "Params":
+                    ReadXmlParams(reader);
+                    break;
+            }
+        }
+    }
+
     public void ReadXml(XmlReader reader)
+    {
+        // X, Y, and objectType have already been set 
+        // and should be assigned to a tile
+        //movementCost = int.Parse(reader.GetAttribute("movementCost"));
+
+        ReadXmlParams(reader);
+    }
+
+    public void ReadXmlParams(XmlReader reader)
     {
         // X, Y, and objectType have already been set 
         // and should be assigned to a tile
@@ -287,7 +427,7 @@ public class Furniture : IXmlSerializable
     /// <param name="key">The key</param>
     /// <param name="default_value"></param>
     /// <returns>The parameter</returns>
-    public float GetParameter(string key, float default_value = 0)
+    public float GetParameter(string key, float default_value)
     {
         if (furnParameters.ContainsKey(key) == false)
         {
@@ -295,6 +435,16 @@ public class Furniture : IXmlSerializable
         }
 
         return furnParameters[key];
+    }
+
+    /// <summary>
+    /// for Lua
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public float GetParameter(string key)
+    {
+        return GetParameter(key, 0);
     }
 
     public void SetParameter(string key, float value)
@@ -316,15 +466,26 @@ public class Furniture : IXmlSerializable
     /// Registers a function that will be called every Update.
     /// </summary>
     /// <param name="a">The function</param>
-    public void RegisterUpdateAction(Action<Furniture, float> a)
+    public void RegisterUpdateAction(string luaFunctionName)
     {
-        updateActions += a;
+        updateActions.Add(luaFunctionName);
     }
 
 
-    public void UnregisterUpdateAction(Action<Furniture, float> a)
+    public void UnregisterUpdateAction(string luaFunctionName)
     {
-        updateActions -= a;
+        updateActions.Remove(luaFunctionName);
+    }
+
+    public void RegisterIsEnterableAction(string luaFunctionName)
+    {
+        updateActions.Add(luaFunctionName);
+    }
+
+
+    public void UnregisterIsEnterableAction(string luaFunctionName)
+    {
+        updateActions.Remove(luaFunctionName);
     }
 
     public int JobCount()
