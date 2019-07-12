@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using MoonSharp.Interpreter;
 
 /// <summary>
 /// Inventory are things that are lying on the floor/stockpile like a bunch of metal bars
 /// or uninstalled furniture.
 /// </summary>
+[MoonSharpUserData]
 public class Inventory
 {
     public string objectType = "Steel Plate";

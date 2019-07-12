@@ -5,7 +5,9 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.IO;
+using MoonSharp.Interpreter;
 
+[MoonSharpUserData]
 public class World : IXmlSerializable
 {
 

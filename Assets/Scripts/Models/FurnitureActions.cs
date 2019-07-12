@@ -11,16 +11,41 @@ public class FurnitureActions
 
     public FurnitureActions(string rawLuaCode)
     {
-        // Tell the LUA interpreter system to load all the classes
+        // Tell the Lua interpreter system to load all the classes
         // that we have marked as [MoonSharpUserData]
         UserData.RegisterAssembly();
+
         _Instance = this;
 
         myLuaScript = new Script();
+
+        // If we want to be able to instantiate a new object of a class
+        // i.e. by doing SomeClass.__new() (in the Lua script)
+        // We need to make the base type visible
+        // UserData.RegisterType<Job>(); to not need [MoonSharpUserData] annotations
+        myLuaScript.Globals["Inventory"] = typeof(Inventory);
+        myLuaScript.Globals["Job"] = typeof(Job);
+
+        //Also to access statics/ globals
+        myLuaScript.Globals["World"] = typeof(World);
+
+        //ActivateRemoteDebugger(myLuaScript);
         myLuaScript.DoString(rawLuaCode);
 
-
     }
+
+    //static RemoteDebuggerService remoteDebugger;
+
+    //private void ActivateRemoteDebugger(Script script)
+    //{
+    //    if (remoteDebugger == null)
+    //    {
+    //        remoteDebugger = new RemoteDebuggerService(new RemoteDebuggerOptions()
+    //        {
+
+    //        });
+    //    }
+    //}
 
     static public void CallFunctionsWithFurniture(string[] functionNames, Furniture furn, float deltaTime)
     {
@@ -30,7 +55,7 @@ public class FurnitureActions
 
             if (func == null)
             {
-                Debug.LogError(fn + " is not a LUA function");
+                Debug.LogError(fn + " is not a Lua function");
                 return;
             }
 

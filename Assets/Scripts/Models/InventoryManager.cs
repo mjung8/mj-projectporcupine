@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using MoonSharp.Interpreter;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[MoonSharpUserData]
 public class InventoryManager
 {
     public Dictionary<string, List<Inventory>> inventories;

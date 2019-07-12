@@ -363,7 +363,8 @@ public class Furniture : IXmlSerializable
                         objectType,
                         FurnitureActions.JobComplete_FurnitureBuilding,
                         jobTime,
-                        invs.ToArray());
+                        invs.ToArray(),
+                        false);
 
                     World.Current.SetFurnitureJobPrototype(j, this);
 
@@ -374,6 +375,18 @@ public class Furniture : IXmlSerializable
                     break;
                 case "IsEnterable":
                     isEnterableAction = reader.GetAttribute("FunctionName");
+                    break;
+                case "JobSpotOffset":
+                    jobSpotOffset = new Vector2(
+                        int.Parse(reader.GetAttribute("X")),
+                        int.Parse(reader.GetAttribute("Y"))
+                    );
+                    break;
+                case "JobSpawnSpotOffset":
+                    jobSpawnSpotOffset = new Vector2(
+                        int.Parse(reader.GetAttribute("X")),
+                        int.Parse(reader.GetAttribute("Y"))
+                    );
                     break;
                 case "Params":
                     ReadXmlParams(reader);
@@ -425,7 +438,7 @@ public class Furniture : IXmlSerializable
     }
 
     /// <summary>
-    /// for lua
+    /// for Lua
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>

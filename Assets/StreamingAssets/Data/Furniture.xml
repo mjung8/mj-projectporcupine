@@ -47,6 +47,12 @@
 
   <Furniture objectType="Stockpile">
     <Name>Stockpile</Name>
+    <MovementCost>1</MovementCost>
+    <Width>1</Width>
+    <Height>1</Height>
+    <LinksToNeighbours>true</LinksToNeighbours>
+
+    <OnUpdate FunctionName="Stockpile_UpdateAction" />
   </Furniture>
 
   <Furniture objectType="Oxygen Generator">
@@ -70,6 +76,11 @@
     <MovementCost>1</MovementCost>
     <Width>3</Width>
     <Height>3</Height>
+
+    <JobSpotOffset X="1" Y="0" />
+    <JobSpawnSpotOffset X="0" Y="0" />
+      
+    <OnUpdate FunctionName="MiningDroneStation_UpdateAction" />
   </Furniture>
 
 </Furnitures>

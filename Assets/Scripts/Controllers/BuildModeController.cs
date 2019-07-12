@@ -97,7 +97,7 @@ public class BuildModeController : MonoBehaviour
                 else
                 {
                     Debug.LogError("There is no furnitureJobPrototype for: " + furnitureType);
-                    j = new Job(t, furnitureType, FurnitureActions.JobComplete_FurnitureBuilding, 0.1f, null);
+                    j = new Job(t, furnitureType, FurnitureActions.JobComplete_FurnitureBuilding, 0.1f, null, false);
                 }
 
                 j.furniturePrototype = WorldController.Instance.world.furniturePrototypes[furnitureType];
