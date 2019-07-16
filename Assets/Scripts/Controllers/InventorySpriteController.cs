@@ -9,8 +9,6 @@ public class InventorySpriteController : MonoBehaviour
 
     Dictionary<Inventory, GameObject> inventoryGameObjectMap;
 
-    Dictionary<string, Sprite> inventorySprites;
-
     World world
     {
         get { return WorldController.Instance.world; }
@@ -19,8 +17,6 @@ public class InventorySpriteController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        LoadSprites();
-
         // Instantiate the dictionary that tracks which GameObject is rendering which Tile data
         inventoryGameObjectMap = new Dictionary<Inventory, GameObject>();
 
@@ -37,17 +33,6 @@ public class InventorySpriteController : MonoBehaviour
         }
 
         //c.SetDestination(world.GetTileAt(world.Width / 2 + 5, world.Height / 2));
-    }
-
-    void LoadSprites()
-    {
-        inventorySprites = new Dictionary<string, Sprite>();
-        Sprite[] sprites = Resources.LoadAll<Sprite>("Images/Inventory/");
-
-        foreach (Sprite s in sprites)
-        {
-            inventorySprites[s.name] = s;
-        }
     }
 
     public void OnInventoryCreated(Inventory inv)
@@ -68,7 +53,7 @@ public class InventorySpriteController : MonoBehaviour
         inv_go.transform.SetParent(this.transform, true);
 
         SpriteRenderer sr = inv_go.AddComponent<SpriteRenderer>();
-        sr.sprite = inventorySprites[inv.objectType];
+        sr.sprite = SpriteManager.current.GetSprite("Inventory", inv.objectType);
         sr.sortingLayerName = "Inventory";
 
         if (inv.maxStackSize > 1)

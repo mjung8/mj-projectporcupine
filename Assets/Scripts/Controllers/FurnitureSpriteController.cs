@@ -7,8 +7,6 @@ public class FurnitureSpriteController : MonoBehaviour
 {
     Dictionary<Furniture, GameObject> furnitureGameObjectMap;
 
-    Dictionary<string, Sprite> furnitureSprites;
-
     World world
     {
         get { return WorldController.Instance.world; }
@@ -17,9 +15,6 @@ public class FurnitureSpriteController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
-        LoadSprites();
-
         // Instantiate the dictionary that tracks which GameObject is rendering which Tile data
         furnitureGameObjectMap = new Dictionary<Furniture, GameObject>();
 
@@ -29,17 +24,6 @@ public class FurnitureSpriteController : MonoBehaviour
         foreach (Furniture furn in world.furnitures)
         {
             OnFurnitureCreated(furn);
-        }
-    }
-
-    void LoadSprites()
-    {
-        furnitureSprites = new Dictionary<string, Sprite>();
-        Sprite[] sprites = Resources.LoadAll<Sprite>("Images/Furniture/");
-
-        foreach (Sprite s in sprites)
-        {
-            furnitureSprites[s.name] = s;
         }
     }
 
@@ -66,11 +50,11 @@ public class FurnitureSpriteController : MonoBehaviour
             // By default, door graphic is meant for walls EW
             // Check to see if we actually have a wall NS and then rotate
             Tile northTile = world.GetTileAt(furn.tile.X, furn.tile.Y + 1);
-            Tile southhTile = world.GetTileAt(furn.tile.X, furn.tile.Y - 1);
+            Tile southTile = world.GetTileAt(furn.tile.X, furn.tile.Y - 1);
 
-            if (northTile != null && southhTile != null && northTile.furniture != null
-                && southhTile.furniture != null && northTile.furniture.objectType == "Wall"
-                && southhTile.furniture.objectType == "Wall")
+            if (northTile != null && southTile != null && northTile.furniture != null
+                && southTile.furniture != null && northTile.furniture.objectType.Contains("Wall")
+                && southTile.furniture.objectType.Contains("Wall"))
             {
                 furn_go.transform.rotation = Quaternion.Euler(0, 0, 90);
             }
@@ -142,7 +126,7 @@ public class FurnitureSpriteController : MonoBehaviour
                 }
             }
 
-            return furnitureSprites[spriteName];
+            return SpriteManager.current.GetSprite("Furniture", spriteName); // furnitureSprites[spriteName];
         }
 
         // Otherwise, the sprite name is more complicated.
@@ -176,30 +160,25 @@ public class FurnitureSpriteController : MonoBehaviour
         }
 
         // e.g. Wall_NESW
-        if (furnitureSprites[spriteName] == false)
-        {
-            Debug.LogError("GetSpriteForfurniture -- no sprites with name: " + spriteName);
-            return null;
-        }
+        //if (furnitureSprites[spriteName] == false)
+        //{
+        //    Debug.LogError("GetSpriteForfurniture -- no sprites with name: " + spriteName);
+        //    return null;
+        //}
 
-        return furnitureSprites[spriteName];
-
+        return SpriteManager.current.GetSprite("Furniture", spriteName); // furnitureSprites[spriteName];
     }
 
     public Sprite GetSpriteForFurniture(string objectType)
     {
-        if (furnitureSprites.ContainsKey(objectType))
+        Sprite s = SpriteManager.current.GetSprite("Furniture", objectType);
+
+        if (s == null)
         {
-            return furnitureSprites[objectType];
+            s = SpriteManager.current.GetSprite("Furniture", objectType + "_");
         }
 
-        if (furnitureSprites.ContainsKey(objectType + "_"))
-        {
-            return furnitureSprites[objectType + "_"];
-        }
-
-        Debug.LogError("GetSpriteForFurniture -- no sprites with name: " + objectType);
-        return null;
+        return s;
     }
 
 }
