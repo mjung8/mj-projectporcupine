@@ -84,7 +84,7 @@ public class MouseController : MonoBehaviour
         public int subSelection = 0;
     }
 
-    SelectionInfo mySelection;
+    public SelectionInfo mySelection;
 
     void UpdateSelection()
     {
@@ -123,7 +123,9 @@ public class MouseController : MonoBehaviour
                 // We have just selected a brand new tile, reset the info
                 mySelection = new SelectionInfo();
                 mySelection.tile = tileUnderMouse;
-                mySelection.stuffInTile = new object[] { null, tileUnderMouse.furniture, tileUnderMouse.inventory, tileUnderMouse };
+                RebuildSelectionStuffInTile();
+
+                // Select the first non-null entry
                 for (int i = 0; i < mySelection.stuffInTile.Length; i++)
                 {
                     if (mySelection.stuffInTile[i] != null)
@@ -137,14 +139,35 @@ public class MouseController : MonoBehaviour
             {
                 // This is the same time we already have selected so cycle the subSelection to the next non-null item
                 // Note that the tile sub selection can never be null so we know we will always find something
+
+                // Rebuild the arra of possible sub-selection in case characters moved in or out of the tile
+                RebuildSelectionStuffInTile();
+
                 do
                 {
                     mySelection.subSelection = (mySelection.subSelection + 1) % mySelection.stuffInTile.Length;
                 } while (mySelection.stuffInTile[mySelection.subSelection] == null);
             }
 
-            //Debug.Log(mySelection.subSelection);
+            Debug.Log(mySelection.subSelection);
         }
+    }
+
+    void RebuildSelectionStuffInTile()
+    {
+        // Make sure stuffInTile is big enough to handle all the charactesr, plus the extra 3 values
+        mySelection.stuffInTile = new object[mySelection.tile.characters.Count + 3];
+
+        // Copy the character references
+        for (int i = 0; i < mySelection.tile.characters.Count; i++)
+        {
+            mySelection.stuffInTile[i] = mySelection.tile.characters[i];
+        }
+
+        // Now assign references to the other three sub-selections available
+        mySelection.stuffInTile[mySelection.stuffInTile.Length - 3] = mySelection.tile.furniture;
+        mySelection.stuffInTile[mySelection.stuffInTile.Length - 2] = mySelection.tile.inventory;
+        mySelection.stuffInTile[mySelection.stuffInTile.Length - 1] = mySelection.tile;
     }
 
     void UpdateDragging()

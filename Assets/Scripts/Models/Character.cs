@@ -31,7 +31,24 @@ public class Character : IXmlSerializable
         }
     }
 
-    public Tile currTile { get; protected set; }
+    private Tile _currTile;
+    public Tile currTile
+    {
+        get
+        {
+            return _currTile;
+        }
+
+        protected set
+        {
+            if (_currTile != null)
+            {
+                _currTile.characters.Remove(this);
+            }
+            _currTile = value;
+            _currTile.characters.Add(this);
+        }
+    }
 
     // If we aren't moving then destTile = currTile
     Tile _destTile;
@@ -205,7 +222,7 @@ public class Character : IXmlSerializable
                             myJob.canTakeFromStockpile
                     );
 
-                        if(newPath == null)
+                        if (newPath == null)
                         {
                             //Debug.Log("pathAStar is null and we have no path to object of type: " + desired.objectType);
                             // Cancel the job since we hav eno way to get raw materials

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System;
 using System.Xml;
 using System.Xml.Schema;
@@ -39,6 +40,8 @@ public class Tile : IXmlSerializable
     public Inventory inventory { get; set; }
 
     public Room room;
+
+    public List<Character> characters;
 
     // furniture is a wall, door, furniture
     public Furniture furniture
@@ -81,6 +84,7 @@ public class Tile : IXmlSerializable
     {
         this.X = x;
         this.Y = y;
+        characters = new List<Character>();
     }
 
     /// <summary>
