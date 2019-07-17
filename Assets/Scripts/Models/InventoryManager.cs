@@ -136,26 +136,21 @@ public class InventoryManager
     /// <returns></returns>
     public Inventory GetClosestInventoryOfType(string objectType, Tile t, int desiredAmount, bool canTakeFromStockpile)
     {
-        // FIXME: a) we are lying about returning the closest item;
-        // b) there's no way to return the closest item in an optimal manner until 
-        // inventories db is more sophisticated
+        Path_AStar path = GetPathToClosestInventoryOfType(objectType, t, desiredAmount, canTakeFromStockpile);
+        return path.EndTile().inventory;
+    }
 
+    public Path_AStar GetPathToClosestInventoryOfType(string objectType, Tile t, int desiredAmount, bool canTakeFromStockpile)
+    {
         if (inventories.ContainsKey(objectType) == false)
         {
             Debug.LogError("GetClosestInventoryType -- no itmes of desired type.");
             return null;
         }
 
-        foreach (Inventory inv in inventories[objectType])
-        {
-            if (inv.tile != null &&
-                (canTakeFromStockpile || inv.tile.furniture == null || inv.tile.furniture.IsStockpile() == false))
-            {
-                return inv;
-            }
-        }
+        Path_AStar path = new Path_AStar(World.Current, t, null, objectType);
 
-        return null;
+        return path;
     }
 
 }

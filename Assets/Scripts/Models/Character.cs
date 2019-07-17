@@ -174,21 +174,47 @@ public class Character : IXmlSerializable
 
                     // Find the first thing in the job that isn't satisfied
                     Inventory desired = myJob.GetFirstDesiredInventory();
-                    Inventory supplier = World.Current.inventoryManager.GetClosestInventoryOfType(
+
+                    if (currTile != nextTile)
+                    {
+                        // We are still moving somewhere so just bail out
+                        return;
+                    }
+
+                    // Any chance we already have a path that leads to the items we want?
+                    if (pathAStar != null && pathAStar.EndTile() != null && pathAStar.EndTile().inventory != null && pathAStar.EndTile().inventory.objectType == desired.objectType)
+                    {
+                        // We are already moving towards a tile that we want so do nothing
+                    }
+                    else
+                    {
+                        pathAStar = World.Current.inventoryManager.GetPathToClosestInventoryOfType(
                         desired.objectType,
                         currTile,
                         desired.maxStackSize - desired.stackSize,
                         myJob.canTakeFromStockpile
                     );
 
-                    if (supplier == null)
-                    {
-                        Debug.Log("No tile contains objects of type " + desired.objectType + "to satisfy job requirements");
-                        AbandonJob();
-                        return;
+                        Debug.Log("pathaStar returned with a length of: " + pathAStar.Length());
+
+                        if (pathAStar == null || pathAStar.Length() == 0)
+                        {
+                            Debug.Log("No tile contains objects of type " + desired.objectType + "to satisfy job requirements");
+                            AbandonJob();
+                            return;
+                        }
+
+                        destTile = pathAStar.EndTile();
+
+                        // Ignore the first tile because that's the tile we're already in
+                        if (pathAStar == null)
+                        {
+                            Debug.LogError("What?");
+                        }
+                        nextTile = pathAStar.Dequeue();
                     }
 
-                    destTile = supplier.tile;
+                    // One way or the other, we are now on route to an object of the right type
                     return;
                 }
             }

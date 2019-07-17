@@ -558,7 +558,7 @@ public class World : IXmlSerializable
     public void ReadXml(XmlReader reader)
     {
         // Load info here
-        Debug.Log("World::ReadXml");
+        //Debug.Log("World::ReadXml");
 
         Width = int.Parse(reader.GetAttribute("Width"));
         Height = int.Parse(reader.GetAttribute("Height"));
@@ -613,7 +613,7 @@ public class World : IXmlSerializable
 
     void ReadXml_Tiles(XmlReader reader)
     {
-        Debug.Log("ReadXml_Tiles");
+        //Debug.Log("ReadXml_Tiles");
         // We are in the "Tiles" element, so read elements
         // until we run out of "Tile" nodes
 
@@ -631,7 +631,7 @@ public class World : IXmlSerializable
 
     void ReadXml_Furnitures(XmlReader reader)
     {
-        Debug.Log("ReadXml_Furnitures");
+        //Debug.Log("ReadXml_Furnitures");
 
         if (reader.ReadToDescendant("Furniture"))
         {
@@ -654,7 +654,7 @@ public class World : IXmlSerializable
 
     void ReadXml_Rooms(XmlReader reader)
     {
-        Debug.Log("ReadXml_Rooms");
+        //Debug.Log("ReadXml_Rooms");
 
         if (reader.ReadToDescendant("Room"))
         {
@@ -676,7 +676,7 @@ public class World : IXmlSerializable
 
     void ReadXml_Characters(XmlReader reader)
     {
-        Debug.Log("ReadXml_Characters");
+        //Debug.Log("ReadXml_Characters");
 
         if (reader.ReadToDescendant("Character"))
         {
