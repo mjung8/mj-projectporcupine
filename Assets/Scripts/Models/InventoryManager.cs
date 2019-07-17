@@ -144,7 +144,7 @@ public class InventoryManager
     {
         if (inventories.ContainsKey(objectType) == false)
         {
-            Debug.LogError("GetClosestInventoryType -- no itmes of desired type.");
+            //Debug.LogError("GetClosestInventoryType -- no itmes of desired type.");
             return null;
         }
 
