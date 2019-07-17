@@ -76,8 +76,6 @@ public class SpriteManager : MonoBehaviour
 
         if (imageTexture.LoadImage(imageBytes))
         {
-
-            Debug.Log("this is an image file? " + filePath);
             // Image load successful
             // See if there's a matching XML file for this image
             string baseSpriteName = Path.GetFileNameWithoutExtension(filePath);
@@ -137,7 +135,7 @@ public class SpriteManager : MonoBehaviour
     void LoadSprite(string spriteCategory, string spriteName, Texture2D imageTexture, Rect spriteCoordinates, int pixelsPerUnit)
     {
         spriteName = spriteCategory + "/" + spriteName;
-        Debug.Log("LoadSprite: " + spriteName);
+        //Debug.Log("LoadSprite: " + spriteName);
         Vector2 pivotPoint = new Vector2(0.5f, 0.5f);   // range from 0..1 -- so 0.5f is center
 
         Sprite s = Sprite.Create(imageTexture, spriteCoordinates, pivotPoint, pixelsPerUnit);

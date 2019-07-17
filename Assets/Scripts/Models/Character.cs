@@ -31,11 +31,28 @@ public class Character : IXmlSerializable
         }
     }
 
-    public Tile currTile { get; protected set; }
+    private Tile _currTile;
+    public Tile currTile
+    {
+        get
+        {
+            return _currTile;
+        }
+
+        protected set
+        {
+            if (_currTile != null)
+            {
+                _currTile.characters.Remove(this);
+            }
+            _currTile = value;
+            _currTile.characters.Add(this);
+        }
+    }
 
     // If we aren't moving then destTile = currTile
     Tile _destTile;
-    Tile destTile
+    Tile DestTile
     {
         get { return _destTile; }
         set
@@ -68,7 +85,7 @@ public class Character : IXmlSerializable
 
     public Character(Tile tile)
     {
-        currTile = destTile = nextTile = tile;
+        currTile = DestTile = nextTile = tile;
     }
 
     void GetNewJob()
@@ -78,30 +95,40 @@ public class Character : IXmlSerializable
         if (myJob == null)
             return;
 
-        destTile = myJob.tile;
+        DestTile = myJob.tile;
         myJob.RegisterJobStoppedCallback(OnJobStopped);
 
         // Immediately check to see if the job tile is reachable
-        pathAStar = new Path_AStar(World.Current, currTile, destTile);  // This will calculate path from curr to dest
+        pathAStar = new Path_AStar(World.Current, currTile, DestTile);  // This will calculate path from curr to dest
         if (pathAStar.Length() == 0)
         {
             Debug.LogError("Path_AStar returned no path to destination!");
             AbandonJob();
-            destTile = currTile;
+            DestTile = currTile;
         }
     }
 
+    float jobSearchCooldown = 0;
+
     void Update_DoJob(float deltaTime)
     {
+        jobSearchCooldown -= Time.deltaTime;
         // Do I have a job?
         if (myJob == null)
         {
+            if (jobSearchCooldown > 0)
+            {
+                //Don't look for a job now
+                return;
+            }
+
             GetNewJob();
 
             if (myJob == null)
             {
                 // There was no job in the queue so just return
-                destTile = currTile;
+                jobSearchCooldown = UnityEngine.Random.Range(0.1f, 0.5f);
+                DestTile = currTile;
                 return;
             }
         }
@@ -136,7 +163,7 @@ public class Character : IXmlSerializable
                     }
                     else
                     {
-                        destTile = myJob.tile;
+                        DestTile = myJob.tile;
                         return;
                     }
                 }
@@ -174,21 +201,54 @@ public class Character : IXmlSerializable
 
                     // Find the first thing in the job that isn't satisfied
                     Inventory desired = myJob.GetFirstDesiredInventory();
-                    Inventory supplier = World.Current.inventoryManager.GetClosestInventoryOfType(
-                        desired.objectType,
-                        currTile,
-                        desired.maxStackSize - desired.stackSize,
-                        myJob.canTakeFromStockpile
-                    );
 
-                    if (supplier == null)
+                    if (currTile != nextTile)
                     {
-                        Debug.Log("No tile contains objects of type " + desired.objectType + "to satisfy job requirements");
-                        AbandonJob();
+                        // We are still moving somewhere so just bail out
                         return;
                     }
 
-                    destTile = supplier.tile;
+                    // Any chance we already have a path that leads to the items we want?
+                    if (pathAStar != null && pathAStar.EndTile() != null && pathAStar.EndTile().inventory != null && pathAStar.EndTile().inventory.objectType == desired.objectType)
+                    {
+                        // We are already moving towards a tile that we want so do nothing
+                    }
+                    else
+                    {
+                        Path_AStar newPath = World.Current.inventoryManager.GetPathToClosestInventoryOfType(
+                            desired.objectType,
+                            currTile,
+                            desired.maxStackSize - desired.stackSize,
+                            myJob.canTakeFromStockpile
+                    );
+
+                        if (newPath == null)
+                        {
+                            //Debug.Log("pathAStar is null and we have no path to object of type: " + desired.objectType);
+                            // Cancel the job since we hav eno way to get raw materials
+                            AbandonJob();
+                            return;
+                        }
+
+                        Debug.Log("pathaStar returned with a length of: " + newPath.Length());
+
+                        if (newPath == null || newPath.Length() == 0)
+                        {
+                            Debug.Log("No tile contains objects of type " + desired.objectType + "to satisfy job requirements");
+                            AbandonJob();
+                            return;
+                        }
+
+                        DestTile = newPath.EndTile();
+
+                        // Since we already have a path calculated let's just save that
+                        pathAStar = newPath;
+
+                        // Ignore the first tile because that's the tile we're already in
+                        nextTile = newPath.Dequeue();
+                    }
+
+                    // One way or the other, we are now on route to an object of the right type
                     return;
                 }
             }
@@ -197,7 +257,7 @@ public class Character : IXmlSerializable
         }
 
         // Materials acquired. Go to job and do job.
-        destTile = myJob.tile;
+        DestTile = myJob.tile;
 
         if (currTile == myJob.tile)
         {
@@ -212,14 +272,14 @@ public class Character : IXmlSerializable
 
     public void AbandonJob()
     {
-        nextTile = destTile = currTile;
+        nextTile = DestTile = currTile;
         World.Current.jobQueue.Enqueue(myJob);
         myJob = null;
     }
 
     void Update_DoMovement(float deltaTime)
     {
-        if (currTile == destTile)
+        if (currTile == DestTile)
         {
             pathAStar = null;
             return; // Already there
@@ -235,7 +295,7 @@ public class Character : IXmlSerializable
             if (pathAStar == null || pathAStar.Length() == 0)
             {
                 // Generate a path to our destination
-                pathAStar = new Path_AStar(World.Current, currTile, destTile);  // This will calculate path from curr to dest
+                pathAStar = new Path_AStar(World.Current, currTile, DestTile);  // This will calculate path from curr to dest
                 if (pathAStar.Length() == 0)
                 {
                     Debug.LogError("Path_AStar returned no path to destination!");
@@ -324,7 +384,7 @@ public class Character : IXmlSerializable
             Debug.Log("Character::SetDestination -- destination tile is not a neighbour.");
         }
 
-        destTile = tile;
+        DestTile = tile;
     }
 
     public void RegisterOnChangedCallback(Action<Character> cb)

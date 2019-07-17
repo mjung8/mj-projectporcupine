@@ -9,8 +9,12 @@ public class Path_AStar
 
     Queue<Tile> path;
 
-    public Path_AStar(World world, Tile tileStart, Tile tileEnd)
+    public Path_AStar(World world, Tile tileStart, Tile tileEnd, string objectType = null, int desiredAmount = 0, bool canTakeFromStockpile = false)
     {
+        // if tileEnd is null, then we are simply scanning for the nearest objectType
+        // We can do this by ignoring the heuristic component of AStar which basically
+        // just turns this into an overengineered Dijkstra's algo
+
         // Check to see if there's a valid tile graph
         if (world.tileGraph == null)
         {
@@ -26,14 +30,21 @@ public class Path_AStar
             Debug.LogError("Path_AStar: the starting tile isn't in the list of nodes.");
             return;
         }
-        if (nodes.ContainsKey(tileEnd) == false)
-        {
-            Debug.LogError("Path_AStar: the ending tile isn't in the list of nodes.");
-            return;
-        }
 
         Path_Node<Tile> start = nodes[tileStart];
-        Path_Node<Tile> goal = nodes[tileEnd];
+
+        // if tileEnd is null then we are looking for an inventory object
+        Path_Node<Tile> goal = null;
+        if (tileEnd != null)
+        {
+            if (nodes.ContainsKey(tileEnd) == false)
+            {
+                Debug.LogError("Path_AStar: the ending tile isn't in the list of nodes.");
+                return;
+            }
+
+            goal = nodes[tileEnd];
+        }
 
         // Mostly following wikipedia A* search algorithm
         // https://en.wikipedia.org/wiki/A*_search_algorithm
@@ -64,13 +75,37 @@ public class Path_AStar
         while (OpenSet.Count > 0)
         {
             Path_Node<Tile> current = OpenSet.Dequeue();
-            if (current == goal)
+            if ((goal != null && current == goal) ||
+                (goal == null && current.data.inventory != null && current.data.inventory.objectType == objectType))
             {
                 // We have reached our goal.
                 // Convert this into a sequence of tiles to walk on.
                 // Then end this constructor function.
                 reconstruct_path(Came_From, current);
                 return;
+            }
+
+            if (goal != null)
+            {
+                if (current == goal)
+                {
+                    reconstruct_path(Came_From, current);
+                    return;
+                }
+            }
+            else
+            {
+                // looking for inventory
+                if (current.data.inventory != null && current.data.inventory.objectType == objectType)
+                {
+                    // Type is correct
+                    if (canTakeFromStockpile || current.data.furniture == null || current.data.furniture.IsStockpile() == false)
+                    {
+                        // Stockpile status is fine
+                        reconstruct_path(Came_From, current);
+                        return;
+                    }
+                }
             }
 
             ClosedSet.Add(current);
@@ -116,6 +151,13 @@ public class Path_AStar
 
     float heuristic_cost_estimate(Path_Node<Tile> a, Path_Node<Tile> b)
     {
+        if (b == null)
+        {
+            // We have no fixed destination (i.e. looking for inventory item)
+            // so just return 0 for the cost estimate (i.e. all directions just as good)
+            return 0f;
+        }
+
         return Mathf.Sqrt(
             Mathf.Pow(a.data.X - b.data.X, 2) +
             Mathf.Pow(a.data.Y - b.data.Y, 2)
@@ -169,6 +211,16 @@ public class Path_AStar
 
     public Tile Dequeue()
     {
+        if(path == null)
+        {
+            Debug.LogError("Attempting to dequeue from a null path.");
+            return null;
+        }
+
+        if(path.Count <= 0)
+        {
+            Debug.LogError("what???");
+        }
         return path.Dequeue();
     }
 
@@ -181,4 +233,13 @@ public class Path_AStar
 
         return path.Count;
     }
+
+    public Tile EndTile()
+    {
+        if (path == null || path.Count == 0)
+            return null;
+
+        return path.Last();
+    }
+
 }

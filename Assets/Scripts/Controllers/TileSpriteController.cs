@@ -5,10 +5,6 @@ using System.Linq;
 
 public class TileSpriteController : MonoBehaviour
 {
-    // Simple way to handle current sprite
-    public Sprite floorSprite;
-    public Sprite emptySprite;
-
     Dictionary<Tile, GameObject> tileGameObjectMap;
 
     World world
@@ -41,7 +37,7 @@ public class TileSpriteController : MonoBehaviour
 
                 // Add a sprite renderer, add empty tile sprite
                 SpriteRenderer sr = tile_go.AddComponent<SpriteRenderer>();
-                sr.sprite = emptySprite;
+                sr.sprite = SpriteManager.current.GetSprite("Tile", "Empty");
                 sr.sortingLayerName = "Tiles";
 
                 OnTileChanged(tile_data);
@@ -96,11 +92,11 @@ public class TileSpriteController : MonoBehaviour
 
         if (tile_data.Type == TileType.Floor)
         {
-            tile_go.GetComponent<SpriteRenderer>().sprite = floorSprite;
+            tile_go.GetComponent<SpriteRenderer>().sprite = SpriteManager.current.GetSprite("Tile", "Floor");
         }
         else if (tile_data.Type == TileType.Empty)
         {
-            tile_go.GetComponent<SpriteRenderer>().sprite = emptySprite;
+            tile_go.GetComponent<SpriteRenderer>().sprite = SpriteManager.current.GetSprite("Tile", "Empty");
         }
         else
         {

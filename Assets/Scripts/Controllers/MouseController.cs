@@ -70,10 +70,104 @@ public class MouseController : MonoBehaviour
 
         UpdateDragging();
         UpdateCameraMovement();
+        UpdateSelection();
 
         // Save the mouse position from this frame
         lastFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         lastFramePosition.z = 0;
+    }
+
+    public class SelectionInfo
+    {
+        public Tile tile;
+        public object[] stuffInTile;
+        public int subSelection = 0;
+    }
+
+    public SelectionInfo mySelection;
+
+    void UpdateSelection()
+    {
+        // This handles left-clicking on furniture or characters to set a selection.
+
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            mySelection = null;
+        }
+
+        if (currentMode != MouseMode.SELECT)
+        {
+            return;
+        }
+
+        // If we are over a UI element, bail out
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            // Just released the mouse button, so update the selection.
+            Tile tileUnderMouse = GetMouseOverTile();
+
+            if (tileUnderMouse == null)
+            {
+                // No valid tile under mouse
+                return;
+            }
+
+            if (mySelection == null || mySelection.tile != tileUnderMouse)
+            {
+                //Debug.Log("new tile");
+                // We have just selected a brand new tile, reset the info
+                mySelection = new SelectionInfo();
+                mySelection.tile = tileUnderMouse;
+                RebuildSelectionStuffInTile();
+
+                // Select the first non-null entry
+                for (int i = 0; i < mySelection.stuffInTile.Length; i++)
+                {
+                    if (mySelection.stuffInTile[i] != null)
+                    {
+                        mySelection.subSelection = i;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                // This is the same time we already have selected so cycle the subSelection to the next non-null item
+                // Note that the tile sub selection can never be null so we know we will always find something
+
+                // Rebuild the arra of possible sub-selection in case characters moved in or out of the tile
+                RebuildSelectionStuffInTile();
+
+                do
+                {
+                    mySelection.subSelection = (mySelection.subSelection + 1) % mySelection.stuffInTile.Length;
+                } while (mySelection.stuffInTile[mySelection.subSelection] == null);
+            }
+
+            Debug.Log(mySelection.subSelection);
+        }
+    }
+
+    void RebuildSelectionStuffInTile()
+    {
+        // Make sure stuffInTile is big enough to handle all the charactesr, plus the extra 3 values
+        mySelection.stuffInTile = new object[mySelection.tile.characters.Count + 3];
+
+        // Copy the character references
+        for (int i = 0; i < mySelection.tile.characters.Count; i++)
+        {
+            mySelection.stuffInTile[i] = mySelection.tile.characters[i];
+        }
+
+        // Now assign references to the other three sub-selections available
+        mySelection.stuffInTile[mySelection.stuffInTile.Length - 3] = mySelection.tile.furniture;
+        mySelection.stuffInTile[mySelection.stuffInTile.Length - 2] = mySelection.tile.inventory;
+        mySelection.stuffInTile[mySelection.stuffInTile.Length - 1] = mySelection.tile;
     }
 
     void UpdateDragging()
