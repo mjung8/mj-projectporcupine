@@ -31,6 +31,8 @@ public class SelectionInfoTextField : MonoBehaviour
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
 
-        txt.text = mc.mySelection.ToString();
+        ISelectableInterface actualSelection = mc.mySelection.stuffInTile[mc.mySelection.subSelection];
+
+        txt.text = actualSelection.GetName() + "\n" + actualSelection.GetDescription() + "\n" + actualSelection.GetHitPointString(); ;
     }
 }

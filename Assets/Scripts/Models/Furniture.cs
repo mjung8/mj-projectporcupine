@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using MoonSharp.Interpreter;
 
 [MoonSharpUserData]
-public class Furniture : IXmlSerializable
+public class Furniture : IXmlSerializable, ISelectableInterface
 {
     /// <summary>
     /// Custom parameter for this particular piece of furniture.
@@ -567,4 +567,21 @@ public class Furniture : IXmlSerializable
         // TODO: allow us to customize this
         return World.Current.GetTileAt(tile.X + (int)jobSpawnSpotOffset.x, tile.Y + (int)jobSpawnSpotOffset.y);
     }
+
+    #region ISelectableInterface
+    public string GetName()
+    {
+        return this.Name;
+    }
+
+    public string GetDescription()
+    {
+        return "This is a piece of furniture."; // TODO: add description property and matching xml field
+    }
+
+    public string GetHitPointString()
+    {
+        return "18/18"; // TODO: add a hitpoint system to everything
+    }
+    #endregion
 }

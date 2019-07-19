@@ -6,7 +6,7 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
-public class Character : IXmlSerializable
+public class Character : IXmlSerializable, ISelectableInterface
 {
     // How to track the position?
     public float X
@@ -427,4 +427,21 @@ public class Character : IXmlSerializable
     {
 
     }
+
+    #region ISelectableInterface
+    public string GetName()
+    {
+        return "Sally S. Smith";
+    }
+
+    public string GetDescription()
+    {
+        return "A human astronaut.";
+    }
+
+    public string GetHitPointString()
+    {
+        return "100/100";
+    }
+    #endregion
 }
