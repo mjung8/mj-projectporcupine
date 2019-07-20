@@ -14,7 +14,7 @@ public class WorldController : MonoBehaviour
     // World and tile data
     public World world { get; protected set; }
 
-    static bool loadWorld = false;
+    static string loadWorldFromFile = null;
 
     private bool _isPaused = false;
     public bool IsPaused
@@ -41,10 +41,10 @@ public class WorldController : MonoBehaviour
         }
         Instance = this;
 
-        if (loadWorld)
+        if (loadWorldFromFile != null)
         {
-            loadWorld = false;
             CreateWorldFromSaveFile();
+            loadWorldFromFile = null;
         }
         else
         {
@@ -59,7 +59,7 @@ public class WorldController : MonoBehaviour
         {
             world.Update(Time.deltaTime);
         }
-        
+
     }
 
     /// <summary>
@@ -87,12 +87,12 @@ public class WorldController : MonoBehaviour
         return Path.Combine(Application.persistentDataPath, "Saves");
     }
 
-    public void LoadWorld()
+    public void LoadWorld(string fileName)
     {
         Debug.Log("LoadWorld button clicked");
 
         // Reload the scene to reset all data (and purge all references)
-        loadWorld = true;
+        loadWorldFromFile = fileName;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
@@ -111,7 +111,13 @@ public class WorldController : MonoBehaviour
 
         // Create a world from save file data
         XmlSerializer serializer = new XmlSerializer(typeof(World));
-        TextReader reader = new StringReader(PlayerPrefs.GetString("SaveGame00"));
+
+        // This can throw an ex 
+        // TODO: show an error message
+        string saveGameText = File.ReadAllText(loadWorldFromFile);
+
+        TextReader reader = new StringReader(saveGameText);
+
         Debug.Log(reader.ToString());
         world = (World)serializer.Deserialize(reader);
         reader.Close();
