@@ -31,9 +31,9 @@ public class FurnitureBuildMenu : MonoBehaviour
             b.onClick.AddListener(delegate { bmc.SetMode_BuildFurniture(objectId); });
         }
 
-        // to compensate for commented out Update
-        AutomaticVerticalSize automaticVerticalSize = FindObjectOfType<AutomaticVerticalSize>();
-        automaticVerticalSize.AdjustSize();
+        //// to compensate for commented out Update
+        //AutomaticVerticalSize automaticVerticalSize = FindObjectOfType<AutomaticVerticalSize>();
+        //automaticVerticalSize.AdjustSize();
     }
 
 }
