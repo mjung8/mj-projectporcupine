@@ -16,7 +16,19 @@ public class WorldController : MonoBehaviour
 
     static bool loadWorld = false;
 
-    public GameObject saveFileDialogBox;
+    private bool _isPaused = false;
+    public bool IsPaused
+    {
+        get
+        {
+            return _isPaused || IsModal;
+        }
+        set
+        {
+            _isPaused = value;
+        }
+    }
+    public bool IsModal;   // If true, a modal dialog box is open so normal inputs should be ignored.
 
     // Use this for initialization
     // OnEnable runs first
@@ -43,7 +55,11 @@ public class WorldController : MonoBehaviour
     void Update()
     {
         // TODO: Add pause/unpause, speed, etc...
-        world.Update(Time.deltaTime);
+        if (IsPaused == false)
+        {
+            world.Update(Time.deltaTime);
+        }
+        
     }
 
     /// <summary>
@@ -66,78 +82,9 @@ public class WorldController : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    public void ShowSaveDialog()
-    {
-        // When "Save" is clicked, show the user a file dialog box
-        // asking for a filename to save the game. The user can overwrite existing.
-
-        // When the dialog box is closed with Save/OK, do the save. 
-        // User can close/cancel the dialog box to do nothing.
-
-        saveFileDialogBox.SetActive(true);
-    }
-
-    string FileSaveBasePath()
+    public string FileSaveBasePath()
     {
         return Path.Combine(Application.persistentDataPath, "Saves");
-    }
-
-    public void SaveDialogOkayWasClicked()
-    {
-        // TODO:
-        // Check to see if the file already exists
-        // If so, ask for overwrite confirmation.
-
-        // Get the file name from the save file dialog box
-        string fileName = saveFileDialogBox.GetComponentInChildren<InputField>().text;
-
-        // Is the filename valid? i.e. may want to ban path delimiters (/ \ or :) and periods?
-
-        // Right now fileName is just what as in the dialog box. Need to pad this out to the full
-        // path and an extension
-        // like: C:\Users\user\ApplicationData\MyCompanyName\MyGameName\Save\SaveGameName123.sav
-        // Application.persistentDataPath = C:\Users\user\ApplicationData\MyCompanyName\MyGameName\
-        string filePath = Path.Combine(FileSaveBasePath(), fileName + ".sav");
-
-        // At this point, filePath should look right
-
-        if (File.Exists(filePath) == true)
-        {
-            // TODO: Do file overwrite dialog box.
-            return;
-        }
-
-        saveFileDialogBox.SetActive(false);
-
-        SaveWorld(filePath);
-    }
-
-    public void SaveWorld(string filePath)
-    {
-        // This function gets called when the user confirms a filename in dialog box.
-
-        Debug.Log("SaveWorld button clicked");
-
-        XmlSerializer serializer = new XmlSerializer(typeof(World));
-        TextWriter writer = new StringWriter();
-        serializer.Serialize(writer, world);
-        writer.Close();
-
-        Debug.Log(writer.ToString());
-
-        //PlayerPrefs.SetString("SaveGame00", writer.ToString());
-
-        // Create/overwrite the save file with the xml text
-        // Make sure the save folder exists
-        if (Directory.Exists(FileSaveBasePath()) == false)
-        {
-            // NOTE: This can throw an exception if we can't create the folder,
-            // but this shouldn't happen since we have the ability to save to
-            // persistent data by definition, unless something is wrong with the device.
-            Directory.CreateDirectory(FileSaveBasePath());
-        }
-
-        File.WriteAllText(filePath, writer.ToString());
     }
 
     public void LoadWorld()

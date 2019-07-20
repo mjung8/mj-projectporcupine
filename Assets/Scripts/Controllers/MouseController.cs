@@ -51,6 +51,12 @@ public class MouseController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (WorldController.Instance.IsModal)
+        {
+            // A modal dialog is open so don't process any game inputs
+            return;
+        }
+
         currentFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         currentFramePosition.z = 0;
 
