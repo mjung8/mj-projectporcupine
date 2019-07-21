@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DialogBoxController : MonoBehaviour
+public class DialogBox : MonoBehaviour
 {
 
     virtual public void ShowDialog()
