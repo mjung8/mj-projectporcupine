@@ -15,7 +15,7 @@ public enum TileType { Empty, Floor };
 public enum ENTERABILITY { Yes, Never, Soon };
 
 [MoonSharpUserData]
-public class Tile : IXmlSerializable, ISelectableInterface
+public class Tile : IXmlSerializable, ISelectable
 {
 
     private TileType _type = TileType.Empty;

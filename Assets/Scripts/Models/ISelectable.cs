@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface ISelectableInterface
+public interface ISelectable
 {
     string GetName();
     string GetDescription();

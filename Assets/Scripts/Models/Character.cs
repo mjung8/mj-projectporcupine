@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 /// A Character is an entity on the map that can move between tiles.
 /// For now, it only moves after getting a job from the work queue.
 /// </summary>
-public class Character : IXmlSerializable, ISelectableInterface
+public class Character : IXmlSerializable, ISelectable
 {
     /// <summary>
     /// Returns a float representing the Character's X position.

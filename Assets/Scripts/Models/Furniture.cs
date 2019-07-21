@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using MoonSharp.Interpreter;
 
 [MoonSharpUserData]
-public class Furniture : IXmlSerializable, ISelectableInterface
+public class Furniture : IXmlSerializable, ISelectable
 {
     /// <summary>
     /// Custom parameter for this particular piece of furniture.
