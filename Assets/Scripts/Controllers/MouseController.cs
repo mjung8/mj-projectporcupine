@@ -60,7 +60,7 @@ public class MouseController : MonoBehaviour
         currentFramePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         currentFramePosition.z = 0;
 
-        if (Input.GetKeyUp(KeyCode.Escape))
+        if (Input.GetKeyUp(KeyCode.Escape) || Input.GetMouseButtonUp(1))
         {
             if (currentMode == MouseMode.BUILD)
             {
