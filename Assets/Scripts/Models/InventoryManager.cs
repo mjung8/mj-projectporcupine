@@ -148,7 +148,7 @@ public class InventoryManager
             return null;
         }
 
-        Path_AStar path = new Path_AStar(World.Current, t, null, objectType);
+        Path_AStar path = new Path_AStar(World.Current, t, null, objectType, desiredAmount, canTakeFromStockpile);
 
         return path;
     }

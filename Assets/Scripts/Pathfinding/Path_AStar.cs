@@ -75,16 +75,8 @@ public class Path_AStar
         while (OpenSet.Count > 0)
         {
             Path_Node<Tile> current = OpenSet.Dequeue();
-            if ((goal != null && current == goal) ||
-                (goal == null && current.data.inventory != null && current.data.inventory.objectType == objectType))
-            {
-                // We have reached our goal.
-                // Convert this into a sequence of tiles to walk on.
-                // Then end this constructor function.
-                reconstruct_path(Came_From, current);
-                return;
-            }
 
+            // If we have a positional goal, check to see if we're there
             if (goal != null)
             {
                 if (current == goal)
@@ -95,6 +87,7 @@ public class Path_AStar
             }
             else
             {
+                // If we don't have a positional goal, we're just
                 // looking for inventory
                 if (current.data.inventory != null && current.data.inventory.objectType == objectType)
                 {
