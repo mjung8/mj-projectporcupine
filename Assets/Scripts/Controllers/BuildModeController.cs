@@ -84,6 +84,16 @@ public class BuildModeController : MonoBehaviour
                 && t.pendingFunitureJob == null)
             {
                 // This tile position is valid for this furniture
+
+                // If there is existing furniture, delete it
+                // TODO: Return resources? Will the Deconstruct() method handle that? 
+                // If so what will happen if resources drop ontop of new non-passable structure.
+                if (t.furniture != null)
+                {
+                    t.furniture.Deconstruct();
+                }
+
+
                 // Create a job for it to be built
                 Job j;
 

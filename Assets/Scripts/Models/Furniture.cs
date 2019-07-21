@@ -25,6 +25,8 @@ public class Furniture : IXmlSerializable, ISelectableInterface
     //public Func<Furniture, ENTERABILITY> IsEnterable;
     protected string isEnterableAction;
 
+    protected List<string> replaceableFurniture = new List<string>();
+
     List<Job> jobs;
 
     // If this furniture gets worked by a person,
@@ -83,6 +85,14 @@ public class Furniture : IXmlSerializable, ISelectableInterface
         set
         {
             _Name = value;
+        }
+    }
+
+    public List<string> ReplaceableFurniture
+    {
+        get
+        {
+            return replaceableFurniture;
         }
     }
 
@@ -263,6 +273,21 @@ public class Furniture : IXmlSerializable, ISelectableInterface
             {
                 Tile t2 = World.Current.GetTileAt(x_off, y_off);
 
+                // Check to see if there is furniture which is replaceable
+                bool isReplaceable = false;
+
+                if (t2.furniture != null)
+                {
+                    for (int i = 0; i < ReplaceableFurniture.Count; i++)
+                    {
+                        if (t2.furniture.Name == ReplaceableFurniture[i])
+                        {
+                            isReplaceable = true;
+                        }
+
+                    }
+                }
+
                 // Make sure tile is floor
                 if (t2.Type != TileType.Floor)
                 {
@@ -270,7 +295,7 @@ public class Furniture : IXmlSerializable, ISelectableInterface
                 }
 
                 // Make sure tile doesn't already have furniture
-                if (t2.furniture != null)
+                if (t2.furniture != null && isReplaceable == false)
                 {
                     return false;
                 }
@@ -337,6 +362,9 @@ public class Furniture : IXmlSerializable, ISelectableInterface
                 case "EnclosesRooms":
                     reader.Read();
                     roomEnclosure = reader.ReadContentAsBoolean();
+                    break;
+                case "CanReplaceFurniture":
+                    replaceableFurniture.Add(reader.GetAttribute("objectName").ToString());
                     break;
                 case "BuildingJob":
                     float jobTime = float.Parse(reader.GetAttribute("jobTime"));

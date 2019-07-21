@@ -25,6 +25,7 @@
     <Height>1</Height>
     <LinksToNeighbours>false</LinksToNeighbours>
     <EnclosesRooms>true</EnclosesRooms>
+    <CanReplaceFurniture objectName="Basic Wall" />
 
     <Params>
       <Param name="openness" value="0" />
