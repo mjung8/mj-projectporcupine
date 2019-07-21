@@ -11,8 +11,18 @@ using MoonSharp.Interpreter;
 // the terrain type. For us, we only need to differentiate between empty space
 // and floor (aka the station structure/scaffold). Walls/Doors/etc... will be
 // furnitures sitting on top of the floor
-public enum TileType { Empty, Floor };
-public enum ENTERABILITY { Yes, Never, Soon };
+public enum TileType
+{
+    Empty,
+    Floor
+};
+
+public enum ENTERABILITY
+{
+    Yes,
+    Never,
+    Soon
+};
 
 [MoonSharpUserData]
 public class Tile : IXmlSerializable, ISelectable

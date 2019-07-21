@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class AutomaticVerticalSize : MonoBehaviour {
+public class AutomaticVerticalSize : MonoBehaviour
+{
 
     public float childHeight = 35f;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         AdjustSize();
-	}
+    }
 
     void Update()
     {

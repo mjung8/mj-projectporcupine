@@ -8,7 +8,7 @@ using MoonSharp.Interpreter;
 /// or uninstalled furniture.
 /// </summary>
 [MoonSharpUserData]
-public class Inventory: ISelectable
+public class Inventory : ISelectable
 {
     public string objectType = "Steel Plate";
     public int maxStackSize = 50;
@@ -19,10 +19,10 @@ public class Inventory: ISelectable
         get { return _stackSize; }
         set
         {
-            if(_stackSize != value)
+            if (_stackSize != value)
             {
                 _stackSize = value;
-                if(cbInventoryChanged != null)
+                if (cbInventoryChanged != null)
                 {
                     cbInventoryChanged(this);
                 }

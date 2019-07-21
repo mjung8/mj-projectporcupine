@@ -80,8 +80,9 @@ public class BuildModeController : MonoBehaviour
             // Run the ValidPlacement function
             string furnitureType = buildModeObjectType;
 
-            if (WorldController.Instance.world.IsFurniturePlacementValid(furnitureType, t)
-                && t.pendingFunitureJob == null)
+            if (
+                WorldController.Instance.world.IsFurniturePlacementValid(furnitureType, t) && 
+                t.pendingFunitureJob == null)
             {
                 // This tile position is valid for this furniture
 

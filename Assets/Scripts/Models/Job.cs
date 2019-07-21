@@ -160,7 +160,7 @@ public class Job
         if (cbJobWorked != null)
             cbJobWorked(this);
 
-        if(cbJobWorkedLua != null)
+        if (cbJobWorkedLua != null)
         {
             foreach (string luaFunction in cbJobWorkedLua)
                 FurnitureActions.CallFunction(luaFunction, this);
@@ -172,7 +172,7 @@ public class Job
             if (cbJobCompleted != null)
                 cbJobCompleted(this);
 
-            foreach(string luaFunc in cbJobCompletedLua)
+            foreach (string luaFunc in cbJobCompletedLua)
             {
                 FurnitureActions.CallFunction(luaFunc, this);
             }

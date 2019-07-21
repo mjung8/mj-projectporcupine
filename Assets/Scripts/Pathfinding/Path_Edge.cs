@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Path_Edge<T>
 {
-    public float cost;  // Cost to traverse this edge (cost to ENTER tile)
+    // Cost to traverse this edge (cost to ENTER tile)
+    public float cost;
     public Path_Node<T> node;
 }

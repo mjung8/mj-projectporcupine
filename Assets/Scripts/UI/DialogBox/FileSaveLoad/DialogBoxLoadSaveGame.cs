@@ -25,7 +25,7 @@ public class DialogBoxLoadSaveGame : DialogBox
 
         DirectoryInfo saveDir = new DirectoryInfo(directoryPath);
         FileInfo[] saveGames = saveDir.GetFiles().OrderByDescending(f => f.CreationTime).ToArray();
-        
+
         // Our save dialog has an input field which the fileListItems fill out when it's clicked
         InputField inputField = gameObject.GetComponentInChildren<InputField>();
 

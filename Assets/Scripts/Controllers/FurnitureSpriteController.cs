@@ -18,6 +18,7 @@ public class FurnitureSpriteController : MonoBehaviour
         // Instantiate the dictionary that tracks which GameObject is rendering which Tile data
         furnitureGameObjectMap = new Dictionary<Furniture, GameObject>();
 
+        // Register callback so GameObject gets updated whenever Furniture is created
         world.RegisterFurnitureCreated(OnFurnitureCreated);
 
         // Go through any EXISTING furniture (ie. from a save file that was loaded OnEnable) and call the OnCreated event manually

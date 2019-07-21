@@ -204,13 +204,13 @@ public class Path_AStar
 
     public Tile Dequeue()
     {
-        if(path == null)
+        if (path == null)
         {
             Debug.LogError("Attempting to dequeue from a null path.");
             return null;
         }
 
-        if(path.Count <= 0)
+        if (path.Count <= 0)
         {
             Debug.LogError("what???");
         }
