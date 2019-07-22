@@ -81,8 +81,8 @@ public class BuildModeController : MonoBehaviour
             string furnitureType = buildModeObjectType;
 
             if (
-                WorldController.Instance.world.IsFurniturePlacementValid(furnitureType, t) && 
-                t.pendingFunitureJob == null)
+                WorldController.Instance.world.IsFurniturePlacementValid(furnitureType, t) &&
+                t.pendingBuildJob == null)
             {
                 // This tile position is valid for this furniture
 
@@ -115,8 +115,8 @@ public class BuildModeController : MonoBehaviour
 
                 // FIXME: not good to manually and explicitly set
                 // flags that preven conflicts. It's too easy to forget to set/clear them!
-                t.pendingFunitureJob = j;
-                j.RegisterJobCompletedCallback((theJob) => theJob.tile.pendingFunitureJob = null);
+                t.pendingBuildJob = j;
+                j.RegisterJobCompletedCallback((theJob) => theJob.tile.pendingBuildJob = null);
 
                 // Add the job to the queue
                 WorldController.Instance.world.jobQueue.Enqueue(j);
@@ -126,7 +126,39 @@ public class BuildModeController : MonoBehaviour
         else if (buildMode == BuildMode.FLOOR)
         {
             // We are in tile-changing mode
-            t.Type = buildModeTile;
+            //t.Type = buildModeTile;
+
+            TileType tileType = buildModeTile;
+
+            if (
+               t.Type != tileType &&
+               t.furniture == null &&
+               t.pendingBuildJob == null)
+            {
+                // This tile position is valid til type
+
+                // Create a job for it to be build
+
+                Job j = new Job(t,
+                   tileType,
+                   Tile.ChangeTileTypeJobComplete,
+                   0.1f,
+                   null,
+                   false);
+
+
+                // FIXME: I don't like having to manually and explicitly set
+                // flags that preven conflicts. It's too easy to forget to set/clear them!
+                t.pendingBuildJob = j;
+                j.RegisterJobStoppedCallback((theJob) =>
+                {
+                    theJob.tile.pendingBuildJob = null;
+                });
+
+                // Add the job to the queue
+                WorldController.Instance.world.jobQueue.Enqueue(j);
+
+            }
         }
         else if (buildMode == BuildMode.DECONSTRUCT)
         {
