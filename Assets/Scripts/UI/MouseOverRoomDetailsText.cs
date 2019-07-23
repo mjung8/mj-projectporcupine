@@ -43,7 +43,7 @@ public class MouseOverRoomDetailsText : MonoBehaviour
         string s = "";
         foreach (string g in t.room.GetGasNames())
         {
-            s += g + ": " + t.room.GetGasAmount(g) + " (" + (t.room.GetGasPercentage(g) * 100) + "%) ";
+            s += g + ": " + t.room.GetGasPressure(g) + " (" + (t.room.GetGasPercentage(g) * 100) + "%) ";
         }
 
         myText.text = s;

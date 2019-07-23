@@ -19,7 +19,7 @@ public class FurnitureSpriteController : MonoBehaviour
         furnitureGameObjectMap = new Dictionary<Furniture, GameObject>();
 
         // Register callback so GameObject gets updated whenever Furniture is created
-        world.RegisterFurnitureCreated(OnFurnitureCreated);
+        world.cbFurnitureCreated += OnFurnitureCreated;
 
         // Go through any EXISTING furniture (ie. from a save file that was loaded OnEnable) and call the OnCreated event manually
         foreach (Furniture furn in world.furnitures)
@@ -68,8 +68,8 @@ public class FurnitureSpriteController : MonoBehaviour
 
         // Register our callback so that or GameObject gets updated whenever
         // the object's info changes
-        furn.RegisterOnChangedCallback(OnFurnitureChanged);
-        furn.RegisterOnRemovedCallback(OnFurnitureRemoved);
+        furn.cbOnChanged += OnFurnitureChanged;
+        furn.cbOnRemoved += OnFurnitureRemoved;
     }
 
     void OnFurnitureRemoved(Furniture furn)

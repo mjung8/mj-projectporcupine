@@ -29,10 +29,10 @@ public class World : IXmlSerializable
     // The tile height of world.
     public int Height { get; protected set; }
 
-    Action<Furniture> cbFurnitureCreated;
-    Action<Character> cbCharacterCreated;
-    Action<Inventory> cbInventoryCreated;
-    Action<Tile> cbTileChanged;
+    public event Action<Furniture> cbFurnitureCreated;
+    public event Action<Character> cbCharacterCreated;
+    public event Action<Inventory> cbInventoryCreated;
+    public event Action<Tile> cbTileChanged;
 
     // TODO: most likely replaced with dedicated class
     public JobQueue jobQueue;
@@ -123,7 +123,7 @@ public class World : IXmlSerializable
             for (int y = 0; y < Height; y++)
             {
                 tiles[x, y] = new Tile(x, y);
-                tiles[x, y].RegisterTileTypeChangedCallback(OnTileChanged);
+                tiles[x, y].cbTileChanged += OnTileChanged;
                 tiles[x, y].room = GetOutsideRoom();  // Rooms 0 is always going to be outside, the default room
             }
         }
@@ -392,7 +392,7 @@ public class World : IXmlSerializable
             return null;
         }
 
-        furn.RegisterOnRemovedCallback(OnFurnitureRemoved);
+        furn.cbOnRemoved += OnFurnitureRemoved;
 
         furnitures.Add(furn);
 
@@ -415,46 +415,6 @@ public class World : IXmlSerializable
         }
 
         return furn;
-    }
-
-    public void RegisterFurnitureCreated(Action<Furniture> callbackfunc)
-    {
-        cbFurnitureCreated += callbackfunc;
-    }
-
-    public void UnregisterFurnitureCreated(Action<Furniture> callbackfunc)
-    {
-        cbFurnitureCreated -= callbackfunc;
-    }
-
-    public void RegisterCharacterCreated(Action<Character> callbackfunc)
-    {
-        cbCharacterCreated += callbackfunc;
-    }
-
-    public void UnregisterCharacterCreated(Action<Character> callbackfunc)
-    {
-        cbCharacterCreated -= callbackfunc;
-    }
-
-    public void RegisterInventoryCreated(Action<Inventory> callbackfunc)
-    {
-        cbInventoryCreated += callbackfunc;
-    }
-
-    public void UnregisterInventoryCreated(Action<Inventory> callbackfunc)
-    {
-        cbInventoryCreated -= callbackfunc;
-    }
-
-    public void RegisterTileChanged(Action<Tile> callbackfunc)
-    {
-        cbTileChanged += callbackfunc;
-    }
-
-    public void UnregisterTileChanged(Action<Tile> callbackfunc)
-    {
-        cbTileChanged -= callbackfunc;
     }
 
     // Gets called when any tile changes

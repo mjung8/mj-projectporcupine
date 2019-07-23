@@ -6,6 +6,8 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Collections.Generic;
 using MoonSharp.Interpreter;
+using MoonSharp;
+using MoonSharp.Interpreter.Interop;
 
 [MoonSharpUserData]
 public class Furniture : IXmlSerializable, ISelectable
@@ -88,6 +90,8 @@ public class Furniture : IXmlSerializable, ISelectable
         }
     }
 
+    private string Description;
+
     public List<string> ReplaceableFurniture
     {
         get
@@ -114,8 +118,8 @@ public class Furniture : IXmlSerializable, ISelectable
         get; protected set;
     }
 
-    public Action<Furniture> cbOnChanged;
-    public Action<Furniture> cbOnRemoved;
+    public event Action<Furniture> cbOnChanged;
+    public event Action<Furniture> cbOnRemoved;
 
     Func<Tile, bool> funcPositionValidation;
 
@@ -137,6 +141,7 @@ public class Furniture : IXmlSerializable, ISelectable
     {
         this.objectType = other.objectType;
         this.Name = other.Name;
+        this.Description = other.Description;
         this.movementCost = other.movementCost;
         this.roomEnclosure = other.roomEnclosure;
         this.Width = other.Width;
@@ -240,26 +245,6 @@ public class Furniture : IXmlSerializable, ISelectable
         return furn;
     }
 
-    public void RegisterOnChangedCallback(Action<Furniture> callbackfunc)
-    {
-        cbOnChanged += callbackfunc;
-    }
-
-    public void UnregisterOnChangedCallback(Action<Furniture> callbackfunc)
-    {
-        cbOnChanged -= callbackfunc;
-    }
-
-    public void RegisterOnRemovedCallback(Action<Furniture> callbackfunc)
-    {
-        cbOnRemoved += callbackfunc;
-    }
-
-    public void UnregisterOnRemovedCallback(Action<Furniture> callbackfunc)
-    {
-        cbOnRemoved -= callbackfunc;
-    }
-
     public bool IsValidPosition(Tile t)
     {
         return funcPositionValidation(t);
@@ -305,6 +290,15 @@ public class Furniture : IXmlSerializable, ISelectable
         return true;
     }
 
+    [MoonSharpVisible(true)]
+    private void UpdateOnChanged(Furniture furn)
+    {
+        if (cbOnChanged != null)
+        {
+            cbOnChanged(furn);
+        }
+    }
+
     public XmlSchema GetSchema()
     {
         throw new NotImplementedException();
@@ -342,6 +336,10 @@ public class Furniture : IXmlSerializable, ISelectable
                 case "Name":
                     reader.Read();
                     Name = reader.ReadContentAsString();
+                    break;
+                case "Description":
+                    reader.Read();
+                    Description = reader.ReadContentAsString();
                     break;
                 case "MovementCost":
                     reader.Read();
@@ -525,7 +523,7 @@ public class Furniture : IXmlSerializable, ISelectable
     {
         j.furniture = this;
         jobs.Add(j);
-        j.RegisterJobStoppedCallback(OnJobStopped);
+        j.cbJobStopped += OnJobStopped;
         World.Current.jobQueue.Enqueue(j);
     }
 
@@ -536,7 +534,7 @@ public class Furniture : IXmlSerializable, ISelectable
 
     protected void RemoveJob(Job j)
     {
-        j.UnregisterJobStoppedCallback(OnJobStopped);
+        j.cbJobStopped -= OnJobStopped;
         jobs.Remove(j);
         j.furniture = null;
     }
@@ -604,7 +602,7 @@ public class Furniture : IXmlSerializable, ISelectable
 
     public string GetDescription()
     {
-        return "This is a piece of furniture."; // TODO: add description property and matching xml field
+        return this.Description;
     }
 
     public string GetHitPointString()

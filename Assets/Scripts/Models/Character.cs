@@ -95,7 +95,7 @@ public class Character : IXmlSerializable, ISelectable
     float speed = 5f;
 
     /// A callback to trigger when Character information changes (e.g. the position).
-    Action<Character> cbCharacterChanged;
+    public event Action<Character> cbCharacterChanged;
 
     /// Our job, if any.
     Job myJob;
@@ -129,7 +129,7 @@ public class Character : IXmlSerializable, ISelectable
         }
 
         DestTile = myJob.tile;
-        myJob.RegisterJobStoppedCallback(OnJobStopped);
+        myJob.cbJobStopped += OnJobStopped;
 
         // Immediately check to see if the job tile is reachable
         pathAStar = new Path_AStar(World.Current, CurrTile, DestTile);  // This will calculate path from curr to dest
@@ -404,21 +404,11 @@ public class Character : IXmlSerializable, ISelectable
 
     }
 
-    public void RegisterOnChangedCallback(Action<Character> cb)
-    {
-        cbCharacterChanged += cb;
-    }
-
-    public void UnregisterOnChangedCallback(Action<Character> cb)
-    {
-        cbCharacterChanged -= cb;
-    }
-
     void OnJobStopped(Job j)
     {
         //Job completed (if non-repeating) or cancelled
 
-        j.UnregisterJobStoppedCallback(OnJobStopped);
+        j.cbJobStopped -= OnJobStopped;
 
         if (j != myJob)
         {

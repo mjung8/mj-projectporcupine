@@ -155,7 +155,7 @@ public class MouseController : MonoBehaviour
                 } while (mySelection.stuffInTile[mySelection.subSelection] == null);
             }
 
-            Debug.Log(mySelection.subSelection);
+            //Debug.Log(mySelection.subSelection);
         }
     }
 
