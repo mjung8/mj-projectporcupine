@@ -6,6 +6,8 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Collections.Generic;
 using MoonSharp.Interpreter;
+using MoonSharp;
+using MoonSharp.Interpreter.Interop;
 
 [MoonSharpUserData]
 public class Furniture : IXmlSerializable, ISelectable
@@ -286,6 +288,15 @@ public class Furniture : IXmlSerializable, ISelectable
         }
 
         return true;
+    }
+
+    [MoonSharpVisible(true)]
+    private void UpdateOnChanged(Furniture furn)
+    {
+        if (cbOnChanged != null)
+        {
+            cbOnChanged(furn);
+        }
     }
 
     public XmlSchema GetSchema()
