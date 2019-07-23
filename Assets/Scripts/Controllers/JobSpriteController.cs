@@ -22,7 +22,7 @@ public class JobSpriteController : MonoBehaviour
 
     void OnJobCreated(Job job)
     {
-        if (job.jobObjectType == null)
+        if (job.jobObjectType == null && job.jobTileType == TileType.Empty)
         {
             //This job doesn't have an associated sprite so no need to render
             return;
@@ -44,11 +44,22 @@ public class JobSpriteController : MonoBehaviour
         jobGameObjectMap.Add(job, job_go);
 
         job_go.name = "JOB_" + job.jobObjectType + "_ " + job.tile.X + "_" + job.tile.Y;
-        job_go.transform.position = new Vector3(job.tile.X + ((job.furniturePrototype.Width - 1) / 2f), job.tile.Y + ((job.furniturePrototype.Height - 1) / 2f), 0);
         job_go.transform.SetParent(this.transform, true);
 
         SpriteRenderer sr = job_go.AddComponent<SpriteRenderer>();
-        sr.sprite = fsc.GetSpriteForFurniture(job.jobObjectType);
+        //This job is for building a tile
+        if (job.jobTileType != TileType.Empty)
+        {
+            // TODO: other tile types
+            job_go.transform.position = new Vector3(job.tile.X, job.tile.Y, 0);
+            sr.sprite = SpriteManager.current.GetSprite("Tile", "Empty");
+        }
+        else
+        {
+            //This is a normal furniture job.
+            job_go.transform.position = new Vector3(job.tile.X + ((job.furniturePrototype.Width - 1) / 2f), job.tile.Y + ((job.furniturePrototype.Height - 1) / 2f), 0);
+            sr.sprite = fsc.GetSpriteForFurniture(job.jobObjectType);
+        }
         sr.color = new Color(0.5f, 1f, 0.5f, 0.25f);
         sr.sortingLayerName = "Jobs";
 
