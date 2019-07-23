@@ -80,7 +80,7 @@
 
     <JobSpotOffset X="1" Y="0" />
     <JobSpawnSpotOffset X="0" Y="0" />
-      
+
     <OnUpdate FunctionName="MiningDroneStation_UpdateAction" />
   </Furniture>
 

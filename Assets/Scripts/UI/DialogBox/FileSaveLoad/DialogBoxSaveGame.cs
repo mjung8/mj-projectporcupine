@@ -30,7 +30,7 @@ public class DialogBoxSaveGame : DialogBoxLoadSaveGame
         if (File.Exists(filePath) == true)
         {
             // TODO: Do file overwrite dialog box.
-            Debug.LogError("File already exists -- overwriting the file for now.");
+            Debug.LogWarning("File already exists -- overwriting the file for now.");
         }
 
         CloseDialog();

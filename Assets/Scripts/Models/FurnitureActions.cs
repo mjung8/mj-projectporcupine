@@ -76,7 +76,7 @@ public class FurnitureActions
     public static void JobComplete_FurnitureBuilding(Job theJob)
     {
         WorldController.Instance.world.PlaceFurniture(theJob.jobObjectType, theJob.tile);
-        theJob.tile.pendingFunitureJob = null;
+        theJob.tile.pendingBuildJob = null;
     }
 
     //public static void Door_UpdateAction(Furniture furn, float deltaTime)

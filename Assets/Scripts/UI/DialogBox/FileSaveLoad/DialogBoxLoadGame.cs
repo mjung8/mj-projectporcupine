@@ -18,7 +18,11 @@ public class DialogBoxLoadGame : DialogBoxLoadSaveGame
         // path and an extension
         // like: C:\Users\user\ApplicationData\MyCompanyName\MyGameName\Save\SaveGameName123.sav
         // Application.persistentDataPath = C:\Users\user\ApplicationData\MyCompanyName\MyGameName\
-        string filePath = Path.Combine(WorldController.Instance.FileSaveBasePath(), fileName + ".sav");
+        string saveDirectoryPath = WorldController.Instance.FileSaveBasePath();
+
+        EnsureDirectoryExists(saveDirectoryPath);
+
+        string filePath = System.IO.Path.Combine(saveDirectoryPath, fileName + ".sav");
 
         // At this point, filePath should look right
 

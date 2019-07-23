@@ -21,6 +21,8 @@ public class Job
 
     public string jobObjectType { get; protected set; }
 
+    public TileType jobTileType { get; protected set; }
+
     public Furniture furniturePrototype;
 
     public Furniture furniture; // The piece of furniture that owns this job. Frequently will be null.
@@ -37,10 +39,31 @@ public class Job
 
     public Dictionary<string, Inventory> inventoryRequirements;
 
-    public Job(Tile tile, string jobObjectType, Action<Job> cbJobComplete, float jobTime, Inventory[] inventoryRequirements, bool jobRepeats)
+    public Job(Tile tile, string jobObjectType, Action<Job> cbJobComplete, float jobTime, Inventory[] inventoryRequirements, bool jobRepeats = false)
     {
         this.tile = tile;
         this.jobObjectType = jobObjectType;
+        this.cbJobCompleted += cbJobComplete;
+        this.jobTimeRequired = this.jobTime = jobTime;
+        this.jobRepeats = jobRepeats;
+
+        cbJobWorkedLua = new List<string>();
+        cbJobCompletedLua = new List<string>();
+
+        this.inventoryRequirements = new Dictionary<string, Inventory>();
+        if (inventoryRequirements != null)
+        {
+            foreach (Inventory inv in inventoryRequirements)
+            {
+                this.inventoryRequirements[inv.objectType] = inv.Clone();
+            }
+        }
+    }
+
+    public Job(Tile tile, TileType jobTileType, Action<Job> cbJobComplete, float jobTime, Inventory[] inventoryRequirements, bool jobRepeats = false)
+    {
+        this.tile = tile;
+        this.jobTileType = jobTileType;
         this.cbJobCompleted += cbJobComplete;
         this.jobTimeRequired = this.jobTime = jobTime;
         this.jobRepeats = jobRepeats;
@@ -62,6 +85,7 @@ public class Job
     {
         this.tile = other.tile;
         this.jobObjectType = other.jobObjectType;
+        this.jobTileType = other.jobTileType;
         this.cbJobCompleted += other.cbJobCompleted;
         this.jobTime = other.jobTime;
 

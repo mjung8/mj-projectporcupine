@@ -59,7 +59,7 @@ public class Tile : IXmlSerializable, ISelectable
         get; protected set;
     }
 
-    public Job pendingFunitureJob;
+    public Job pendingBuildJob;
 
     // Know the context in which this exists...
     public int X { get; protected set; }
@@ -71,8 +71,11 @@ public class Tile : IXmlSerializable, ISelectable
     {
         get
         {
-            if (Type == TileType.Empty)
-                return 0;   // Unwalkable
+            // This prevents the character from walking in empty tiles. 
+            // Disabled to allow the character to construct floor tiles.
+            // TODO: Permanent solution for handling characters and empty tiles
+            //if (Type == TileType.Empty)
+            //    return 0;   // Unwalkable
 
             if (furniture == null)
                 return baseTileMovementCost;
@@ -200,6 +203,17 @@ public class Tile : IXmlSerializable, ISelectable
         inv.stackSize = 0;
 
         return true;
+    }
+
+    // Called when the character has completed the job to change tile type
+    public static void ChangeTileTypeJobComplete(Job theJob)
+    {
+        // FIXME: For now this is hardcoded to build floor
+        theJob.tile.Type = theJob.jobTileType;
+
+        // FIXME: I don't like having to manually and explicitly set
+        // flags that preven conflicts. It's too easy to forget to set/clear them!
+        theJob.tile.pendingBuildJob = null;
     }
 
     // Tells us if two tiles are adjaccent
