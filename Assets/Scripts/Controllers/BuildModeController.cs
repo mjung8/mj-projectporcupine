@@ -116,7 +116,10 @@ public class BuildModeController : MonoBehaviour
                 // FIXME: not good to manually and explicitly set
                 // flags that preven conflicts. It's too easy to forget to set/clear them!
                 t.pendingBuildJob = j;
-                j.RegisterJobCompletedCallback((theJob) => theJob.tile.pendingBuildJob = null);
+                j.cbJobStopped += (theJob) =>
+                {
+                    theJob.tile.pendingBuildJob = null;
+                };
 
                 // Add the job to the queue
                 WorldController.Instance.world.jobQueue.Enqueue(j);
@@ -150,10 +153,10 @@ public class BuildModeController : MonoBehaviour
                 // FIXME: I don't like having to manually and explicitly set
                 // flags that preven conflicts. It's too easy to forget to set/clear them!
                 t.pendingBuildJob = j;
-                j.RegisterJobStoppedCallback((theJob) =>
+                j.cbJobStopped += (theJob) =>
                 {
                     theJob.tile.pendingBuildJob = null;
-                });
+                };
 
                 // Add the job to the queue
                 WorldController.Instance.world.jobQueue.Enqueue(j);

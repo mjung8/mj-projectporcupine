@@ -85,7 +85,7 @@ public class Tile : IXmlSerializable, ISelectable
     }
 
     // The function to callback any time the data changes
-    Action<Tile> cbTileChanged;
+    public event Action<Tile> cbTileChanged;
 
     /// <summary>
     /// Initialize a new instance of the Tile class.
@@ -98,24 +98,6 @@ public class Tile : IXmlSerializable, ISelectable
         this.X = x;
         this.Y = y;
         characters = new List<Character>();
-    }
-
-    /// <summary>
-    /// Register a function to be called back when the tile type changes.
-    /// </summary>
-    /// <param name="callback"></param>
-    public void RegisterTileTypeChangedCallback(Action<Tile> callback)
-    {
-        cbTileChanged += callback;
-    }
-
-    /// <summary>
-    /// Unregister a callback.
-    /// </summary>
-    /// <param name="callback"></param>
-    public void UnregisterTileTypeChangedCallback(Action<Tile> callback)
-    {
-        cbTileChanged -= callback;
     }
 
     public bool UnplaceFurniture()

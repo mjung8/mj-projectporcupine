@@ -21,7 +21,7 @@ public class InventorySpriteController : MonoBehaviour
         inventoryGameObjectMap = new Dictionary<Inventory, GameObject>();
 
         // Reigster a callback so we know when a character is created
-        world.RegisterInventoryCreated(OnInventoryCreated);
+        world.cbInventoryCreated += OnInventoryCreated;
 
         // Check for pre-existing characters which won't be do the callback
         foreach (string objectType in world.inventoryManager.inventories.Keys)
@@ -67,7 +67,7 @@ public class InventorySpriteController : MonoBehaviour
 
         // Register our callback so that or GameObject gets updated whenever
         // the object's info changes
-        inv.RegisterChangedCallback(OnInventoryChanged);
+        inv.cbInventoryChanged += OnInventoryChanged;
     }
 
     void OnInventoryChanged(Inventory inv)
@@ -94,7 +94,7 @@ public class InventorySpriteController : MonoBehaviour
             // This stack has gone to zero, so remove sprite
             Destroy(inv_go);
             inventoryGameObjectMap.Remove(inv);
-            inv.UnregisterChangedCallback(OnInventoryChanged);
+            inv.cbInventoryChanged -= OnInventoryChanged;
         }
     }
 }

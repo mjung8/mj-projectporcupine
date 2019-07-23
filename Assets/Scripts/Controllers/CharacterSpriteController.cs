@@ -19,7 +19,7 @@ public class CharacterSpriteController : MonoBehaviour
         characterGameObjectMap = new Dictionary<Character, GameObject>();
 
         // Reigster a callback so we know when a character is created
-        world.RegisterCharacterCreated(OnCharacterCreated);
+        world.cbCharacterCreated += OnCharacterCreated;
 
         // Check for pre-existing characters which won't do the callback
         foreach (Character c in world.characters)
@@ -52,7 +52,7 @@ public class CharacterSpriteController : MonoBehaviour
 
         // Register our callback so that or GameObject gets updated whenever
         // the object's info changes
-        c.RegisterOnChangedCallback(OnCharacterChanged);
+        c.cbCharacterChanged += OnCharacterChanged;
     }
 
     void OnCharacterChanged(Character c)

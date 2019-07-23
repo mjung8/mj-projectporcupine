@@ -30,7 +30,7 @@ public class Inventory : ISelectable
         }
     }
 
-    Action<Inventory> cbInventoryChanged;
+    public event Action<Inventory> cbInventoryChanged;
 
     public Tile tile;
     public Character character;
@@ -57,16 +57,6 @@ public class Inventory : ISelectable
     public virtual Inventory Clone()
     {
         return new Inventory(this);
-    }
-
-    public void RegisterChangedCallback(Action<Inventory> callback)
-    {
-        cbInventoryChanged += callback;
-    }
-
-    public void UnregisterChangedCallback(Action<Inventory> callback)
-    {
-        cbInventoryChanged -= callback;
     }
 
     #region ISelectableInterface

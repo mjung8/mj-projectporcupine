@@ -114,8 +114,8 @@ public class Furniture : IXmlSerializable, ISelectable
         get; protected set;
     }
 
-    public Action<Furniture> cbOnChanged;
-    public Action<Furniture> cbOnRemoved;
+    public event Action<Furniture> cbOnChanged;
+    public event Action<Furniture> cbOnRemoved;
 
     Func<Tile, bool> funcPositionValidation;
 
@@ -238,26 +238,6 @@ public class Furniture : IXmlSerializable, ISelectable
         }
 
         return furn;
-    }
-
-    public void RegisterOnChangedCallback(Action<Furniture> callbackfunc)
-    {
-        cbOnChanged += callbackfunc;
-    }
-
-    public void UnregisterOnChangedCallback(Action<Furniture> callbackfunc)
-    {
-        cbOnChanged -= callbackfunc;
-    }
-
-    public void RegisterOnRemovedCallback(Action<Furniture> callbackfunc)
-    {
-        cbOnRemoved += callbackfunc;
-    }
-
-    public void UnregisterOnRemovedCallback(Action<Furniture> callbackfunc)
-    {
-        cbOnRemoved -= callbackfunc;
     }
 
     public bool IsValidPosition(Tile t)
@@ -525,7 +505,7 @@ public class Furniture : IXmlSerializable, ISelectable
     {
         j.furniture = this;
         jobs.Add(j);
-        j.RegisterJobStoppedCallback(OnJobStopped);
+        j.cbJobStopped += OnJobStopped;
         World.Current.jobQueue.Enqueue(j);
     }
 
@@ -536,7 +516,7 @@ public class Furniture : IXmlSerializable, ISelectable
 
     protected void RemoveJob(Job j)
     {
-        j.UnregisterJobStoppedCallback(OnJobStopped);
+        j.cbJobStopped -= OnJobStopped;
         jobs.Remove(j);
         j.furniture = null;
     }
