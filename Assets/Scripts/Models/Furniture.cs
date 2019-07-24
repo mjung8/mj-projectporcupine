@@ -111,6 +111,9 @@ public class Furniture : IXmlSerializable, ISelectable
     public int Width { get; protected set; }
     public int Height { get; protected set; }
 
+    public string LocalizationCode { get; protected set; }
+    public string UnlocalizedDescription { get; protected set; }
+
     public Color tint = Color.white;
 
     public bool linksToNeighbour
@@ -162,6 +165,9 @@ public class Furniture : IXmlSerializable, ISelectable
 
         if (other.funcPositionValidation != null)
             this.funcPositionValidation = (Func<Tile, bool>)other.funcPositionValidation.Clone();
+
+        this.LocalizationCode = other.LocalizationCode;
+        this.UnlocalizedDescription = other.UnlocalizedDescription;
     }
 
     // Make a copy of the current furniture
@@ -417,6 +423,15 @@ public class Furniture : IXmlSerializable, ISelectable
                 case "Params":
                     ReadXmlParams(reader);
                     break;
+                case "LocalizationCode":
+                    reader.Read();
+                    LocalizationCode = reader.ReadContentAsString();
+                    break;
+
+                case "UnlocalizedDescription":
+                    reader.Read();
+                    UnlocalizedDescription = reader.ReadContentAsString();
+                    break;
             }
         }
     }
@@ -597,12 +612,12 @@ public class Furniture : IXmlSerializable, ISelectable
     #region ISelectableInterface
     public string GetName()
     {
-        return this.Name;
+        return LocalizationCode; //this.Name;
     }
 
     public string GetDescription()
     {
-        return this.Description;
+        return UnlocalizedDescription; //this.Description;
     }
 
     public string GetHitPointString()
