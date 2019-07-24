@@ -142,7 +142,9 @@ public class InventoryManager
 
     public Path_AStar GetPathToClosestInventoryOfType(string objectType, Tile t, int desiredAmount, bool canTakeFromStockpile)
     {
-        if (inventories.ContainsKey(objectType) == false)
+        if (inventories.ContainsKey(objectType) == false
+             || (!canTakeFromStockpile && inventories[objectType].TrueForAll(i => i.tile != null && i.tile.furniture != null && i.tile.furniture.IsStockpile()))) 
+             //we can also avoid going through the Astar construction if we know that all available inventories are stockpiles and we are not allowed to touch those
         {
             //Debug.LogError("GetClosestInventoryType -- no itmes of desired type.");
             return null;

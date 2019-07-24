@@ -51,8 +51,8 @@ public class World : IXmlSerializable
 
         // Make one character
         CreateCharacter(GetTileAt(Width / 2, Height / 2));
-        CreateCharacter(GetTileAt(Width / 2, Height / 2));
-        CreateCharacter(GetTileAt(Width / 2, Height / 2));
+        //CreateCharacter(GetTileAt(Width / 2, Height / 2));
+        //CreateCharacter(GetTileAt(Width / 2, Height / 2));
 
     }
 
