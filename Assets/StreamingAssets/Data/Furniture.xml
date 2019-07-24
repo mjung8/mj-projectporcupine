@@ -19,7 +19,7 @@
 
     <LocalizationCode>furn_steel_wall</LocalizationCode>
     <UnlocalizedDescription>furn_steel_wall_desc</UnlocalizedDescription>
-    
+
   </Furniture>
 
   <Furniture objectType="Door">
@@ -66,7 +66,7 @@
 
     <LocalizationCode>furn_stockpile</LocalizationCode>
     <UnlocalizedDescription>furn_stockpile_desc</UnlocalizedDescription>
-    
+
   </Furniture>
 
   <Furniture objectType="Oxygen Generator">
@@ -75,6 +75,7 @@
     <MovementCost>10</MovementCost>
     <Width>2</Width>
     <Height>2</Height>
+    <Power>1</Power>
 
     <OnUpdate FunctionName="OnUpdate_GasGenerator" />
 
@@ -103,7 +104,17 @@
 
     <LocalizationCode>furn_mining_drone_station</LocalizationCode>
     <UnlocalizedDescription>furn_mining_drone_station_desc</UnlocalizedDescription>
-    
+
+  </Furniture>
+
+  <Furniture objectType="Power Generator">
+    <Name>Power Generator</Name>
+    <MovementCost>10</MovementCost>
+    <Width>2</Width>
+    <Height>2</Height>
+
+    <PowerGenerator supply="5"/>
+
   </Furniture>
 
 </Furnitures>

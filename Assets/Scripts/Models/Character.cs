@@ -250,7 +250,7 @@ public class Character : IXmlSerializable, ISelectable
 
                     if (newPath == null || newPath.Length() < 1)
                     {
-                        Debug.Log("No tile contains objects of type " + desired.objectType + "to satisfy job requirements");
+                        //Debug.Log("No tile contains objects of type " + desired.objectType + "to satisfy job requirements");
                         AbandonJob();
                         return false;
                     }

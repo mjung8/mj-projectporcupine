@@ -17,6 +17,7 @@ public class World : IXmlSerializable
     public List<Furniture> furnitures;
     public List<Room> rooms;
     public InventoryManager inventoryManager;
+    public PowerSystem powerSystem;
 
     // The pathfinding graph used to navigate the world
     public Path_TileGraph tileGraph;
@@ -135,6 +136,7 @@ public class World : IXmlSerializable
         characters = new List<Character>();
         furnitures = new List<Furniture>();
         inventoryManager = new InventoryManager();
+        powerSystem = new PowerSystem();
 
     }
 

@@ -44,6 +44,16 @@ public class Furniture : IXmlSerializable, ISelectable
         if (updateActions != null)
         {
             //updateActions(this, deltaTime);
+
+            if (powerValue > 0 && isPowerGenerator == false)
+            {
+                if (World.Current.powerSystem.RequestPower(this) == false)
+                {
+                    World.Current.powerSystem.RegisterPowerConsumer(this);
+                    return;
+                }
+            }
+
             FurnitureActions.CallFunctionsWithFurniture(updateActions.ToArray(), this, deltaTime);
         }
     }
@@ -58,6 +68,11 @@ public class Furniture : IXmlSerializable, ISelectable
 
         return (ENTERABILITY)ret.Number;
     }
+
+    // This is true if the Furniture produces power
+    public bool isPowerGenerator;
+    // If it is a generator this is the amount of power it produces otherwise this is the amount it consumes.
+    public float powerValue;
 
     // Represents base tile of object -- but large objects will occupy
     // multiple tiles.
@@ -162,6 +177,18 @@ public class Furniture : IXmlSerializable, ISelectable
             this.updateActions = new List<string>(other.updateActions);
 
         this.isEnterableAction = other.isEnterableAction;
+
+        this.isPowerGenerator = other.isPowerGenerator;
+        this.powerValue = other.powerValue;
+
+        if (isPowerGenerator == true)
+        {
+            World.Current.powerSystem.RegisterPowerSupply(this);
+        }
+        else if (powerValue > 0)
+        {
+            World.Current.powerSystem.RegisterPowerConsumer(this);
+        }
 
         if (other.funcPositionValidation != null)
             this.funcPositionValidation = (Func<Tile, bool>)other.funcPositionValidation.Clone();
@@ -419,6 +446,14 @@ public class Furniture : IXmlSerializable, ISelectable
                         int.Parse(reader.GetAttribute("X")),
                         int.Parse(reader.GetAttribute("Y"))
                     );
+                    break;
+                case "PowerGenerator":
+                    isPowerGenerator = true;
+                    powerValue = float.Parse(reader.GetAttribute("supply"));
+                    break;
+                case "Power":
+                    reader.Read();
+                    powerValue = reader.ReadContentAsFloat();
                     break;
                 case "Params":
                     ReadXmlParams(reader);
