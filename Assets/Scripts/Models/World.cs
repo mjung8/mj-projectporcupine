@@ -504,6 +504,18 @@ public class World : IXmlSerializable
         }
         writer.WriteEndElement();
 
+        writer.WriteStartElement("Inventories");
+        foreach (string objectType in inventoryManager.inventories.Keys)
+        {
+            foreach (Inventory inv in inventoryManager.inventories[objectType])
+            {
+                writer.WriteStartElement("Inventory");
+                inv.WriteXml(writer);
+                writer.WriteEndElement();
+            }
+        }
+        writer.WriteEndElement();
+
         writer.WriteStartElement("Furnitures");
         foreach (Furniture furn in furnitures)
         {
@@ -546,6 +558,9 @@ public class World : IXmlSerializable
                     break;
                 case "Tiles":
                     ReadXml_Tiles(reader);
+                    break;
+                case "Inventories":
+                    ReadXml_Inventories(reader);
                     break;
                 case "Furnitures":
                     ReadXml_Furnitures(reader);
@@ -599,6 +614,27 @@ public class World : IXmlSerializable
             } while (reader.ReadToNextSibling("Tile"));
         }
 
+    }
+
+    void ReadXml_Inventories(XmlReader reader)
+    {
+        Debug.Log("ReadXml_Inventories");
+
+        if (reader.ReadToDescendant("Inventory"))
+        {
+            do
+            {
+                int x = int.Parse(reader.GetAttribute("X"));
+                int y = int.Parse(reader.GetAttribute("Y"));
+
+                //Create our inventory from the file
+                Inventory inv = new Inventory(reader.GetAttribute("objectType"),
+                    int.Parse(reader.GetAttribute("maxStackSize")),
+                    int.Parse(reader.GetAttribute("stackSize")));
+
+                inventoryManager.PlaceInventory(tiles[x, y], inv);
+            } while (reader.ReadToNextSibling("Inventory"));
+        }
     }
 
     void ReadXml_Furnitures(XmlReader reader)
