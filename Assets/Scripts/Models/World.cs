@@ -412,7 +412,11 @@ public class World : IXmlSerializable
             {
                 // Tiles return movement cost as base cost times furniture movement cost
                 // so a furniture with movement 1 doesn't impact pathfinding
-                InvalidateTileGraph();  // Reset the pathfinding system
+                //InvalidateTileGraph();  // Reset the pathfinding system
+                if (tileGraph != null)
+                {
+                    tileGraph.RegenerateGraphAtTile(t);
+                }
             }
         }
 
@@ -427,7 +431,11 @@ public class World : IXmlSerializable
 
         cbTileChanged(t);
 
-        InvalidateTileGraph();
+        //InvalidateTileGraph();
+        if (tileGraph != null)
+        {
+            tileGraph.RegenerateGraphAtTile(t);
+        }
     }
 
     // This should be called whenever a change to the world

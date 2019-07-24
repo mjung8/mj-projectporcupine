@@ -5,6 +5,7 @@ using System;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using UnityEngine.Profiling;
 
 /// <summary>
 /// A Character is an entity on the map that can move between tiles.
@@ -132,7 +133,10 @@ public class Character : IXmlSerializable, ISelectable
         myJob.cbJobStopped += OnJobStopped;
 
         // Immediately check to see if the job tile is reachable
+        Profiler.BeginSample("PathGeneration mj");
         pathAStar = new Path_AStar(World.Current, CurrTile, DestTile);  // This will calculate path from curr to dest
+        Profiler.EndSample();
+
         if (pathAStar.Length() == 0)
         {
             Debug.LogError("Path_AStar returned no path to destination!");
@@ -338,7 +342,7 @@ public class Character : IXmlSerializable, ISelectable
 
             if (NextTile == CurrTile)
             {
-                Debug.LogError("Update_DoMovement - nextTile is currTile?");
+                //Debug.LogError("Update_DoMovement - nextTile is currTile?");
             }
         }
 
