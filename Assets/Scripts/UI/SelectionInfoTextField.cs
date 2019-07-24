@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using ProjectPorcupine.Localization;
 
 public class SelectionInfoTextField : MonoBehaviour
 {
@@ -33,6 +34,9 @@ public class SelectionInfoTextField : MonoBehaviour
 
         ISelectable actualSelection = mc.mySelection.stuffInTile[mc.mySelection.subSelection];
 
-        txt.text = actualSelection.GetName() + "\n" + actualSelection.GetDescription() + "\n" + actualSelection.GetHitPointString(); ;
+        //TODO: Change the hitpoint stuff.
+        txt.text = LocalizationTable.GetLocalization(actualSelection.GetName()) + "\n" +
+            LocalizationTable.GetLocalization(actualSelection.GetDescription()) + "\n" +
+            actualSelection.GetHitPointString();
     }
 }
