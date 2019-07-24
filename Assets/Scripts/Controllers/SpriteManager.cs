@@ -63,7 +63,7 @@ public class SpriteManager : MonoBehaviour
 
         // TODO: LoadImage is returning TRUE for non-images .meta .xml
         // bail for now as a temp fix
-        if (filePath.Contains(".xml") || filePath.Contains(".meta"))
+        if (filePath.Contains(".xml") || filePath.Contains(".meta") || filePath.Contains(".db"))
         {
             return;
         }
