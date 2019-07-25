@@ -107,7 +107,7 @@ public class Room : IXmlSerializable
         List<Room> roomsDone = new List<Room>();
         foreach (Tile t in tile.GetNeighbours())
         {
-            if (roomsDone.Contains(t.room) == false)
+            if (t.room != null && roomsDone.Contains(t.room) == false)
             {
                 foreach (Room r in roomsDone)
                 {
