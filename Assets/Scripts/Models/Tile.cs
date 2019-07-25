@@ -198,6 +198,11 @@ public class Tile : IXmlSerializable, ISelectable
         theJob.tile.pendingBuildJob = null;
     }
 
+    public void EqualiseGas(float leakFactor)
+    {
+        Room.EqualiseGasByTile(this, leakFactor);
+    }
+
     // Tells us if two tiles are adjaccent
     public bool IsNeighbour(Tile tile, bool diagOkay = false)
     {

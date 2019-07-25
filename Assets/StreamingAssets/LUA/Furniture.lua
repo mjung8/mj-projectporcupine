@@ -45,6 +45,14 @@ function OnUpdate_Door(furniture, deltaTime)
 	furniture.UpdateOnChanged(furniture);
 end
 
+function OnUpdate_Leak_Door( furniture, deltaTime )
+	furniture.tile.EqualiseGas(deltaTime * 10.0 * (furniture.GetParameter("openness") + 0.1))
+end
+
+function OnUpdate_Leak_Airlock( furniture, deltaTime )
+	furniture.tile.EqualiseGas(deltaTime * 10.0 * (furniture.GetParameter("openness")))
+end
+
 function IsEnterable_Door(furniture)
 	furniture.SetParameter("is_opening", 1)
 	

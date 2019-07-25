@@ -46,7 +46,7 @@ public class FurnitureSpriteController : MonoBehaviour
         furn_go.transform.SetParent(this.transform, true);
 
         // FIXME: This hardcoding is not good
-        if (furn.objectType == "Door")
+        if (furn.objectType == "Door" || furn.objectType == "Airlock")
         {
             // By default, door graphic is meant for walls EW
             // Check to see if we actually have a wall NS and then rotate
@@ -124,6 +124,30 @@ public class FurnitureSpriteController : MonoBehaviour
                 else
                 {
                     spriteName = "Door_openness_3";
+                }
+            }
+
+            if (furn.objectType == "Airlock")
+            {
+                if (furn.GetParameter("openness") < 0.1f)
+                {
+                    // Airlock is closed
+                    spriteName = "Airlock";
+                }
+                else if (furn.GetParameter("openness") < 0.5f)
+                {
+                    // Airlock is a bit open
+                    spriteName = "Airlock_openness_1";
+                }
+                else if (furn.GetParameter("openness") < 0.9f)
+                {
+                    // Airlock is a lot open
+                    spriteName = "Airlock_openness_2";
+                }
+                else
+                {
+                    // Airlock is a fully open
+                    spriteName = "Airlock_openness_3";
                 }
             }
 

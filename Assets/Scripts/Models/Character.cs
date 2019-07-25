@@ -361,7 +361,7 @@ public class Character : IXmlSerializable, ISelectable
             // Most likely a wall got built, so we need to reset pathfinding
             // FIXME: when a wall gets spanwed, invalidate path immediately. or check sometimes to save CPU.
             // or register a callback to ontilechanged event
-            Debug.LogError("Fix me - character trying to walk through unwalkable  tile");
+            //Debug.LogError("Fix me - character trying to walk through unwalkable  tile");
             NextTile = null;    // our next tile is a no-go
             pathAStar = null;   // pathfinding info is out of date
             return;
