@@ -4,9 +4,33 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Xml.Serialization;
 using System.IO;
+using UnityEditor;
 
 public class DialogBoxLoadGame : DialogBoxLoadSaveGame
 {
+    public GameObject dialog;
+    GameObject go;
+    public bool pressedDelete;
+    Component fileItem;
+
+    void Update()
+    {
+        if (pressedDelete)
+        {
+            SetButtonLocation(fileItem);
+        }
+    }
+
+    public void SetFileItem(Component item)
+    {
+        fileItem = item;
+    }
+
+    public void SetButtonLocation(Component item)
+    {
+        GameObject go = GameObject.FindGameObjectWithTag("DeleteButton");
+        go.transform.position = new Vector3(item.transform.position.x + 110f, item.transform.position.y - 8f);
+    }
 
     public void OkayWasClicked()
     {
@@ -37,6 +61,49 @@ public class DialogBoxLoadGame : DialogBoxLoadSaveGame
         CloseDialog();
 
         LoadWorld(filePath);
+    }
+
+    public override void CloseDialog()
+    {
+        GameObject go = GameObject.FindGameObjectWithTag("DeleteButton");
+        go.GetComponent<Image>().color = new Color(255, 255, 255, 0);
+        pressedDelete = false;
+        base.CloseDialog();
+    }
+
+    public void DeleteFile()
+    {
+        string fileName = gameObject.GetComponentInChildren<InputField>().text;
+
+        string saveDirectoryPath = WorldController.Instance.FileSaveBasePath();
+
+        EnsureDirectoryExists(saveDirectoryPath);
+
+        string filePath = System.IO.Path.Combine(saveDirectoryPath, fileName + ".sav");
+
+        if (File.Exists(filePath) == false)
+        {
+
+            Debug.LogError("File doesn't exist.  What?");
+            CloseDialog();
+            return;
+        }
+
+        CloseSureDialog();
+        FileUtil.DeleteFileOrDirectory(filePath);
+        CloseDialog();
+        ShowDialog();
+    }
+
+    public void CloseSureDialog()
+    {
+        dialog.SetActive(false);
+    }
+
+    public void DeleteWasClicked()
+    {
+
+        dialog.SetActive(true);
     }
 
     public void LoadWorld(string filePath)
